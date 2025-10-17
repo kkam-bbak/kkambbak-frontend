@@ -60,5 +60,6 @@ node -p "const p=require('./package.json');({node:process.version, ...p.dependen
 <타입>: [요구사항 ID] 요약
 # 예) Feat: [REQ-0002] 로그인 화면 UI
 ```
+```
 타입: Feat, Fix, Update, Modify, Delete, Refactor, Docs, Test, Chore
 ```
