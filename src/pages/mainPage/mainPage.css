@@ -6,7 +6,7 @@ html, body, #root {
     display: flex; /* 중앙 정렬을 위해 body에 flex 적용 */
     justify-content: center; /* 가로 중앙 정렬 */
     align-items: center; /* 세로 중앙 정렬 */
-    background-color: #333; 
+    background-color: #333; /* 앱 배경과 구분되는 배경색 (선택 사항) */
 }
 
 /* 전체 컨테이너 규격 */
@@ -46,7 +46,7 @@ html, body, #root {
 .speech-bubble {
     position: absolute;
     width: 268px;
-    height: 38px;
+    height: 50px;
     top: 60px;
     left: 46px;
     background-color: #ff4d00; 
@@ -65,10 +65,10 @@ html, body, #root {
 /* 말풍선 꼬리 */
 .bubble-tail {
     position: absolute;
-    width: 30px;
-    height: 23px;
-    top: 30px; 
-    left: 119.67px; 
+    width: 40px;
+    height: 13px;
+    top: 50px; 
+    left: 110px; 
     clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
     background-color: #ff4d00; 
     transform: rotate(180deg);
@@ -99,7 +99,7 @@ html, body, #root {
     position: absolute;
     width: 100%; 
     left: 0;
-    /* 핵심 애니메이션: Top과 Height 모두 트랜지션 적용 */
+    /* 애니메이션: Top과 Height 모두 트랜지션 적용 */
     transition: top 0.5s ease-in-out, height 0.5s ease-in-out, z-index 0.1s;
     cursor: pointer;
     box-sizing: border-box;
@@ -126,17 +126,12 @@ html, body, #root {
 
 .tab-header h3 {
     margin: 0;
-    font-weight: 500;
+    font-weight: normal; /* 탭 제목 굵기 통일 */
+    font-size: 18px; 
 }
 
-.large-text { 
-    font-size: 24px;
-    font-weight: bold;
-}
+/* .large-text와 .collapsed-text 클래스는 더 이상 필요 없으므로 제거 */
 
-.collapsed-text { 
-    font-size: 16px;
-}
 
 /* 확장된 콘텐츠 영역 */
 .tab-content {
@@ -147,10 +142,11 @@ html, body, #root {
 .menu-header {
     margin-bottom: 20px;
 }
+/* 확장된 콘텐츠의 h2 제목 */
 .menu-header h2 {
     margin: 0;
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 18px;
+    font-weight: normal; /* 굵기 제거 */
 }
 
 /* --- Content Styles (Learn, Role, Game) --- */
@@ -174,7 +170,7 @@ html, body, #root {
 .content-buttons {
     display: flex;
     justify-content: space-between;
-    margin-top: 30px;
+    margin-top: 60px;
 }
 
 .content-buttons.center {
@@ -182,7 +178,7 @@ html, body, #root {
 }
 
 .action-button {
-    height: 50px;
+    height: 45px;
     border-radius: 10px;
     border: none;
     font-size: 16px;
@@ -192,25 +188,18 @@ html, body, #root {
 }
 
 .action-button.white {
+    height: 40px;
     background-color: white;
     width: 48%;
 }
 
 .action-button.full-width {
-    width: 90%;
+    width: 98%;
 }
 
 
 /* --- Profile Styles (Full Screen Mode) --- */
 
-/* Profile 활성화 시 내부의 로그아웃 버튼 (상단 정렬) */
-.logout-button.profile-mode {
-    position: static; 
-    margin-left: auto; 
-    top: auto;
-    left: auto;
-    color: white; 
-}
 
 .profile-top-bar {
     display: flex;
@@ -228,8 +217,8 @@ html, body, #root {
 }
 
 .profile-title {
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 18px;
+    font-weight: normal; 
     margin: 0;
 }
 
@@ -262,7 +251,7 @@ html, body, #root {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.8);
+    color: black;
 }
 
 .profile-field input, .profile-description-box {

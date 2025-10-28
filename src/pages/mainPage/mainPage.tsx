@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './mainPage.css'; 
 
@@ -60,8 +60,6 @@ const ProfileContent: React.FC<NavigateProp> = ({ navigate }) => (
         <div className="profile-top-bar">
             <div className="profile-top-header">
                 <h2 className="profile-title">Profile</h2>
-                {/* 로그아웃 버튼을  (Profile 활성 시) */}
-                <button className="logout-button profile-mode" onClick={() => navigate('/auth/login')}>Logout</button> 
             </div>
             
             {/* 프로필 이미지 (실제 이미지 경로 필요) */}
@@ -145,6 +143,8 @@ const PROFILE_FULL_TOP = 0;
 const MainPage: React.FC = () => {
     const [activeMenu, setActiveMenu] = useState<MenuItem['id']>('learn');
     const navigate = useNavigate();
+
+    
     
     // 토글 로직이 포함된 클릭 핸들러
     const handleMenuClick = (id: MenuItem['id']) => {
