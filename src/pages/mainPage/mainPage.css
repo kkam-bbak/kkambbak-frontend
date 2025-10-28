@@ -1,0 +1,313 @@
+/* 1. HTML/Body에 전체 화면 높이 설정 및 중앙 정렬을 위한 Flexbox 적용 */
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex; /* 중앙 정렬을 위해 body에 flex 적용 */
+    justify-content: center; /* 가로 중앙 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    background-color: #333; 
+}
+
+/* 전체 컨테이너 규격 */
+.app-container {
+    width: 360px;
+    height: 720px;
+    background-color: #000; 
+    position: relative; 
+    /* 둥근 모서리와 오버플로우 처리 */
+    overflow: hidden; 
+    border-radius: 15px; 
+    
+    font-family: 'Inter', sans-serif;
+    color: white;
+    flex-shrink: 0; 
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); 
+    margin: 0 auto;
+}
+
+/* -------------------- 1. 상단 고정 요소 (Profile 비활성 시) -------------------- */
+/* 기존 로그아웃 버튼 */
+.logout-button {
+    position: absolute;
+    width: 64px;
+    height: 32px;
+    top: 5px; 
+    left: 296px;
+    background-color: transparent;
+    border: none;
+    color: gray;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 20;
+}
+
+/* 말풍선 */
+.speech-bubble {
+    position: absolute;
+    width: 268px;
+    height: 38px;
+    top: 60px;
+    left: 46px;
+    background-color: #ff4d00; 
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    color: black;
+    padding: 0 10px;
+    box-sizing: border-box;
+    z-index: 10;
+    text-align: center;
+}
+
+/* 말풍선 꼬리 */
+.bubble-tail {
+    position: absolute;
+    width: 30px;
+    height: 23px;
+    top: 30px; 
+    left: 119.67px; 
+    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
+    background-color: #ff4d00; 
+    transform: rotate(180deg);
+}
+
+/* 캐릭터 */
+.character-placeholder {
+    position: absolute;
+    width: 92px;
+    height: 124px;
+    top: 130px;
+    left: 134px;
+    background-color: #ff4d00; 
+    border-radius: 50%; /* 임시 형태 */
+    z-index: 10;
+}
+
+/* -------------------- 2. 하단 메뉴 영역 (애니메이션) -------------------- */
+.menu-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; 
+}
+
+.menu-item {
+    position: absolute;
+    width: 100%; 
+    left: 0;
+    /* 핵심 애니메이션: Top과 Height 모두 트랜지션 적용 */
+    transition: top 0.5s ease-in-out, height 0.5s ease-in-out, z-index 0.1s;
+    cursor: pointer;
+    box-sizing: border-box;
+    color: black;
+    /* 상단 좌우 모서리만 둥글게 유지 */
+    border-radius: 15px 15px 0 0; 
+    overflow: hidden; 
+}
+
+/* 프로필이 활성화되어 전체 화면을 덮을 때의 스타일 */
+.menu-item.profile-active {
+    border-radius: 0; /* 모든 둥근 모서리 제거 (앱 컨테이너가 둥근 모서리를 담당) */
+    padding-top: 0; 
+}
+
+/* 탭 헤더 (접혀있을 때 보이는 부분: 40px 높이) */
+.tab-header {
+    height: 40px; 
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.tab-header h3 {
+    margin: 0;
+    font-weight: 500;
+}
+
+.large-text { 
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.collapsed-text { 
+    font-size: 16px;
+}
+
+/* 확장된 콘텐츠 영역 */
+.tab-content {
+    /* 탭 헤더 40px를 제외한 나머지 영역에 패딩 적용 (Profile은 예외 처리) */
+    padding: 10px 20px 20px 20px;
+}
+
+.menu-header {
+    margin-bottom: 20px;
+}
+.menu-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* --- Content Styles (Learn, Role, Game) --- */
+
+.content-image-box {
+    text-align: center;
+    padding: 50px 0;
+    background-color: #ff4d00; 
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.menu-item-role .content-image-box.blue {
+    background-color: #2b4f9c; 
+}
+
+.menu-item-1vs1 .content-image-box.green {
+    background-color: #63b963; 
+}
+
+.content-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.content-buttons.center {
+    justify-content: center;
+}
+
+.action-button {
+    height: 50px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: black;
+}
+
+.action-button.white {
+    background-color: white;
+    width: 48%;
+}
+
+.action-button.full-width {
+    width: 90%;
+}
+
+
+/* --- Profile Styles (Full Screen Mode) --- */
+
+/* Profile 활성화 시 내부의 로그아웃 버튼 (상단 정렬) */
+.logout-button.profile-mode {
+    position: static; 
+    margin-left: auto; 
+    top: auto;
+    left: auto;
+    color: white; 
+}
+
+.profile-top-bar {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    padding: 20px; 
+}
+
+.profile-top-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.profile-image-box {
+    width: 100px; 
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden; 
+    background-color: #9a4097; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px auto 30px auto; 
+}
+
+.profile-image-box .profile-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+
+
+.profile-fields-container {
+    display: grid;
+    gap: 15px; 
+    padding: 0 20px;
+}
+
+.profile-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.profile-field input, .profile-description-box {
+    width: 100%;
+    padding: 12px 15px; 
+    border-radius: 8px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.1); 
+    color: white;
+    box-sizing: border-box;
+    min-height: 45px; 
+    display: flex;
+    align-items: center;
+}
+
+.profile-description-box {
+    min-height: 70px; 
+}
+
+.profile-row-fields {
+    display: flex;
+    gap: 15px; 
+}
+
+.profile-row-fields .half-width {
+    flex: 1; 
+}
+
+.no-rounds-left {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 5px;
+    text-align: right;
+}
+
+.profile-buttons {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px; 
+    position: sticky; 
+    bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #DA70D6; 
+}
+.profile-buttons .action-button {
+    width: 30%;
+}
