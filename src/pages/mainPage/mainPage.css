@@ -46,10 +46,10 @@ html, body, #root {
 .speech-bubble {
     position: absolute;
     width: 268px;
-    height: 50px;
+    height: 40px;
     top: 60px;
     left: 46px;
-    background-color: #ff4d00; 
+    background-color: #FF5000; 
     border-radius: 10px;
     display: flex;
     justify-content: center;
@@ -70,7 +70,7 @@ html, body, #root {
     top: 50px; 
     left: 110px; 
     clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
-    background-color: #ff4d00; 
+    background-color: #FF5000; 
     transform: rotate(180deg);
 }
 
@@ -79,9 +79,9 @@ html, body, #root {
     position: absolute;
     width: 92px;
     height: 124px;
-    top: 130px;
+    top: 150px;
     left: 134px;
-    background-color: #ff4d00; 
+    background-color: #FF5000; 
     border-radius: 50%; /* 임시 형태 */
     z-index: 10;
 }
@@ -154,17 +154,17 @@ html, body, #root {
 .content-image-box {
     text-align: center;
     padding: 50px 0;
-    background-color: #ff4d00; 
+    background-color: #FF5000; 
     border-radius: 10px;
     margin: 20px 0;
 }
 
 .menu-item-role .content-image-box.blue {
-    background-color: #2b4f9c; 
+    background-color: #007CFF; 
 }
 
 .menu-item-1vs1 .content-image-box.green {
-    background-color: #63b963; 
+    background-color: #39FF14; 
 }
 
 .content-buttons {
@@ -227,7 +227,7 @@ html, body, #root {
     height: 100px;
     border-radius: 50%;
     overflow: hidden; 
-    background-color: #9a4097; 
+    background-color: #FB14FF; 
     display: flex;
     align-items: center;
     justify-content: center;

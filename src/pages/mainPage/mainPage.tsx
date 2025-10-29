@@ -16,8 +16,8 @@ const LearnContent: React.FC<NavigateProp> = ({ navigate }) => (
         <div className="extended-content">
             <div className="content-image-box">이미지 들어감</div>
             <div className="content-buttons">
-                <button className="action-button white" onClick={() => navigate('/learn/survey')}>Survey</button>
-                <button className="action-button white" onClick={() => navigate('/learn/start')}>Start learning</button>
+                <button className="action-button white" onClick={() => navigate('../mainpage/survey')}>Survey</button>
+                <button className="action-button white" onClick={() => navigate('../mainpage/startLearn')}>Start learning</button>
             </div>
         </div>
     </>
@@ -126,9 +126,9 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
     { id: 'learn', text: 'Learn Korean in the blink', backgroundColor: '#ff4d00', bubbleText: 'Let\'s learn basic Korean words' },
-    { id: 'role', text: 'Role Play', backgroundColor: '#4169E1', bubbleText: 'Let\'s learn how to converse in Korean through role playing.' },
-    { id: '1vs1', text: '1vs1 Game', backgroundColor: '#98FB98', bubbleText: 'Let\'s learn how to converse in Korean through role playing.' },
-    { id: 'profile', text: 'Profile', backgroundColor: '#DA70D6', bubbleText: 'Profile management is here!' },
+    { id: 'role', text: 'Role Play', backgroundColor: '#007CFF', bubbleText: 'Let\'s learn how to converse in Korean through role playing.' },
+    { id: '1vs1', text: '1vs1 Game', backgroundColor: '#39FF14', bubbleText: 'Let\'s learn how to converse in Korean through role playing.' },
+    { id: 'profile', text: 'Profile', backgroundColor: '#FB14FF', bubbleText: 'Profile management is here!' },
 ];
 
 const APP_HEIGHT = 720;

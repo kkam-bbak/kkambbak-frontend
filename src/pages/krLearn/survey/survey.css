@@ -1,0 +1,137 @@
+/* 전체 컨테이너 규격 */
+.survey-container {
+    width: 360px;
+    height: 720px;
+    background-color: #000; /* 메인 페이지와 동일한 검은색 배경 */
+    position: relative; 
+    font-family: 'Inter', sans-serif;
+    color: white;
+    overflow: hidden;
+}
+
+/* 상단 섹션 (말풍선과 캐릭터) */
+.survey-header-section {
+    position: relative;
+    height: 300px; /* 창 시작 위치(290px)까지 영역 확보 */
+}
+
+/* Logout 버튼 (mainPage 규격 재사용) */
+.logout-button {
+    position: absolute;
+    width: 64px;
+    height: 32px;
+    top: 5px; 
+    left: 296px;
+    background-color: transparent;
+    border: none;
+    color: gray;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 20;
+}
+
+/* 1. 말풍선 (Width: 328px, Height: 86px, Top: 32px, Left: 16px, Color: #FF5000) */
+.speech-bubble {
+    position: absolute;
+    width: 328px;
+    height: 85px;
+    top: 40px; 
+    left: 16px;
+    background-color: #FF5000; 
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    color: black;
+    padding: 0px 10px;
+    box-sizing: border-box;
+    z-index: 10;
+    text-align: center;
+}
+
+/* 말풍선 꼬리 위치 조정 */
+.bubble-tail {
+    position: absolute;
+    width: 30px;
+    height: 13px;
+    top: 80px; /* 말풍선 Height 86px를 고려하여 위치 조정 */
+    left: 165px; 
+    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
+    background-color: #FF5000; 
+    transform: rotate(180deg);
+}
+
+/* 캐릭터 Placeholder (mainPage 규격 재사용) */
+.character-placeholder {
+    position: absolute;
+    width: 92px;
+    height: 124px;
+    top: 150px; /* 말풍선 아래 적절한 위치 */
+    left: 134px;
+    background-color: #FF5000; 
+    border-radius: 50%; 
+    z-index: 10;
+}
+
+/* 2. Survey 내용 창 (Width: 360px, Height: 430px, Top: 290px) */
+.survey-content-window {
+    position: absolute;
+    width: 100%; /* 360px */
+    height: 420px; 
+    top: 300px;
+    left: 0;
+    background-color: #FF5000; /* Orange Color */
+    color: black; 
+    /* 둥근 모서리: Top-left 20px, Top-right 20px */
+    border-radius: 20px 20px 0 0; 
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.survey-content-inner {
+   
+    height: 100%;
+    position: relative;
+}
+
+/* 3. Survey Title Text (Width: 216px, Top: 16px, Left: 16px) */
+.survey-title {
+    margin: 0;
+    font-size: 18px;
+    padding: 10px 16px;
+    font-weight: normal; 
+    width: 216px;
+    height: 20px; 
+    color: black; 
+}
+
+/* 설문 폼 영역 */
+.survey-form-area {
+    padding-top: 10px;
+    height: calc(100% - 100px); /* 버튼 높이를 제외한 나머지 공간 */
+    color: white;
+}
+
+/* 4. Skip 버튼 (Width: 328px, Height: 40px, Left: 16px) */
+.skip-button-container {
+    position: absolute;
+    bottom: 20px; /* 하단 여백 */
+    left: 16px; 
+    width: 328px; /* 360px - 16px*2 */
+    box-sizing: border-box;
+}
+
+.skip-button {
+    width: 100%;
+    height: 40px; 
+    /* Colors: #FFFFFF */
+    background-color: #FFFFFF; 
+    border-radius: 10px; 
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    color: black;
+    cursor: pointer;
+    /* 패딩은 버튼 자체에 적용하지 않고 컨테이너/버튼 크기로 맞춤 */
+}
