@@ -135,3 +135,59 @@
     cursor: pointer;
     /* 패딩은 버튼 자체에 적용하지 않고 컨테이너/버튼 크기로 맞춤 */
 }
+
+
+
+/* 설문 폼 영역 */
+.survey-form-area {
+    padding: 10px 16px; 
+    height: calc(100% - 100px); 
+    color: black; 
+    /* ⭐️ 설문 시작 전/완료 시 중앙 정렬을 위한 스타일 */
+    display: flex; 
+    flex-direction: column;
+    justify-content: flex-start; /* 기본: 버튼이 위에서부터 나열되도록 */
+}
+
+/* 설문 시작 유도 메시지 (초기 화면) */
+.survey-start-message {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    font-size: 16px;
+    font-weight: normal;
+    color: white; /* 텍스트 색상 */
+}
+
+/* 설문 완료 메시지 "Done!" 스타일 */
+.survey-done-message {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Survey 창 중앙에 배치 */
+    font-size: 18px;
+    color: black; 
+}
+
+/* 설문 옵션 버튼 스타일 */
+.survey-option-button {
+    
+    width: 90%;
+    height: 40px; 
+    background-color: #000000; 
+    border-radius: 10px; 
+    border: none;
+    font-size: 14px;
+    font-weight: normal;
+    color: gray;
+    cursor: pointer;
+    margin-bottom: 13px; 
+}
+
+.bullet-point {
+    display: inline-block;
+    padding-right: 10px;
+}

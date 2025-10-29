@@ -5,6 +5,7 @@ import AppLayout from '../components/layout/AppLayout'
 import Home from '../pages/Home'
 import MainPage from '../pages/mainPage/mainPage' 
 import Survey from '../pages/krLearn/survey/survey'
+import LearnList from '../pages/krLearn/startLearn/learnList'
 
 import { useUser } from '../stores/user'
 
@@ -22,6 +23,8 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: 'mainpage', element: <MainPage /> },
       { path: 'mainpage/survey', element: <Survey /> },
+      { path: 'mainpage/learnList', element: <LearnList /> },
+      
       {
         path: 'app',
         element: <Protected />,
