@@ -194,7 +194,7 @@ const Survey: React.FC = () => {
                                 className="skip-button" 
                                 onClick={(e) => {
                                     e.stopPropagation(); // Survey 창 클릭 이벤트 전파 방지
-                                    navigate('/learn/start');
+                                    navigate('../mainpage/learnList');
                                 }}
                             >
                                 Skip to learning
