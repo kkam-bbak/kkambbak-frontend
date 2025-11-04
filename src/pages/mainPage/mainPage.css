@@ -6,69 +6,62 @@ html, body, #root {
     display: flex; /* 중앙 정렬을 위해 body에 flex 적용 */
     justify-content: center; /* 가로 중앙 정렬 */
     align-items: center; /* 세로 중앙 정렬 */
-    background-color: #333; /* 앱 배경과 구분되는 배경색 (선택 사항) */
+    background-color: #484848; /* 앱 배경과 구분되는 배경색 (선택 사항) */
 }
 
 /* 전체 컨테이너 규격 */
 .app-container {
     width: 360px;
     height: 720px;
-    background-color: #000; 
+    background-color: #000;
     position: relative; 
-    /* 둥근 모서리와 오버플로우 처리 */
-    overflow: hidden; 
-    border-radius: 15px; 
-    
     font-family: 'Inter', sans-serif;
     color: white;
-    flex-shrink: 0; 
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); 
-    margin: 0 auto;
+    overflow: hidden;
 }
 
 /* -------------------- 1. 상단 고정 요소 (Profile 비활성 시) -------------------- */
 /* 기존 로그아웃 버튼 */
 .logout-button {
     position: absolute;
+    top: 6px;
     width: 64px;
     height: 32px;
-    top: 5px; 
-    left: 296px;
     background-color: transparent;
     border: none;
-    color: gray;
-    font-size: 14px;
+    color: #757575;
+    font-size: 13px;
     cursor: pointer;
-    z-index: 20;
 }
 
 /* 말풍선 */
 .speech-bubble {
-    position: absolute;
-    width: 268px;
-    height: 40px;
-    top: 60px;
-    left: 46px;
+    width: 328px; /*제일큰 말풍선으로 디폴트 잡아놓음*/
+    height: 86px;
+    top: 32px;
+    left: 16px;
     background-color: #FF5000; 
     border-radius: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: absolute;
     font-size: 15px;
     color: black;
-    padding: 0 10px;
-    box-sizing: border-box;
+    padding: 12px 16px;
+    
     z-index: 10;
     text-align: center;
 }
 
 /* 말풍선 꼬리 */
 .bubble-tail {
+    
     position: absolute;
-    width: 40px;
-    height: 13px;
-    top: 50px; 
-    left: 110px; 
+    width: 28.67px;
+    height: 28.67px;
+    top: 100%; 
+    left: 50%; 
     clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
     background-color: #FF5000; 
     transform: rotate(180deg);
@@ -81,9 +74,9 @@ html, body, #root {
     height: 124px;
     top: 150px;
     left: 134px;
+
     background-color: #FF5000; 
-    border-radius: 50%; /* 임시 형태 */
-    z-index: 10;
+    border-radius: 50%;
 }
 
 /* -------------------- 2. 하단 메뉴 영역 (애니메이션) -------------------- */
@@ -125,7 +118,8 @@ html, body, #root {
 }
 
 .tab-header h3 {
-    margin: 0;
+    top: 16px;
+    left: 16px;
     font-weight: normal; /* 탭 제목 굵기 통일 */
     font-size: 18px; 
 }
@@ -137,6 +131,29 @@ html, body, #root {
 .tab-content {
     /* 탭 헤더 40px를 제외한 나머지 영역에 패딩 적용 (Profile은 예외 처리) */
     padding: 10px 20px 20px 20px;
+    
+    /* 1️⃣ Flexbox 컨테이너로 지정 */
+    display: flex;
+    flex-direction: column; 
+    
+    /* 탭 헤더(40px)를 제외한 나머지 높이를 100%로 채워야 함 */
+    height: calc(100% - 40px); /* .menu-item 전체 높이에서 탭 헤더 높이(40px) 제외 */
+}
+
+.extended-content {
+    /* 2️⃣ 남은 공간을 모두 차지하도록 flex-grow 설정 */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 이 영역이 남은 수직 공간을 모두 차지 */
+}
+
+.content-buttons {
+    /* 3️⃣ 이전에 설정했던 top: 218px;는 제거 */
+    /* top: 218px; */ 
+    
+    margin-top: auto; /* 버튼 컨테이너를 부모(extended-content)의 맨 아래로 밀어냄 */
+    padding-bottom: 0; /* 필요한 경우 하단 패딩 제거 */
+    text-align: center; /* 버튼이 중앙에 위치하도록 (Start Learning 버튼이 full-width면 무시됨) */
 }
 
 .menu-header {
@@ -167,22 +184,11 @@ html, body, #root {
     background-color: #39FF14; 
 }
 
-.content-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 60px;
-}
-
-.content-buttons.center {
-    justify-content: center;
-}
-
 .action-button {
     height: 45px;
     border-radius: 10px;
     border: none;
     font-size: 16px;
-    font-weight: bold;
     cursor: pointer;
     color: black;
 }
@@ -194,7 +200,15 @@ html, body, #root {
 }
 
 .action-button.full-width {
-    width: 98%;
+    Height: 40px;
+    width: 328px;
+    border-radius: 10px;
+    padding: 14px 40px;
+    font-weight: 600;
+    background-color: white;
+    color: black;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
 }
 
 

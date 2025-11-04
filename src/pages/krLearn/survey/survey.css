@@ -78,37 +78,30 @@
 .survey-content-window {
     position: absolute;
     width: 100%; /* 360px */
-    height: 420px; 
-    top: 300px;
-    left: 0;
+    height: 430px; 
+    top: 290px;
     background-color: #FF5000; /* Orange Color */
     color: black; 
     /* 둥근 모서리: Top-left 20px, Top-right 20px */
-    border-radius: 20px 20px 0 0; 
+    border-radius: 15px 15px 0 0; 
     box-sizing: border-box;
     overflow: hidden;
-}
 
-.survey-content-inner {
-   
-    height: 100%;
-    position: relative;
+
 }
 
 /* 3. Survey Title Text (Width: 216px, Top: 16px, Left: 16px) */
 .survey-title {
-    margin: 0;
     font-size: 18px;
-    padding: 10px 16px;
     font-weight: normal; 
-    width: 216px;
-    height: 20px; 
     color: black; 
+    width: 216px;
+    padding-left: 16px;
+
 }
 
 /* 설문 폼 영역 */
 .survey-form-area {
-    padding-top: 10px;
     height: calc(100% - 100px); /* 버튼 높이를 제외한 나머지 공간 */
     color: white;
 }
@@ -129,8 +122,8 @@
     background-color: #FFFFFF; 
     border-radius: 10px; 
     border: none;
-    font-size: 16px;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 12px;
     color: black;
     cursor: pointer;
     /* 패딩은 버튼 자체에 적용하지 않고 컨테이너/버튼 크기로 맞춤 */
@@ -166,15 +159,19 @@
     width: 100%;
     height: 100%;
     display: flex;
+    margin-top: 150px; /*201로 하면 너무 아래로 내려감*/
     justify-content: center;
-    align-items: center; /* Survey 창 중앙에 배치 */
+    align-items: center;
     font-size: 18px;
+    font-weight: 500;
     color: black; 
+    cursor: pointer;
+
 }
+
 
 /* 설문 옵션 버튼 스타일 */
 .survey-option-button {
-    
     width: 90%;
     height: 40px; 
     background-color: #000000; 

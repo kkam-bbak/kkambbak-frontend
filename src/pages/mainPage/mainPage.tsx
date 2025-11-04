@@ -16,8 +16,7 @@ const LearnContent: React.FC<NavigateProp> = ({ navigate }) => (
         <div className="extended-content">
             <div className="content-image-box">이미지 들어감</div>
             <div className="content-buttons">
-                <button className="action-button white" onClick={() => navigate('../mainpage/survey')}>Survey</button>
-                <button className="action-button white" onClick={() => navigate('../mainpage/learnList')}>Start learning</button>
+                <button className="action-button white full-width" onClick={() => navigate('../mainpage/survey')}>Start learning</button>
             </div>
         </div>
     </>
@@ -103,8 +102,9 @@ const ProfileContent: React.FC<NavigateProp> = ({ navigate }) => (
         </div>
 
         <div className="profile-buttons">
+            <button className="action-button white" onClick={() => navigate('/profile/tryagain')}>Try again</button>
             <button className="action-button white" onClick={() => navigate('/profile/share')}>Share</button>
-          
+            <button className="action-button white" onClick={() => navigate('/profile/done')}>Done</button>
         </div>
     </>
 );
@@ -125,16 +125,16 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-    { id: 'learn', text: 'Learn Korean in the blink', backgroundColor: '#ff4d00', bubbleText: 'Let\'s learn basic Korean words' },
+    { id: 'learn', text: 'Learn Korean in the blink', backgroundColor: '#FF5000', bubbleText: 'Let\'s learn basic Korean words' },
     { id: 'role', text: 'Role Play', backgroundColor: '#007CFF', bubbleText: 'Let\'s learn how to converse in Korean through role playing.' },
     { id: '1vs1', text: '1vs1 Game', backgroundColor: '#39FF14', bubbleText: 'Let\'s learn how to converse in Korean through role playing.' },
     { id: 'profile', text: 'Profile', backgroundColor: '#FB14FF', bubbleText: 'Profile management is here!' },
 ];
 
 const APP_HEIGHT = 720;
-const HEADER_HEIGHT = 300; 
-const COLLAPSED_HEIGHT = 40; 
-const EXTENDED_HEIGHT_NORMAL = APP_HEIGHT - HEADER_HEIGHT - (3 * COLLAPSED_HEIGHT); // 420px
+const HEADER_HEIGHT = 290; 
+const COLLAPSED_HEIGHT = 52; 
+const EXTENDED_HEIGHT_NORMAL = APP_HEIGHT - HEADER_HEIGHT - (3 * COLLAPSED_HEIGHT) ; // 274px
 
 // 프로필이 전체 화면을 차지할 때의 높이와 top
 const PROFILE_FULL_HEIGHT = APP_HEIGHT; 

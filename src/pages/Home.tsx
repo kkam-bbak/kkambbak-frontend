@@ -1,5 +1,6 @@
 import { useUser } from '../stores/user'
 import { useMe } from '../hooks/useMe'
+import react from "react";
 
 export default function Home() {
   const { user, login, logout } = useUser()
