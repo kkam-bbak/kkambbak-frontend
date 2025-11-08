@@ -1,0 +1,54 @@
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #484848;
+}
+
+.splash-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ff5000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+@media (min-width: 600px) {
+  .splash-container {
+    width: 360px;
+    height: 720px; 
+    min-height: auto;
+    border-radius: 40px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.splash-icon {
+  width: 150px;
+  height: 150px;
+  animation: splash-bounce 2s ease-in-out infinite;
+}
+
+@keyframes splash-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}

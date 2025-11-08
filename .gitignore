@@ -24,4 +24,7 @@ dist-ssr
 *.sw?
 
 task.md
+
 CLAUDE.md
+styleGuide.md
+
