@@ -16,7 +16,7 @@ const LearnContent: React.FC<NavigateProp> = ({ navigate }) => (
         <div className="extended-content">
             <div className="content-image-box">이미지 들어감</div>
             <div className="content-buttons">
-                <button className="action-button white full-width" onClick={() => navigate('../mainpage/survey')}>Start learning</button>
+                <button className="action-button white full-width" onClick={() => navigate('../mainpage/surveyStart')}>Start learning</button>
             </div>
         </div>
     </>

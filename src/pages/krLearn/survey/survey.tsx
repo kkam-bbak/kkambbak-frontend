@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './survey.css'; 
 
-// --- 데이터 및 타입 정의 (이 부분은 이전과 동일하며, 5개 질문으로 구성) ---
+// --- 데이터 및 타입 정의 ---
 
 interface Question {
     bubbleText: string;
@@ -10,7 +10,7 @@ interface Question {
 }
 
 const surveyData: Question[] = [
-    { // Survey 페이지 
+    { // Survey 페이지 1
         bubbleText: "Why are you learning Korean?",
         options: [
             "Preparing for the TOPIK exam", 
@@ -20,7 +20,7 @@ const surveyData: Question[] = [
         ],
     },
 
-    { 
+    { // Survey 페이지 2
         bubbleText: "How do you like to study?",
         options: [
             "Quick and focused learning", 
@@ -28,11 +28,11 @@ const surveyData: Question[] = [
             "Repetitive memorization", 
             "Game or quiz format"],
     },
-    { 
+    { // Survey 페이지 3
         bubbleText: "Which level suits you best?",
         options: ["Beginner", "Intermediate", "Advanced"],
     },
-    { 
+    { // Survey 페이지 4
         bubbleText: "What kind of words are you most interested in?",
         options: [
             "Daily expressions", 
@@ -41,18 +41,18 @@ const surveyData: Question[] = [
             "Topik vocabulary",
             "Slang and informal words"],
     },
-    { 
+    { // Survey 페이지 5
         bubbleText: "How long does it take you to study?",
         options: ["5 mins", "10 mins", "More than 15mins"],
     },
 ];
 
-const INTRO_BUBBLE_TEXT = "Before we start, Answer a few simple questions and we'll tailor your learning to your needs.";
+
 const FINAL_BUBBLE_TEXT = "All set! Here's your personalized Korean learning path";
 const DONE_PAGE_INDEX = surveyData.length;
 
 
-// --- 컴포넌트 분리 (이전과 동일) ---
+// --- 컴포넌트 분리 (SpeechBubble, CharacterSection, PaginationDots) ---
 
 const SpeechBubble: React.FC<{ text: string, isFinal?: boolean }> = ({ text, isFinal = false }) => (
     <div className="speech-bubble">
@@ -62,15 +62,11 @@ const SpeechBubble: React.FC<{ text: string, isFinal?: boolean }> = ({ text, isF
 );
 
 const CharacterSection: React.FC<{ pageIndex: number, isStarted: boolean, onLogout: () => void }> = ({ pageIndex, isStarted, onLogout }) => {
-    // 설문 시작 전: INTRO_BUBBLE_TEXT
-    // 설문 진행 중: 현재 질문 텍스트
-    // 설문 완료: FINAL_BUBBLE_TEXT
     let currentBubbleText;
     if (pageIndex === DONE_PAGE_INDEX) {
         currentBubbleText = FINAL_BUBBLE_TEXT;
-    } else if (!isStarted) {
-        currentBubbleText = INTRO_BUBBLE_TEXT;
     } else {
+        // SurveyStart.tsx를 통과했으므로 무조건 질문 텍스트를 표시
         currentBubbleText = surveyData[pageIndex].bubbleText;
     }
 
@@ -83,35 +79,48 @@ const CharacterSection: React.FC<{ pageIndex: number, isStarted: boolean, onLogo
     );
 };
 
+const PaginationDots: React.FC<{ currentPage: number, totalPages: number, onDotClick: (index: number) => void }> = ({ currentPage, totalPages, onDotClick }) => {
+    return (
+        <div className="pagination-dots">
+            {Array.from({ length: totalPages }, (_, index) => (
+                <div
+                    key={index}
+                    className={`dot ${index === currentPage ? 'active' : ''}`}
+                    onClick={() => { if (index < currentPage) onDotClick(index); }}
+                />
+            ))}
+        </div>
+    );
+};
+
 
 // --- 메인 컴포넌트 ---
 
 const Survey: React.FC = () => {
     const navigate = useNavigate();
     
-    // ⭐️ 핵심 수정: 설문 시작 여부를 추적하는 상태 추가
-    const [isSurveyStarted, setIsSurveyStarted] = useState(false); 
+    // 🔥 설문 시작 상태를 true로 고정하여 1페이지부터 바로 시작
+    const [isSurveyStarted, setIsSurveyStarted] = useState(true); 
     const [currentPage, setCurrentPage] = useState(0);
-    const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+    const [selectedAnswers, setSelectedAnswers] = useState<string[]>(Array(DONE_PAGE_INDEX).fill(null)); 
     const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
 
-    // Survey 창 클릭 핸들러: 설문을 시작하고 첫 질문을 보여줍니다.
-    const handleSurveyWindowClick = () => {
-        if (!isSurveyStarted) {
-            setIsSurveyStarted(true);
-            // currentPage는 이미 0이므로 별도 설정 불필요
-        }
-        // 설문이 이미 시작되었거나 완료된 상태라면 클릭 무시
-    };
     
-    // 답변 버튼 클릭 핸들러 (이전과 동일)
-    const handleOptionClick = (optionText: string, index: number) => {
+    const handleDotClick = (index: number) => {
+        if (index < currentPage) {
+            setCurrentPage(index);
+            setSelectedOptionIndex(null); 
+        }
+    }
+    
+    const handleOptionClick = (optionText: string, optionIndex: number) => {
         if (currentPage >= DONE_PAGE_INDEX) return;
-
-        setSelectedOptionIndex(index); 
+        
+        setSelectedOptionIndex(optionIndex); 
         
         setTimeout(() => {
-            const updatedAnswers = [...selectedAnswers, optionText];
+            const updatedAnswers = [...selectedAnswers];
+            updatedAnswers[currentPage] = optionText;
             setSelectedAnswers(updatedAnswers);
             
             const nextPageIndex = currentPage + 1;
@@ -127,33 +136,40 @@ const Survey: React.FC = () => {
         navigate('/auth/login');
     };
 
+    const handleSkip = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        navigate('../mainpage/learnList');
+    };
+    
+    const handleDoneMessageClick = () => {
+        navigate('../mainpage/learnList');
+    };
+
+
     // --- Survey Content Window 내부 내용 렌더링 함수 ---
     const renderSurveyContent = () => {
-        if (!isSurveyStarted) {
-            //  설문 시작 전: 빈 화면 (클릭 유도 텍스트가 필요하다면 여기에 추가)
+        
+        // 설문 완료 뷰
+        if (currentPage === DONE_PAGE_INDEX) {
             return (
-                <div className="survey-start-message">
-                    
+                <div className="survey-done-view">
+                    <div 
+                        className="survey-done-message"
+                        onClick={handleDoneMessageClick}
+                    >
+                        Well Done! 
+                    </div>
                 </div>
             );
         }
-
-        if (currentPage === DONE_PAGE_INDEX) {
-            // 설문 완료 화면 렌더링
-            return (
-                <div className="survey-done-message"  onClick={() => navigate('../mainpage/learnList')}>
-                    Done!
-                </div>
-            );
-        } else {
-            // 일반 설문 페이지 렌더링
-            const currentQuestion = surveyData[currentPage];
-            return (
-                <>
-                    {/* SurveyOption 컴포넌트는 Survey.tsx에 정의되어 있어야 합니다. */}
-                    {/* 정의되지 않았다면, 아래처럼 임시 버튼 코드를 사용하세요. */}
+        
+        // 일반 설문 페이지 뷰 (질문 옵션 렌더링)
+        const currentQuestion = surveyData[currentPage];
+        return (
+            <div className="survey-question-view">
+                <div className="survey-options-list">
                     {currentQuestion.options.map((option, index) => (
-                         <div className="survey-option-container" key={index}>
+                        <div className="survey-option-container" key={index}>
                             <span className="bullet-point">●</span>
                             <button 
                                 className={`survey-option-button ${selectedOptionIndex === index ? 'selected' : ''}`}
@@ -163,9 +179,9 @@ const Survey: React.FC = () => {
                             </button>
                         </div>
                     ))}
-                </>
-            );
-        }
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -173,35 +189,42 @@ const Survey: React.FC = () => {
             {/* 상단 섹션 */}
             <CharacterSection 
                 pageIndex={currentPage} 
-                isStarted={isSurveyStarted}
+                isStarted={isSurveyStarted} // true로 고정
                 onLogout={handleLogout}
             />
 
             {/* 하단 Survey 내용 창 */}
-            {/* ⭐️ 설문 시작 전에는 클릭 이벤트를 받습니다. */}
-            <div className="survey-content-window" onClick={handleSurveyWindowClick}>
-                <div className="survey-content-inner">
-                    <h1 className="survey-title">Survey</h1>
-                    
-                    <div className="survey-form-area">
-                        {renderSurveyContent()}
-                    </div>
-
-                    {/* Skip to learning 버튼 (시작 전/진행 중일 때만 표시) */}
-                    {currentPage < DONE_PAGE_INDEX && (
-                        <div className="skip-button-container">
+            <div className="survey-content-window">
+                <h1 className="survey-title">Survey</h1>
+                
+                <div className="survey-form-area">
+                    {renderSurveyContent()}
+                </div>
+                
+                {/* ⭐️ Fixed Bottom Controls (페이지네이션과 Skip 버튼) */}
+                {currentPage !== DONE_PAGE_INDEX && (
+                    <div className="fixed-bottom-controls">
+                        
+                        {/* 페이지네이션 도트 (설문 진행 중일 때) */}
+                        <div className="pagination-area">
+                            <PaginationDots 
+                                currentPage={currentPage}
+                                totalPages={DONE_PAGE_INDEX}
+                                onDotClick={handleDotClick}
+                            />
+                        </div>
+                        
+                        {/* Skip to learning 버튼 (진행 중일 때 고정) */}
+                        <div className="skip-button-container skip-bottom-fixed-inner">
                             <button 
                                 className="skip-button" 
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Survey 창 클릭 이벤트 전파 방지
-                                    navigate('../mainpage/learnList');
-                                }}
+                                onClick={handleSkip}
                             >
                                 Skip to learning
                             </button>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );

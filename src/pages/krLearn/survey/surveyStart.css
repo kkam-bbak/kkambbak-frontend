@@ -1,0 +1,149 @@
+/* surveyStart.css */
+
+/* -------------------- 0. 전체 컨테이너 및 레이아웃 -------------------- */
+
+.survey-container {
+    width: 360px;
+    height: 720px;
+    background-color: #000;
+    position: relative; 
+    font-family: 'Inter', sans-serif;
+    color: white;
+    overflow: hidden; 
+}
+
+/* -------------------- 1. 상단 헤더 및 로그아웃 -------------------- */
+.survey-header-section {
+    position: relative;
+    height: 300px; 
+}
+
+.logout-button {
+    position: absolute;
+    width: 64px;
+    height: 32px;
+    top: 5px; 
+    left: 296px;
+    background-color: transparent;
+    border: none;
+    color: gray;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 20;
+}
+
+/* 말풍선 */
+.speech-bubble {
+    position: absolute;
+    width: 328px;
+    height: 85px;
+    top: 40px; 
+    left: 16px;
+    background-color: #FF5000; 
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    color: black;
+    padding: 0px 10px;
+    box-sizing: border-box;
+    z-index: 10;
+    /* 꼬리 위치 기준을 위해 position: relative 설정 */
+    position: relative; 
+    left: 0;
+    top: 0;
+    margin: 0 auto;
+}
+
+/* 말풍선 꼬리 */
+.bubble-tail {
+    position: absolute;
+    width: 30px;
+    height: 13px;
+    bottom: -10px; 
+    left: 50%; 
+    transform: translateX(-50%) rotate(180deg);
+    
+    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
+    background-color: #FF5000; 
+}
+
+/* 캐릭터 Placeholder */
+.character-placeholder {
+    position: absolute;
+    width: 92px;
+    height: 124px;
+    top: 150px; 
+    left: 134px;
+    background-color: #FF5000; 
+    border-radius: 50%; 
+    z-index: 10;
+}
+
+/* -------------------- 3. Survey 내용 창 -------------------- */
+.survey-content-window {
+    position: absolute;
+    width: 100%; 
+    height: 430px; 
+    top: 290px;
+    background-color: #FF5000; 
+    color: black; 
+    border-radius: 15px 15px 0 0; 
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 0; 
+}
+
+.survey-title {
+    font-size: 18px;
+    font-weight: normal; 
+    color: black; 
+    padding: 16px 16px 0 16px;
+    margin: 0;
+}
+
+.survey-form-area {
+    /* 초기 화면에서는 내용이 비어있으므로 높이는 무시해도 되지만, 레이아웃을 위해 설정 */
+    padding: 10px 16px 0 16px; 
+    height: calc(100% - 56px); /* Title 높이(56px) 제외 */
+    color: black; 
+}
+
+
+/* -------------------- 4. 시작/스킵 버튼 (절대 위치 고정 및 크기 일치) -------------------- */
+
+/* 버튼 컨테이너 (너비 328px 고정) */
+.skip-button-container, .start-button-container {
+    width: 328px; 
+    box-sizing: border-box;
+    margin: 0 auto;
+    position: absolute;
+    left: 16px;
+    z-index: 25;
+}
+
+/* Skip to learning 버튼 (가장 하단 고정) */
+.skip-button-container {
+    bottom: 20px; 
+}
+
+/* ⭐️ Start 버튼 컨테이너 (Skip 버튼 위에 위치) */
+.start-button-container {
+    /* Skip 버튼 bottom 20px + Skip 버튼 height 40px + 10px 간격 = 70px */
+    bottom: 70px; 
+}
+
+/* Skip/Start learning 버튼 크기 일치 */
+.skip-button, .start-button {
+    width: 100%;
+    height: 40px; 
+    background-color: #FFFFFF; 
+    border-radius: 10px; 
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    color: black;
+    cursor: pointer;
+    display: block; 
+}

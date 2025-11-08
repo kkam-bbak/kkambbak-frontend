@@ -38,8 +38,8 @@
 /* 말풍선 (228x72, Top: 32px, Left: 66px, Color: #FF5000) */
 .speech-bubble {
     position: absolute;
-    width: 228px;
-    height: 72px;
+    width: 234px;
+    height: 75px;
     top: 32px; 
     left: 66px;
     background-color: #FF5000; 
@@ -189,7 +189,7 @@
 }
 
 /* Start 버튼 */
-.start-button {
+.topic-start-button {
     width: 65px;
     height: 20px;
     background-color: white;
