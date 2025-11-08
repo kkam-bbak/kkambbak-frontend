@@ -1,0 +1,260 @@
+/* learnInfo.css */
+
+/* -------------------- 0. 모달 오버레이 및 기본 컨테이너 -------------------- */
+
+/* 🔥 LearnInfo 모달 오버레이: 전체 화면을 덮음 */
+.learn-info-modal-overlay {
+    position: fixed;
+    width: 360px;
+    height: 720px;
+    /* 🔥 수정: 투명도를 주어 아래 LearnList 배경이 비치도록 합니다. */
+    background-color: rgba(0, 0, 0, 0.7); 
+    bottom: 2.8%;
+    justify-content: center;
+
+    z-index: 9999; 
+    overflow: hidden;
+}
+
+/* 🔥 모달 컨테이너: LearnStart의 배경 역할 (고정된 뷰포트) */
+.info-card-container {
+    width: 360px;
+    height: 720px;
+    background-color: #000; /* LearnStart의 배경색 */
+    position: relative;
+    font-family: 'Inter', sans-serif;
+    color: white;
+    
+    /* 🔥🔥🔥 애니메이션 초기 위치: 화면 전체 높이만큼 아래에 숨김 🔥🔥🔥 */
+    transform: translateY(720px); 
+    transition: transform 0.4s ease-out;
+}
+.learn-info-modal-overlay.open .info-card-container {
+    transform: translateY(0);
+}
+
+
+/* -------------------- 1. 상단 안내 헤더 (고정 요소) -------------------- */
+.info-header {
+    /* 🔥 수정: info-card-container 상단에 고정 */
+    position: absolute; 
+    top: 0; 
+    left: 0;
+    width: 100%;
+    height: 290px; 
+    padding: 0 16px; 
+    box-sizing: border-box; 
+    background-color: #000; /* 검은색 배경 유지 */
+    z-index: 5;
+}
+
+.logout-button {
+    position: absolute;
+    top: 6px; 
+    right: 16px;
+    background-color: transparent;
+    border: none;
+    color: #757575;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: right;
+    z-index: 20;
+}
+
+/* -------------------- 2. 캐릭터 및 말풍선 -------------------- */
+
+.character-section {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    position: absolute; 
+    top: 60px; 
+    left: 50%;
+    transform: translateX(-50%); 
+    width: auto;
+    z-index: 5;
+}
+
+/* 말풍선 스타일 */
+.speech-bubble-info {
+    position: relative;
+    width: 328px;
+    min-height: 40px; 
+    height: auto; 
+    margin: 40px auto 0; 
+    background-color: #FF5000; 
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    color: black;
+    padding: 10px 16px; 
+    text-align: center;
+    z-index: 10;
+}
+
+/* 꼬리 스타일 유지 */
+.bubble-tail-info {
+    position: absolute; width: 30px; height: 13px; bottom: -10px; left: 50%;
+    transform: translateX(-50%) rotate(180deg);
+    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
+    background-color: #FF5000; 
+}
+.character-placeholder-info {
+    position: absolute; width: 92px; height: 124px; top: 150px; left: 134px;
+    background-color: #FF5000; border-radius: 50%; 
+}
+
+/* -------------------- 3. 학습 카드 영역 (슬라이드 애니메이션 적용) -------------------- */
+
+.learning-card-info {
+    position: absolute;
+    width: 100%;
+    height: 430px; 
+    background-color: #FF5000;
+    border-radius: 15px 15px 0 0; 
+    /* 🔥 하단 마이크 버튼까지 보이도록 상하 패딩 조정 */
+    padding: 15px 16px; 
+    box-sizing: border-box;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* 🔥 space-between 제거 후 flex-start로 변경 */
+    
+    top: 290px; 
+    z-index: 10;
+
+}
+
+/* 제목 및 페이지 */
+.card-title-bar-info {
+    display: flex; justify-content: space-between; font-weight: 500;
+    font-size: 16px; margin-bottom: 8px; color: black;
+}
+
+/* 빈 영역 */
+/* 빈 영역 (검은색 박스) */
+.word-display-area-info {
+    width: 100%; 
+    height: 160px; /* 높이 고정 유지 */
+    
+    background-color: #000;
+    border-radius: 10px;
+    
+    /* 🔥 flex-grow/align-items 제거 (height가 고정되었으므로) */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin-bottom: 8px; /* 🔥 입력 필드와의 간격 8px */
+    flex-shrink: 0; /* 높이 고정 유지 */
+}
+
+/* 입력 필드 컨테이너 */
+.input-fields-container-info {
+    display: flex; flex-direction: column; gap: 8px; /* 🔥 간격 8px */
+    margin-bottom: 8px; /* 마이크 버튼과의 간격 8px */
+}
+
+
+
+.input-row-info {
+    display: 328px; align-items: center; height: 40px; background-color: #000; 
+    border-radius: 10px; color: white; overflow: hidden; border: 1px solid transparent;
+
+}
+
+.input-row-info label {
+    width: 90px;
+    font-weight: 500;
+    padding: 0 10px;
+    font-size: 16px;
+    color: #757575; 
+}
+
+.input-row-info input {
+    flex-grow: 1;
+    height: 100%;
+    border: none;
+    background-color: #000;
+    color: white;
+    padding: 0 10px;
+    font-size: 16px;
+}
+.speaker-icon-info {
+    width: 44px;
+    height: 100%;
+    background-color: #000;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* -------------------- 4. 입력 필드 (Translation 색상 수정) -------------------- */
+
+/* Translation 행 */
+.input-row-info.translation-info {
+    background-color: black;
+}
+.input-row-info.translation-info label {
+    background-color: black; /* 🔥 레이블 배경 투명 */
+    color: #757575; /* 🔥 레이블 텍스트는 검은색 */
+}
+.input-row-info.translation-info input {
+    background-color: black; /* 🔥 입력 필드 배경 주황색 */
+    color: #FF5000; /* 🔥 입력 필드 텍스트 검은색 */
+    /* padding 유지 */
+}
+
+
+.mic-button-info {
+    /* 🔥 info-card-container를 기준으로 절대 위치 설정 */
+    position: absolute; 
+    bottom: 16px; 
+    left: 16px;
+    right: 16px;
+    width: 328px; /* 360px - 16px * 2 */
+    
+    height: 50px; 
+    border: none; 
+    border-radius: 10px;
+    font-size: 16px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 8px;
+    transition: all 0.2s;
+    
+    /* 🔥 마이크 버튼이 다른 요소 위에 보이도록 높은 Z-index 설정 */
+    z-index: 20; 
+}
+
+.mic-button-info .mic-icon { transition: color 0.2s; }
+
+/* 🔥 ON (Step 4) */
+.mic-button-info.on {
+    background-color: #000; color: white; border: 2px solid #FF5000; 
+}
+.mic-button-info.on .mic-icon { color: white; }
+
+/* 🔥 OFF (Step 3, 5, 8) */
+.mic-button-info.off {
+    background-color: white; color: black; 
+}
+.mic-button-info.off .mic-icon { color: #FF5000; }
+
+/* 🔥 Disabled (Step 0, 1, 2, 6, 7) */
+.mic-button-info.disabled-info {
+    background-color: rgba(255, 255, 255, 0.5); 
+    color: rgba(0, 0, 0, 0.4); 
+    cursor: not-allowed;
+}
+.mic-button-info.disabled-info .mic-icon {
+    color: rgba(0, 0, 0, 0.4);
+}

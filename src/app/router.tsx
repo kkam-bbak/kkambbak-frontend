@@ -4,8 +4,10 @@ import AppLayout from '../components/layout/AppLayout'
 
 import Home from '../pages/Home'
 import MainPage from '../pages/mainPage/mainPage' 
+import SurveyStart from '../pages/krLearn/survey/surveyStart'   
 import Survey from '../pages/krLearn/survey/survey'
-import LearnList from '../pages/krLearn/startLearn/learnList'
+import LearnList from '../pages/krLearn/learnList/learnList'
+import LearnStart from '../pages/krLearn/learnStart/learnStart'
 
 import { useUser } from '../stores/user'
 
@@ -22,9 +24,17 @@ export const router = createBrowserRouter([
 
       { index: true, element: <Home /> },
       { path: 'mainpage', element: <MainPage /> },
+      { path: 'mainpage/surveyStart', element: <SurveyStart /> },
       { path: 'mainpage/survey', element: <Survey /> },
       { path: 'mainpage/learnList', element: <LearnList /> },
+
+  
       
+      // LearnList.tsx에서 navigate(`/mainpage/learn/${topicId}`) 로 사용해야 합니다.
+      { 
+        path: 'mainpage/learn/:topicId', 
+        element: <LearnStart /> 
+      },
       {
         path: 'app',
         element: <Protected />,

@@ -1,3 +1,5 @@
+/* survey.css */
+
 /* 전체 컨테이너 규격 */
 .survey-container {
     width: 360px;
@@ -12,10 +14,10 @@
 /* 상단 섹션 (말풍선과 캐릭터) */
 .survey-header-section {
     position: relative;
-    height: 300px; /* 창 시작 위치(290px)까지 영역 확보 */
+    height: 300px; 
 }
 
-/* Logout 버튼 (mainPage 규격 재사용) */
+/* Logout 버튼 */
 .logout-button {
     position: absolute;
     width: 64px;
@@ -30,7 +32,7 @@
     z-index: 20;
 }
 
-/* 1. 말풍선 (Width: 328px, Height: 86px, Top: 32px, Left: 16px, Color: #FF5000) */
+/* 말풍선 */
 .speech-bubble {
     position: absolute;
     width: 328px;
@@ -50,141 +52,209 @@
     text-align: center;
 }
 
-/* 말풍선 꼬리 위치 조정 */
+/* 말풍선 꼬리 */
 .bubble-tail {
     position: absolute;
     width: 30px;
     height: 13px;
-    top: 80px; /* 말풍선 Height 86px를 고려하여 위치 조정 */
+    top: 80px; 
     left: 165px; 
     clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
     background-color: #FF5000; 
     transform: rotate(180deg);
 }
 
-/* 캐릭터 Placeholder (mainPage 규격 재사용) */
+/* 캐릭터 Placeholder */
 .character-placeholder {
     position: absolute;
     width: 92px;
     height: 124px;
-    top: 150px; /* 말풍선 아래 적절한 위치 */
+    top: 150px; 
     left: 134px;
     background-color: #FF5000; 
     border-radius: 50%; 
     z-index: 10;
 }
 
-/* 2. Survey 내용 창 (Width: 360px, Height: 430px, Top: 290px) */
+/* Survey 내용 창 */
 .survey-content-window {
     position: absolute;
-    width: 100%; /* 360px */
+    width: 100%; 
     height: 430px; 
     top: 290px;
-    background-color: #FF5000; /* Orange Color */
+    background-color: #FF5000; 
     color: black; 
-    /* 둥근 모서리: Top-left 20px, Top-right 20px */
     border-radius: 15px 15px 0 0; 
     box-sizing: border-box;
     overflow: hidden;
-
-
+    padding-bottom: 50px;
 }
 
-/* 3. Survey Title Text (Width: 216px, Top: 16px, Left: 16px) */
+/* Survey Title Text */
 .survey-title {
     font-size: 18px;
     font-weight: normal; 
     color: black; 
-    width: 216px;
-    padding-left: 16px;
-
+    padding: 16px 16px 0 16px;
+    margin: 0;
 }
-
-/* 설문 폼 영역 */
-.survey-form-area {
-    height: calc(100% - 100px); /* 버튼 높이를 제외한 나머지 공간 */
-    color: white;
-}
-
-/* 4. Skip 버튼 (Width: 328px, Height: 40px, Left: 16px) */
-.skip-button-container {
-    position: absolute;
-    bottom: 20px; /* 하단 여백 */
-    left: 16px; 
-    width: 328px; /* 360px - 16px*2 */
-    box-sizing: border-box;
-}
-
-.skip-button {
-    width: 100%;
-    height: 40px; 
-    /* Colors: #FFFFFF */
-    background-color: #FFFFFF; 
-    border-radius: 10px; 
-    border: none;
-    font-weight: 600;
-    font-size: 12px;
-    color: black;
-    cursor: pointer;
-    /* 패딩은 버튼 자체에 적용하지 않고 컨테이너/버튼 크기로 맞춤 */
-}
-
-
 
 /* 설문 폼 영역 */
 .survey-form-area {
     padding: 10px 16px; 
-    height: calc(100% - 100px); 
+    height: calc(100% - 70px); 
     color: black; 
-    /* ⭐️ 설문 시작 전/완료 시 중앙 정렬을 위한 스타일 */
     display: flex; 
     flex-direction: column;
-    justify-content: flex-start; /* 기본: 버튼이 위에서부터 나열되도록 */
+    justify-content: flex-start;
 }
 
-/* 설문 시작 유도 메시지 (초기 화면) */
-.survey-start-message {
-    width: 100%;
+/* -------------------- 3. 옵션/질문 뷰 -------------------- */
+.survey-question-view {
     height: 100%;
     display: flex;
-    justify-content: center;
-    align-items: center; 
-    font-size: 16px;
-    font-weight: normal;
-    color: white; /* 텍스트 색상 */
+    flex-direction: column;
+    justify-content: space-between; 
 }
 
-/* 설문 완료 메시지 "Done!" 스타일 */
-.survey-done-message {
-    width: 100%;
-    height: 100%;
+.survey-options-list {
+    margin-top: 10px;
+}
+
+.survey-option-container {
     display: flex;
-    margin-top: 150px; /*201로 하면 너무 아래로 내려감*/
-    justify-content: center;
     align-items: center;
-    font-size: 18px;
-    font-weight: 500;
-    color: black; 
-    cursor: pointer;
-
-}
-
-
-/* 설문 옵션 버튼 스타일 */
-.survey-option-button {
-    width: 90%;
-    height: 40px; 
-    background-color: #000000; 
-    border-radius: 10px; 
-    border: none;
-    font-size: 14px;
-    font-weight: normal;
-    color: gray;
-    cursor: pointer;
-    margin-bottom: 13px; 
+    margin-bottom: 8px; 
+    gap: 8px;
 }
 
 .bullet-point {
     display: inline-block;
-    padding-right: 10px;
+    color: black;
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+/* 설문 옵션 버튼 스타일 (이미지 기반) */
+.survey-option-button {
+    width: 304px; 
+    height: 40px; 
+    background-color: #000000; 
+    border-radius: 10px; 
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: #757575; 
+    cursor: pointer;
+    text-align: left;
+    padding: 0 10px;
+    transition: background-color 0.1s;
+}
+
+.survey-option-button.selected {
+    color: white; 
+}
+
+
+/* -------------------- 4. 시작/완료/스킵 버튼 (크기 일치 및 위치 조정) -------------------- */
+
+.skip-button-container {
+    width: 328px; 
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+/* Skip to learning 버튼 (기본 스타일 및 크기 기준) */
+.skip-button{
+    width: 100%;
+    height: 40px; 
+    background-color: #FFFFFF; 
+    border-radius: 10px; 
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    color: black;
+    cursor: pointer;
+}
+
+.start-button{
+    width: 100%;
+    height: 40px; 
+    background-color: #FFFFFF; 
+    border-radius: 10px; 
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    color: black;
+    cursor: pointer;
+}
+
+/* ⭐️ Start 버튼 컨테이너 (시작 화면의 Start 버튼 위치) */
+.start-button-container {
+    position: absolute;
+    bottom: 70px;
+    left: 16px;
+    width: 328px; /* Skip 버튼 컨테이너와 동일한 너비 */
+   
+}
+
+/* ⭐️ Skip to learning 시작 화면 컨테이너 (시작 화면의 Skip 버튼 위치) */
+.skip-start-button-container {
+    position: absolute;
+    bottom: 20px; 
+    left: 16px;
+    width: 328px; /* Start 버튼 컨테이너와 동일한 너비 */
+}
+
+
+/* -------------------- 5. 페이지네이션 및 완료 화면 -------------------- */
+
+
+
+
+/* ⭐️ 페이지네이션 영역 (Skip 버튼 위에 위치) */
+.pagination-area {
+    width: 100%; 
+    left: 134px;
+    /* 🔥 Skip 버튼 (40px)과 간격 확보 */
+    bottom: 84px;
+    position: absolute;
+}
+
+/* 페이지네이션 도트 */
+.pagination-dots {
+    display: flex;
+    gap: 10px;
+ 
+    /* margin-bottom: 20px; 제거 */
+}
+
+/* 도트 스타일은 유지 */
+.dot {
+    width: 8px;
+    height: 8px;
+    background-color: rgba(0, 0, 0, 0.2); 
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.dot.active {
+    background-color: white; 
+}
+/* 설문 완료 메시지 "Done!" */
+.survey-done-view {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 100px;
+}
+
+.survey-done-message {
+    font-size: 18px;
+    font-weight: 500;
+    color: black; 
+    cursor: pointer;
+    margin-bottom: 100px;
 }
