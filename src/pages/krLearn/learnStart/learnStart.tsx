@@ -37,7 +37,7 @@ const LearnStart: React.FC = () => {
     const [isProcessing, setIsProcessing] = useState(false); 
     const [content, setContent] = useState<LearningContent>(dummyWord);
     const [currentWordIndex, setCurrentWordIndex] = useState(1);
-    const totalWords = 25;
+    const totalWords = 2; //총 단어수 예시
     const [countdownTime, setCountdownTime] = useState(0); 
 
     // 표시 상태
