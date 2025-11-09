@@ -14,7 +14,8 @@ import { useUser } from '../stores/user'
 
 function Protected() {
   const user = useUser((s) => s.user)
-  return user ? <Outlet /> : <Navigate to="/login" replace />
+  // accessToken이 있으면 로그인된 상태
+  return user?.accessToken ? <Outlet /> : <Navigate to="/login" replace />
 }
 
 export const router = createBrowserRouter([
@@ -28,17 +29,22 @@ export const router = createBrowserRouter([
   },
   {
     path: '/mainpage',
-    element: <AppLayout />,
+    element: <Protected />,
     children: [
-      { index: true, element: <MainPage /> },
-      { path: 'surveyStart', element: <SurveyStart /> },
-      { path: 'survey', element: <Survey /> },
-      { path: 'learnList', element: <LearnList /> },
-
-      // LearnList.tsx에서 navigate(`/mainpage/learn/${topicId}`) 로 사용해야 합니다.
       {
-        path: 'learn/:topicId',
-        element: <LearnStart />
+        element: <AppLayout />,
+        children: [
+          { index: true, element: <MainPage /> },
+          { path: 'surveyStart', element: <SurveyStart /> },
+          { path: 'survey', element: <Survey /> },
+          { path: 'learnList', element: <LearnList /> },
+
+          // LearnList.tsx에서 navigate(`/mainpage/learn/${topicId}`) 로 사용해야 합니다.
+          {
+            path: 'learn/:topicId',
+            element: <LearnStart />
+          },
+        ],
       },
     ],
   },
