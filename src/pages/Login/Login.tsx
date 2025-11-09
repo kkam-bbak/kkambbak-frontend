@@ -23,13 +23,12 @@ export default function Home() {
 
       // 사용자 정보를 store에 저장
       login({
-        providerId, // 게스트 ID (소셜로그인 마이그레이션용)
+        providerId, // 게스트 ID
         accessToken: tokenData.accessToken,
         refreshToken: tokenData.refreshToken,
         isGuest,
       })
 
-      // 로그인 후 메인 페이지로 이동
       navigate('/mainpage')
     } catch (error) {
       console.error('Guest login failed:', error)
@@ -40,8 +39,16 @@ export default function Home() {
   }
 
   const handleGoogleLogin = () => {
-    // TODO: Google OAuth 구현
-    console.log('Google login not yet implemented')
+    const user = useUser((s) => s.user)
+
+    let oauthUrl = 'https://kkambbak.duckdns.org/oauth2/authorization/google'
+
+    // 게스트 사용자인 경우 guestProviderId 파라미터 추가
+    if (user?.isGuest) {
+      oauthUrl += `?guestProviderId=${user.providerId}`
+    }
+
+    window.location.href = oauthUrl
   }
 
   return (
