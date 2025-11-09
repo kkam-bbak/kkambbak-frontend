@@ -197,7 +197,7 @@ const MainPage: React.FC = () => {
             {activeMenu !== 'profile' && (
                 <>
                     {/* Logout 버튼 (비활성 시) */}
-                    <button className="logout-button" onClick={() => navigate('/auth/login')}>Logout</button>
+                    <button className="logout-button" onClick={() => navigate('/login')}>Logout</button>
                     
                     {/* 말풍선과 꼬리 */}
                     <div className="speech-bubble">
