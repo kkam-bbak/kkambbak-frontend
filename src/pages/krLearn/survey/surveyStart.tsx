@@ -34,14 +34,14 @@ const SurveyStart: React.FC = () => {
     
     const handleStart = (e: React.MouseEvent) => {
         e.stopPropagation();
-        // 🔥 Start 버튼 클릭 시, Survey.tsx (설문 1페이지)로 라우팅
-        navigate('../mainPage/survey'); 
+       
+        navigate('../survey'); 
     };
 
     const handleSkip = (e: React.MouseEvent) => {
         e.stopPropagation();
         // Skip 버튼 클릭 시, LearnList.tsx로 라우팅
-        navigate('../mainpage/learnList'); 
+        navigate('../learnList'); 
     };
 
     const handleLogout = () => {
