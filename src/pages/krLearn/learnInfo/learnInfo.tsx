@@ -50,11 +50,8 @@ const LearnInfo: React.FC<LearnInfoProps> = ({ topic, tab, isOpen, onClose, onCo
             }, delay);
         }
         
-        // 🚨 Step 5 완료 후 (마이크 뗀 후) 다음 Step 6으로 자동 전환하는 로직이 필요합니다.
-        // 현재 Step 5는 사용자 액션으로 전환되지 않으므로, Step 5로 진입하는 순간 타이머를 설정해야 합니다.
-        
+        // Step 5는 사용자 액션(마이크 떼기)으로 진입하며, 5초 뒤 Step 6으로 자동 전환되어야 함
         if (currentStep === 5) {
-             // Step 5는 마이크 떼기 후 진입하며, 5초 뒤 Step 6으로 자동 전환되어야 함
              timer = setTimeout(() => {
                 setCurrentStep(prev => prev + 1);
             }, 5000); 
@@ -65,7 +62,7 @@ const LearnInfo: React.FC<LearnInfoProps> = ({ topic, tab, isOpen, onClose, onCo
         // 최종 단계 (Step 8) 완료 후 2초 뒤 자동 학습 시작
         timer = setTimeout(() => {
             onConfirmStart(); 
-        }, 2000); 
+        }, ); 
     }
 
     return () => { 
@@ -80,15 +77,43 @@ const LearnInfo: React.FC<LearnInfoProps> = ({ topic, tab, isOpen, onClose, onCo
     // 🔥 마이크 버튼 스타일 결정 (ON/OFF/Disabled)
     const getMicButtonState = () => {
         if (currentStep === 4) return 'on';
-        if (currentStep === 3 || currentStep === 5 || currentStep === 8) return 'off';
+        if (currentStep === 3 || currentStep === 5 ) return 'off';
         return 'disabled-info';
     };
 
-    // 🔥 필드 활성화 스타일 클래스 결정
-    const getInputClass = () => {
-        if (currentStep >= 2 && currentStep <= 5) return 'active-fields';
-        if (currentStep === 7) return 'highlight-romnized';
-        return 'inactive-fields'; 
+    // 🔥🔥 학습 카드 (learning-card-info) 클래스 결정 🔥🔥
+    const getCardClass = () => {
+        // Step 3~8일 때만 카드 전체에 흐림 효과 적용
+        if (currentStep >= 3 && currentStep <= 8) {
+            return 'card-fade'; 
+        }
+        // Step 2는 흐림 효과가 없고, 개별 요소만 하이라이트되어야 함.
+        // 하지만 요청에 따라 Step 2도 "전체 흐림"이어야 하므로 card-fade를 적용합니다.
+        if (currentStep === 2) {
+            return 'card-fade';
+        }
+        return '';
+    };
+
+    // 🔥🔥 필드 활성화 스타일 클래스 결정 🔥🔥
+    const getInputClass = (field: 'image' | 'korean' | 'romnized' | 'translation') => {
+        let classes = '';
+
+        if (currentStep === 2) { 
+            // Step 2: 이미지와 Romnized만 원색 표시 + 주황색 테두리
+            if (field === 'image' || field === 'romnized') {
+                classes += ' highlight-no-fade border-highlight-orange';
+            }
+        }
+        
+        if (currentStep === 7) {
+            // Step 7: Romnized만 원색 표시 + 주황색 테두리
+            if (field === 'romnized') {
+                classes += ' highlight-no-fade border-highlight-orange highlight-speaker';
+            }
+        }
+        
+        return classes.trim(); 
     };
 
     // 3. 마이크 시뮬레이션 핸들러 (유지)
@@ -116,7 +141,7 @@ const LearnInfo: React.FC<LearnInfoProps> = ({ topic, tab, isOpen, onClose, onCo
                 </div>
 
                 {/* 학습 카드 영역 */}
-                <div className="learning-card-info">
+                <div className={`learning-card-info ${getCardClass()}`}>
                     
                     {/* 제목 및 페이지 */}
                     <div className="card-title-bar-info">
@@ -124,37 +149,35 @@ const LearnInfo: React.FC<LearnInfoProps> = ({ topic, tab, isOpen, onClose, onCo
                         <span className="word-count-info">{`01/${wordCount.toString().padStart(2, '0')}`}</span>
                     </div>
 
-                    {/* 빈 영역 (안내 메시지/이미지) */}
-                    <div className="word-display-area-info">
+                    {/* 빈 영역 (이미지) */}
+                    <div className={`word-display-area-info ${getInputClass('image')}`}>
                         {/* 🔥 내용은 완전히 비워둠 */}
                     </div>
 
                     {/* 단어 정보 입력 필드 */}
                     <div className="input-fields-container-info">
-                        {/* Romnized Row (스피커 포함) */}
-                        <div className={`input-row-info ${getInputClass()}`}>
-                            <label>Korean</label>
-                            {/* 🔥 value 제거 */}
+                        {/* Romnized Row (스피커 포함) - First row */}
+                        <div className={`input-row-info romnized-info ${getInputClass('romnized')}`}>
+                            <label>Romnized</label>
                             <input type="text" readOnly value={isFieldsActive ? "" : ""} /> 
                             <button 
-                                className="speaker-icon-info" 
-                                disabled={currentStep !== 7 && currentStep !== 8}
+                                className={`speaker-icon-info ${currentStep === 7 ? 'highlight-speaker' : ''}`} 
+                                disabled={currentStep !== 7} // Step 7에서만 활성화
                             >
-                                🔊
-                            </button>
+                                {/* 🔊 아이콘을 <span>으로 감싸고 CSS로 스타일링 */ }
+                                <span className="speaker-icon-symbol">🔊</span>
+                             </button>
                         </div>
                         
-                        {/* Korean Row */}
-                        <div className={`input-row-info ${getInputClass()}`}>
-                            <label>Romnized</label>
-                            {/* 🔥 value 제거 */}
+                        {/* Korean Row - Second row */}
+                        <div className={`input-row-info korean-info ${getInputClass('korean')}`}>
+                            <label>Korean</label>
                             <input type="text" readOnly value={isFieldsActive ? "" : ""} />
                         </div>
 
-                        {/* Translation Row */}
-                        <div className={`input-row-info translation-info ${getInputClass()}`}>
+                        {/* Translation Row - Third row */}
+                        <div className={`input-row-info translation-info ${getInputClass('translation')}`}>
                             <label>Translation</label>
-                            {/* 🔥 value 제거 */}
                             <input type="text" readOnly value={isFieldsActive ? "" : ""} />
                         </div>
                     </div>
@@ -162,12 +185,12 @@ const LearnInfo: React.FC<LearnInfoProps> = ({ topic, tab, isOpen, onClose, onCo
                     {/* 마이크 버튼 */}
                     <button 
                             className={`mic-button-info ${getMicButtonState()}`}
-                            onClick={currentStep === 8 ? onConfirmStart : undefined}
+                            
                             onMouseDown={handleMicDown}
                             onMouseUp={handleMicUp}
                             onTouchStart={handleMicDown}
                             onTouchEnd={handleMicUp}
-                            disabled={currentStep !== 3 && currentStep !== 4 && currentStep !== 5 && currentStep !== 8}
+                            disabled={currentStep !== 3 && currentStep !== 4 }
                         >
                             <span className="mic-icon">🎤</span>
                         </button>
