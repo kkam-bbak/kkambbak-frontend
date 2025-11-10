@@ -21,7 +21,7 @@ export default function Splash() {
   }, [user, navigate])
 
   return (
-    <div className="splash-container">
+    <div className="page-container splash-container">
       <div className="splash-content">
         <img src={IconImage} alt="App Icon" className="splash-icon" />
       </div>

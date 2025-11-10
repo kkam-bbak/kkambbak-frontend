@@ -35,23 +35,27 @@
     align-items: center;
     position: absolute;
     top: 60px; 
-    left: 81px;
+    left: 180px;
     width: 100%;
     z-index: 5;
 }
 
 /* 말풍선 스타일 */
 .speech-bubble-top {
-    width: 198px;
-    height: 44px;
+    width: 222px;
+    height: 58px;
     background-color: #FF5000;
     color: black;
     border: none;
     border-radius: 10px;
-    position: relative;
-    text-align: center;
-    
-    font-size: 15px; 
+   
+    display: flex; /* Flexbox 활성화 */
+    justify-content: center; /* 수평 중앙 정렬 (텍스트) */
+    align-items: center; /* 수직 중앙 정렬 (글자를 아래로 내림) */
+    text-align: center; /* 텍스트가 여러 줄일 때 대비 */
+
+    font-size: 16px;
+    font-weight: 500; 
 }
 
 /* 말풍선 꼬리 */
@@ -239,9 +243,14 @@
 
 .action-buttons-container {
     display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    margin-top: 20px; /* 🔥 마진을 10px 줄여서 전체적으로 위로 올림 */
+   
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.action-button{
+    width: 156px;
+    height: 40px;
 }
 
 .mic-button.off {
