@@ -1,0 +1,189 @@
+/* learnComplete.css */
+
+/* -------------------- 0. 기본 컨테이너 재활용 -------------------- */
+
+/* learnStart.css의 .learn-page-container를 재활용합니다. */
+.learn-complete-view {
+    width: 360px;
+    height: 720px;
+    background-color: #000;
+    position: relative; 
+    font-family: 'Inter', sans-serif;
+    color: white;
+    overflow: hidden; 
+}
+
+/* -------------------- 1. 상단 헤더 및 로그아웃 -------------------- */
+
+.header-section {
+    position: relative;
+    /* learnStart.css의 .learn-header가 차지하던 공간을 활용합니다. */
+    height: 290px;
+}
+
+/* 로그아웃 버튼의 위치는 TSX 파일에서 inline style로 조정되었습니다. (top: 5px, right: 16px) */
+
+
+/* -------------------- 2. 캐릭터 및 말풍선 -------------------- */
+
+/* learnStart.css의 .character-section 재활용 */
+.complete-char-section {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 60px; 
+    left: 180px;
+    width: 100%;
+    z-index: 5;
+}
+
+/* 말풍선 (.speech-bubble-top) 스타일 재활용 */
+.complete-bubble {
+    width: 222px;
+    height: 58px;
+    background-color: #FF5000;
+    color: black;
+    border: none;
+    border-radius: 10px;
+   
+    display: flex; /* Flexbox 활성화 */
+    justify-content: center; /* 수평 중앙 정렬 (텍스트) */
+    align-items: center; /* 수직 중앙 정렬 (글자를 아래로 내림) */
+    text-align: center; /* 텍스트가 여러 줄일 때 대비 */
+
+    font-size: 16px;
+    font-weight: 500; 
+}
+
+/* 말풍선 꼬리 (.bubble-tail) 스타일 재활용 */
+.complete-bubble .bubble-tail {
+    width: 28.67px;
+    height: 28.67px;
+    left: 170px;
+    top: 58px;
+    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
+    background-color: #FF5000; 
+    transform: rotate(180deg);
+}
+
+/* 캐릭터 이미지 스타일 (주황색 물고기/캐릭터 모양) */
+.complete-char-image {
+   
+}
+
+
+/* -------------------- 3. 학습 결과 카드 영역 -------------------- */
+
+/* learnStart.css의 .learning-card 재활용 */
+.complete-card {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 430px; 
+    background-color: #FF5000;
+    border-radius: 20px 20px 0 0;
+    padding: 0px 15px 15px 15px;
+    box-sizing: border-box;
+    color: black;
+    overflow: hidden; 
+}
+
+/* Session Complete! 제목 스타일 */
+.session-complete-title {
+    position: absolute;
+    font-weight: 500;
+    font-size: 18px;
+    
+    color: black;
+}
+
+/* 결과 박스 (검은색 배경) */
+.results-box {
+    margin-top: 52px; /* 제목과의 간격 */
+    background-color: #000;
+    color: white; /* 결과 값은 흰색 */
+    border-radius: 10px;
+    padding: 1px 15px 15px 15px; /* 내부 패딩 */
+    margin-bottom: 16px; /* 아래 여백 */
+}
+
+/* 학습 이름 제목 스타일 */
+.results-topic-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: white;
+}
+
+/* 결과 항목 행 스타일 */
+.result-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px; /* 행 간격 */
+}
+
+.result-row:last-child {
+    margin-bottom: 0; /* 마지막 행은 간격 제거 */
+}
+
+/* 아이콘 스타일 */
+.result-icon {
+    width: 20px;
+    height: 20px;
+    color: white; /* 아이콘 색상: 흰색 */
+    margin-right: 5px;
+}
+
+/* 결과 값 스타일 */
+.result-value {
+    font-size: 12px;
+    font-weight: 500;
+    color: white; /* 텍스트 색상: 흰색 */
+}
+
+/* -------------------- 4. 버튼 영역 -------------------- */
+
+/* Review / Try Again 버튼 컨테이너 */
+.action-buttons-row {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+/* Review / Try Again 버튼 기본 스타일 재활용 */
+.action-button{
+    /* learnStart.css의 .action-button 재활용: width: 156px, height: 40px */
+
+    width: 153px; /* flex-grow 때문에 100%는 의미 없지만 명시적으로 */
+    height: 40px; /* 이미지에 맞춰서 높이 증가 (기존 40px에서 변경) */
+    border-radius: 10px; /* 모서리 둥글게 */
+    font-size: 14px; /* 텍스트 크기 증가 */
+    font-weight: 600;
+}
+
+/* 흰색 배경 버튼 */
+.action-button.white-bg {
+    background-color: white; /* 배경: 흰색 */
+    color: black; /* 텍스트: 주황색 */
+    border: none;
+}
+
+/* Next learning 버튼 */
+.next-learning-button {
+    position: absolute;
+    bottom: 14px; /* 요청하신대로 하단에서 14px 간격 */
+    left: 50%; /* 가운데 정렬을 위해 왼쪽 50% 지정 */
+    transform: translateX(-50%); /* 정확히 가운데로 이동 */
+    width: 328px; 
+    height: 40px; /* 이미지에 맞춰서 높이 증가 */
+    background-color: white; /* 배경: 흰색 */
+    color: black; /* 텍스트: 주황색 */
+    border: none;
+    border-radius: 10px;
+
+    font-size: 14px; /* 텍스트 크기 증가 */
+    font-weight: 600;
+    cursor: pointer;
+  
+}

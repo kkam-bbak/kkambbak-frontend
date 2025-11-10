@@ -57,22 +57,30 @@ const LearnStart: React.FC = () => {
 
     const countdownRef = useRef<number | null>(null);
     
-    // 🔥🔥🔥 자동 채점 로직 함수 🔥🔥🔥
+    // 🔥🔥🔥 자동 채점 로직 함수 (자동 종료 로직 제거) 🔥🔥🔥
     const startGrading = () => {
         setIsProcessing(true);
         setMicOn(false); 
 
         setTimeout(() => {
             setIsProcessing(false);
-            const isCorrect = Math.random() > 0.5;
+            // 현재는 더미 로직: 50% 확률로 정답/오답
+            //const isCorrect = Math.random() > 0.5; 
+
+            setIsProcessing(false);
+            
+            // 오답설정
+            const isCorrect = false;
+            
             setResultStatus(isCorrect ? 'correct' : 'incorrect');
-            // 🔥 정답/오답 확정 시, 결과 표시 초기 상태로 전환
-            setDisplayStatus(isCorrect ? 'initial_feedback' : 'initial_feedback'); 
-        }, 1500);
+            setDisplayStatus('initial_feedback'); 
+
+            
+        }, 1500); // 채점 처리 시간
     };
 
     // --------------------------------------------------
-    // 🔥 1. 학습 흐름 제어 useEffect 🔥
+    // 🔥 1. 학습 흐름 제어 useEffect (정답 시 자동 이동 로직 수정) 🔥
     // --------------------------------------------------
     useEffect(() => {
         let timer: number | undefined;
@@ -80,11 +88,13 @@ const LearnStart: React.FC = () => {
         if (status === 'initial') {
             setResultStatus('none');
             setDisplayStatus('none'); // 상태 초기화
+            // ... (초기 상태 로직)
             const initialTimer = setTimeout(() => { setStatus('listen'); }, 2000); 
             return () => clearTimeout(initialTimer);
         }
 
         if (status === 'listen') {
+            // ... (듣기 상태 로직)
             timer = setTimeout(() => {
                 setStatus('countdown');
                 setCountdownTime(0); 
@@ -92,6 +102,7 @@ const LearnStart: React.FC = () => {
         }
 
         if (status === 'countdown') {
+            // ... (카운트다운 로직)
             countdownRef.current = setInterval(() => {
                 setCountdownTime((prevTime) => {
                     const newTime = prevTime + 0.1;
@@ -107,9 +118,9 @@ const LearnStart: React.FC = () => {
             }, 100) as unknown as number; 
         }
         
-        // 🔥🔥🔥 2. 정답/오답 후 말풍선 순차 변경 및 자동 전환 로직 🔥🔥🔥
+        // 🔥🔥🔥 2. 정답 후 말풍선 순차 변경 및 자동 전환 로직 수정 🔥🔥🔥
         
-        // A. 정답: 'good job!' -> 'sa-gwa means apple.' -> 다음 단어
+        // A. 정답: 'good job!' -> 'sa-gwa means apple.' -> 다음 단어 OR 세션 완료
         if (resultStatus === 'correct' && displayStatus === 'initial_feedback') {
             // 'good job!' 표시 후 1초 뒤 'meaning_revealed'로 전환
             timer = setTimeout(() => {
@@ -118,10 +129,20 @@ const LearnStart: React.FC = () => {
         }
         
         if (resultStatus === 'correct' && displayStatus === 'meaning_revealed') {
+            
+            const isLastWord = currentWordIndex === totalWords;
+
             // 'meaning_revealed' 표시 후 2초 뒤 다음 단어로 자동 전환
             timer = setTimeout(() => {
-                setCurrentWordIndex(prev => prev + 1);
-                setStatus('initial');
+                if (isLastWord) {
+                     // 🚨 마지막 단어 정답 시: LearnComplete로 자동 이동 (요청 사항)
+                    console.log("Last word correct. Auto-navigating to LearnComplete.");
+                    navigate('/mainpage/learn/complete');
+                } else {
+                    // 일반 단어 정답 시: 다음 단어로 자동 이동
+                    setCurrentWordIndex(prev => prev + 1);
+                    setStatus('initial');
+                }
             }, 2000); 
         }
         
@@ -133,18 +154,35 @@ const LearnStart: React.FC = () => {
             if (timer) clearTimeout(timer); 
         };
         
-    }, [status, resultStatus, displayStatus]); // displayStatus 의존성 추가
+    }, [status, resultStatus, displayStatus, currentWordIndex, totalWords, navigate]); 
     
     // --------------------------------------------------
-    // 🔥 2. 이벤트 핸들러 (유지) 🔥
+    // 🔥 2. 이벤트 핸들러 (handleAction 수정) 🔥
     // --------------------------------------------------
     
     const handleAction = (action: 'tryAgain' | 'next') => {
+        
         if (action === 'next') {
+            // 'Next' 버튼은 오답(incorrect) 상태일 때만 사용됨
+            
+            // 🔥🔥🔥 현재 단어가 마지막 단어인지 확인 🔥🔥🔥
+            const isLastWord = currentWordIndex === totalWords;
+            
+            if (isLastWord) {
+                // 마지막 단어에서 'Next' 클릭 시: LearnComplete로 이동 (요청 사항)
+                console.log("Last word incorrect, user clicked Next. Navigating to LearnComplete.");
+                navigate('/mainpage/learn/complete'); 
+                return; // 함수 종료
+            }
+
+            // 마지막 단어가 아니면 다음 단어로 이동
             setCurrentWordIndex(prev => prev + 1);
         }
+        
+        // Try Again 또는 Next 클릭 후 (마지막 단어 Next 제외) 상태 초기화
         setStatus('initial');
         setResultStatus('none');
+        setDisplayStatus('none'); // displayStatus 초기화
     };
 
     const handleMicDown = (e: React.MouseEvent | React.TouchEvent) => {
@@ -190,7 +228,7 @@ const LearnStart: React.FC = () => {
 
     const renderWordImage = () => {
         if (!isWordVisible) return null;
-        // ... (이미지 렌더링 로직 유지) ...
+        
         return (
             <div className="word-image-placeholder"> 
                 <img 
@@ -206,7 +244,6 @@ const LearnStart: React.FC = () => {
     
     return (
         <div className="learn-page-container">
-            {/* ... (UI 렌더링 JSX 유지) ... */}
             
             <div className="learn-header">
                 <button className="logout-button" onClick={handleLogout}>Logout</button>
@@ -255,7 +292,7 @@ const LearnStart: React.FC = () => {
                     </div>
                 </div>
 
-                {/* 🔥🔥 액션 버튼/마이크 버튼 렌더링 로직 수정 🔥🔥 */}
+                {/* 🔥🔥 액션 버튼/마이크 버튼 렌더링 로직 (오답 시 버튼 표시) 🔥🔥 */}
                 {isIncorrectView ? (
                     // 오답일 때: Try Again / Next 버튼 표시
                     <div className="action-buttons-container">
@@ -267,7 +304,7 @@ const LearnStart: React.FC = () => {
                         </button>
                     </div>
                 ) : (
-                    // 정답 또는 학습 중일 때: 마이크 버튼 표시 (정답 시는 비활성화된 상태)
+                    // 정답 또는 학습 중일 때: 마이크 버튼 표시
                     <button 
                         className={`mic-button ${micOn ? 'on' : 'off'} ${!isMicActiveForRecording ? 'disabled' : ''}`}
                         onMouseDown={handleMicDown}
