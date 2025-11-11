@@ -1,0 +1,208 @@
+/* learnReview.css (최종 코드) */
+
+/* learnComplete.css와 동일한 기본 컨테이너 재활용 */
+.Review-page-container {
+    /* 🔥 수정: 뷰포트 크기에 맞춰 360x720 규격을 유지하도록 조정 */
+    width: 360px;
+    height: 100vh; /* 뷰포트 전체 높이를 사용하여 부모의 720px 규격에 유연하게 맞춤 */
+    max-height: 720px; /* 720px을 초과하지 않도록 제한 */
+    
+    background-color: #FF5000;
+    border-radius: 20px;
+    font-family: 'Inter', sans-serif;
+    color: white;
+    
+    overflow-y: auto; /* 페이지 전체에 스크롤 부여 */
+    
+    /* 🔥 수정: 하단 fixed 버튼 높이(50px) + 상하 패딩(15px*2)을 고려하여 공간 확보 */
+    padding: 0 0 60px 0; 
+    
+    position: relative;
+    box-sizing: border-box; 
+    
+    /* 스크롤바 숨기기 (유지) */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Chrome, Safari, Opera 브라우저의 스크롤바 숨김 */
+.Review-page-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* -------------------- 1. 상단 타이틀 및 요약 카드 -------------------- */
+
+.review-header {
+    padding: 5px 15px 15px 15px;
+    /* 🔥 수정: 스크롤 시 상단에 고정 */
+    position: sticky; 
+    top: 0; 
+    background-color: #FF5000;
+    z-index: 10;
+    height: 199px;
+   
+}
+
+.review-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: black;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+/* 결과 요약 박스 (검은색 배경) */
+.review-results-box {
+    background-color: #000;
+    color: white; 
+    border-radius: 10px;
+    padding: 0px 15px 15px 15px;
+    height: 131px;
+}
+
+.results-topic-title {
+    font-size: 18px;
+    font-weight: 500;
+    width: 172px;
+    height: 20px;
+    padding-top: 8px;
+    margin-bottom: 25px;
+    color: white;
+}
+
+/* ... (결과 항목 스타일 유지) ... */
+.result-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px; 
+}
+.result-icon {
+    width: 20px;
+    height: 20px;
+    color: white; 
+    margin-right: 5px;
+}
+.result-value {
+    font-size: 12px;
+    font-weight: 500;
+    color: white;
+}
+
+
+/* -------------------- 2. 단어별 결과 목록 -------------------- */
+
+.word-results-list {
+    /* 🔥 수정: 좌우 패딩만 설정. 스크롤은 부모가 담당. */
+    padding: 0 15px; 
+}
+
+/* 단어 컨테이너 (단어 한 쌍) */
+.rv-word-result-container {
+    background-color: #FF5000; 
+    border-radius: 10px;
+    margin-bottom: 8px;
+    padding-bottom: 2px; 
+    overflow: hidden; 
+    width: 328px;
+    height: 96px;
+}
+
+/* 단어 정보 행 */
+.word-result-row {
+    display: flex;
+    align-items: center;
+    height: 32px; 
+    background-color: #000; 
+    color: white;
+    padding: 0 10px;
+    gap: 10px;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.word-result-row:last-child {
+    border-bottom: none;
+}
+
+.word-label {
+    width: 90px;
+    font-size: 12px;
+    font-weight: 500;
+    color: white; 
+}
+
+.word-value {
+    flex-grow: 1;
+    font-size: 12px;
+    font-weight: 500;
+    color: white;
+}
+
+/* Correct/Wrong 태그 스타일 */
+.result-tag {
+    font-size: 10px;
+    font-weight: 600;
+    
+    border-radius: 6px;
+    min-width: 65px;
+    height: 20px;
+    text-align: center;
+}
+
+.result-tag.correct {
+    background-color: #39FF14; 
+    color: black;
+}
+
+.result-tag.wrong {
+    background-color: #FF0000; 
+    color: black;
+}
+
+/* -------------------- 3. 하단 고정 버튼 -------------------- */
+
+.review-action-container {
+    /* 🔥 수정: Fixed 속성을 다시 적용 */
+    position: fixed;
+    bottom: 22px;
+
+    
+    /* 360px 컨테이너 중앙에 정확히 배치 */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* 🔥 수정: width 360px 컨테이너 경계에 맞게 설정 */
+    width: 360px; 
+    height: 72px;
+    background-color: #FF5000; 
+    
+    /* 🔥 수정: 이미지처럼 버튼이 하단 경계에 가깝게 붙도록 패딩 조정 */
+
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    box-sizing: border-box;
+    z-index: 20;
+}
+
+.review-action-button {
+    flex-grow: 1;
+    height: 40px; 
+    border: none;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* 버튼 색상 */
+.review-action-button.wrong-only {
+    background-color: white;
+    color: black; 
+}
+
+.review-action-button.try-all {
+    background-color: white;
+    color: black;
+}

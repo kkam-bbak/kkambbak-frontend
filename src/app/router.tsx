@@ -10,6 +10,7 @@ import Survey from '../pages/krLearn/survey/survey'
 import LearnList from '../pages/krLearn/learnList/learnList'
 import LearnStart from '../pages/krLearn/learnStart/learnStart'
 import LearnComplete from '../pages/krLearn/learnComplete/learnComplete'
+import LearnRiview from '../pages/krLearn/learnReview/learnReview'
 
 import { useUser } from '../stores/user'
 
@@ -47,7 +48,9 @@ export const router = createBrowserRouter([
             path: 'learn/:topicId',
             element: <LearnStart />
           },
-          { path: 'learn/complete', element: <LearnComplete /> }
+          { path: 'learn/complete', element: <LearnComplete /> },
+          
+          { path: 'learn/review', element: <LearnRiview /> }
         ],
       },
     ],
