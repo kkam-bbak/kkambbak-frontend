@@ -8,6 +8,7 @@ import './Login.css'
 
 export default function Home() {
   const { login } = useUser()
+  const user = useUser((s) => s.user)
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -39,8 +40,6 @@ export default function Home() {
   }
 
   const handleGoogleLogin = () => {
-    const user = useUser((s) => s.user)
-
     let oauthUrl = 'https://kkambbak.duckdns.org/oauth2/authorization/google'
 
     // 게스트 사용자인 경우 guestProviderId 파라미터 추가

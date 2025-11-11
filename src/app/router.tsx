@@ -4,6 +4,7 @@ import AppLayout from '../components/layout/AppLayout'
 
 import Splash from '../pages/Splash/Splash'
 import Login from '../pages/Login/Login'
+import VerifyEmail from '../pages/VerifyEmail/VerifyEmail'
 import MainPage from '../pages/mainPage/mainPage'
 import SurveyStart from '../pages/krLearn/survey/surveyStart'
 import Survey from '../pages/krLearn/survey/survey'
@@ -26,6 +27,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />,
+  },
+  {
+    path: '/verify-email',
+    element: <VerifyEmail />,
   },
   {
     path: '/mainpage',
