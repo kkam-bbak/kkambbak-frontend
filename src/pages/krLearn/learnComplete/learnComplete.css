@@ -108,10 +108,11 @@
 }
 
 /* 학습 이름 제목 스타일 */
-.results-topic-title {
+.comresults-topic-title {
     font-size: 18px;
     font-weight: 500;
     margin-bottom: 15px;
+   
     color: white;
 }
 
