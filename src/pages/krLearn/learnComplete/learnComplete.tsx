@@ -103,7 +103,7 @@ const LearnComplete: React.FC = () => {
     const handleLogout = () => navigate('/auth/login');
 
     // 2. Review 페이지 이동 핸들러
-    const handleReview = () => navigate('/review'); 
+    const handleReview = () => navigate('/mainpage/learn/review'); 
     
     // 3. Try again (현재 학습 시작 화면으로 돌아감)
     const handleTryAgain = () => {
@@ -166,7 +166,7 @@ const LearnComplete: React.FC = () => {
                 <div className="results-box">
                     
                     {/* 1. 학습 이름: Casual_Emotions Result */}
-                    <h2 className="results-topic-title">
+                    <h2 className="comresults-topic-title">
                         {topicName} Result
                     </h2>
 
