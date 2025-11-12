@@ -196,19 +196,21 @@ const MainPage: React.FC = () => {
         <div className="page-container app-container">
             {/* 상단 고정 요소들은 Profile 탭이 활성화되면 숨겨짐 */}
             {activeMenu !== 'profile' && (
+                <div className="header-section">
                 <>
                     {/* Logout 버튼 (비활성 시) */}
-                    <button className="logout-button" onClick={() => navigate('/login')}>Logout</button>
+                    <button className="logout" onClick={() => navigate('/login')}>Logout</button>
                     
                     {/* 말풍선과 꼬리 */}
-                    <div className="speech-bubble">
+                    <div className="speech-bubble main-bubble">
                         {activeBubbleText}
-                        <div className="bubble-tail"></div>
+                        <div className="speech-tail main-tail"></div>
                     </div>
                     <div className="character-placeholder">
                         <img src={Character1} alt="Character" className="character-icon" />
                     </div>
                 </>
+                </div>
             )}
 
             {/* 하단 메뉴 영역 (클릭 및 애니메이션) */}
