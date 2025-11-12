@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Character1 from '../../../assets/Character1.png';
+import CharacterCute from '../../../assets/Character-Cute.png';
 import './survey.css'; 
 
 // --- 데이터 및 타입 정의 ---
@@ -55,27 +57,65 @@ const DONE_PAGE_INDEX = surveyData.length;
 // --- 컴포넌트 분리 (SpeechBubble, CharacterSection, PaginationDots) ---
 
 const SpeechBubble: React.FC<{ text: string, isFinal?: boolean }> = ({ text, isFinal = false }) => (
-    <div className="speech-bubble">
+    <div className="speech-bubble surveyIng-bubble">
         {text}
-        <div className={`bubble-tail ${isFinal ? 'final-tail' : ''}`}></div>
+        <div className={`speech-tail ${isFinal ? 'final-tail' : ''}`}>
+           
+        </div>
     </div>
 );
 
-const CharacterSection: React.FC<{ pageIndex: number, isStarted: boolean, onLogout: () => void }> = ({ pageIndex, isStarted, onLogout }) => {
+// const CharacterSection: React.FC<{ pageIndex: number, isStarted: boolean, onLogout: () => void }> = ({ pageIndex, isStarted, onLogout }) => {
+//     let currentBubbleText;
+//     if (pageIndex === DONE_PAGE_INDEX) {
+//         currentBubbleText = FINAL_BUBBLE_TEXT;
+//     } else {
+//         // SurveyStart.tsx를 통과했으므로 무조건 질문 텍스트를 표시
+//         currentBubbleText = surveyData[pageIndex].bubbleText;
+//     }
+
+//     return (
+//         <div className="header-section">
+//             <button className="logout" onClick={onLogout}>Logout</button>
+//             <SpeechBubble text={currentBubbleText} isFinal={pageIndex === DONE_PAGE_INDEX} />
+//             <div className={`character-placeholder ${pageIndex === DONE_PAGE_INDEX ? 'final-character' : ''}`}>
+                
+//             </div>
+//         </div>
+//     );
+// };
+
+const CharacterSection: React.FC<{ pageIndex: number, isStarted: boolean, onLogout: () => void }> = ({ pageIndex, isStarted, onLogout }) => { 
+    // 설문 진행 중인지 확인
+    const isDone = pageIndex === DONE_PAGE_INDEX;
+
     let currentBubbleText;
-    if (pageIndex === DONE_PAGE_INDEX) {
+    if (isDone) {
         currentBubbleText = FINAL_BUBBLE_TEXT;
-    } else {
+     } else {
         // SurveyStart.tsx를 통과했으므로 무조건 질문 텍스트를 표시
         currentBubbleText = surveyData[pageIndex].bubbleText;
     }
+    
+    // ⭐ 2. 페이지에 따라 사용할 이미지 경로 결정
+    const characterImage = isDone ? CharacterCute : Character1;
+
 
     return (
-        <div className="survey-header-section">
-            <button className="logout-button" onClick={onLogout}>Logout</button>
-            <SpeechBubble text={currentBubbleText} isFinal={pageIndex === DONE_PAGE_INDEX} />
-            <div className={`character-placeholder ${pageIndex === DONE_PAGE_INDEX ? 'final-character' : ''}`}></div>
-        </div>
+     <div className="header-section">
+         <button className="logout" onClick={onLogout}>Logout</button>
+         <SpeechBubble text={currentBubbleText} isFinal={isDone} />
+
+            {/* ⭐ 3. 이미지 태그를 사용하여 캐릭터 이미지 표시 */}
+            <div className={`character-placeholder ${isDone ? 'final-character' : ''}`}>
+                 <img 
+                    src={characterImage} 
+                    alt={isDone ? "Cute Character for Success" : "Instructor Character for Survey"} 
+                    // 필요하다면 이미지 스타일링을 위한 클래스를 추가합니다.
+                    className="character-icon" 
+                />
+             </div>
+         </div>
     );
 };
 
@@ -185,7 +225,7 @@ const Survey: React.FC = () => {
     };
 
     return (
-        <div className="survey-container">
+        <div className="page-container app-container">
             {/* 상단 섹션 */}
             <CharacterSection 
                 pageIndex={currentPage} 
@@ -194,7 +234,7 @@ const Survey: React.FC = () => {
             />
 
             {/* 하단 Survey 내용 창 */}
-            <div className="survey-content-window">
+            <div className="content-window">
                 <h1 className="survey-title">Survey</h1>
                 
                 <div className="survey-form-area">
