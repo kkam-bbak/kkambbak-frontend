@@ -1,5 +1,6 @@
 /* learnStart.css */
 
+
 /* -------------------- 0. 전체 컨테이너 및 레이아웃 -------------------- */
 
 .learn-page-container {
@@ -16,17 +17,21 @@
 .learn-header {
     position: relative;
     /* 하단 창 시작 위치(290px)까지 영역 확보 */
-    height: 290px; 
+    height: 300px; 
 }
 
 .logout-button {
+    position: absolute;
+    width: 64px;
+    height: 32px;
+    top: 5px; 
+    left: 296px;
     background-color: transparent;
     border: none;
-    color: #757575;
-    font-size: 13px;
-    font-weight: 500;
+    color: gray;
+    font-size: 14px;
     cursor: pointer;
-    text-align: right;
+    z-index: 20;
 }
 
 /* -------------------- 2. 캐릭터 및 말풍선 -------------------- */
@@ -35,23 +40,27 @@
     align-items: center;
     position: absolute;
     top: 60px; 
-    left: 81px;
+    left: 180px;
     width: 100%;
     z-index: 5;
 }
 
 /* 말풍선 스타일 */
 .speech-bubble-top {
-    width: 198px;
-    height: 44px;
+    width: 222px;
+    height: 58px;
     background-color: #FF5000;
     color: black;
     border: none;
     border-radius: 10px;
-    position: relative;
-    text-align: center;
-    
-    font-size: 15px; 
+   
+    display: flex; /* Flexbox 활성화 */
+    justify-content: center; /* 수평 중앙 정렬 (텍스트) */
+    align-items: center; /* 수직 중앙 정렬 (글자를 아래로 내림) */
+    text-align: center; /* 텍스트가 여러 줄일 때 대비 */
+
+    font-size: 16px;
+    font-weight: 500; 
 }
 
 /* 말풍선 꼬리 */
@@ -239,9 +248,14 @@
 
 .action-buttons-container {
     display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    margin-top: 20px; /* 🔥 마진을 10px 줄여서 전체적으로 위로 올림 */
+   
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.action-button{
+    width: 156px;
+    height: 40px;
 }
 
 .mic-button.off {

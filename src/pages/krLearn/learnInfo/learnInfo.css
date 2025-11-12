@@ -79,7 +79,7 @@
 /* 말풍선 스타일 */
 .speech-bubble-info {
     position: relative;
-    width: 328px;
+    width: 310px;
     min-height: 40px; 
     height: auto; 
     margin: 40px auto 0; 
@@ -128,6 +128,26 @@
 
 }
 
+/* 🔥🔥 카드 전체의 흐림 효과 오버레이 🔥🔥 */
+.learning-card-info::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    /* ✨ Step 3, 4, 5, 6, 7, 8에만 흐림 효과 적용 */
+    background-color: transparent; 
+    pointer-events: none;
+    z-index: 9; 
+    border-radius: 15px 15px 0 0;
+    transition: background-color 0.4s ease-out;
+}
+
+/* 🔥 Step 3, 4, 5, 6, 7, 8: 흐림 효과 적용 */
+.learning-card-info.card-fade::before {
+    background-color: rgba(0, 0, 0, 0.6); 
+}
+
+
+
 /* 제목 및 페이지 */
 .card-title-bar-info {
     display: flex; justify-content: space-between; font-weight: 500;
@@ -150,6 +170,8 @@
 
     margin-bottom: 8px; /* 🔥 입력 필드와의 간격 8px */
     flex-shrink: 0; /* 높이 고정 유지 */
+
+    
 }
 
 /* 입력 필드 컨테이너 */
@@ -162,7 +184,7 @@
 
 .input-row-info {
     display: 328px; align-items: center; height: 40px; background-color: #000; 
-    border-radius: 10px; color: white; overflow: hidden; border: 1px solid transparent;
+    border-radius: 10px; color: black; overflow: hidden; border: 1px solid transparent;
 
 }
 
@@ -178,19 +200,31 @@
     flex-grow: 1;
     height: 100%;
     border: none;
-    background-color: #000;
-    color: white;
+    background-color: black;
+    color: black;
     padding: 0 10px;
     font-size: 16px;
 }
+/* .speaker-icon-info 에 flex 속성을 추가하여 내부 아이콘을 중앙 정렬 */
 .speaker-icon-info {
     width: 44px;
     height: 100%;
     background-color: #000;
     border: none;
-    color: white;
     cursor: pointer;
-    font-size: 16px;
+    /* 🔥 추가/수정: 내부 요소를 중앙 정렬 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* color 속성은 아이콘 심볼에 직접 적용 */
+}
+
+/* 🔥 새로운 클래스: 아이콘 심볼에 직접 크기와 색상 적용 */
+.speaker-icon-info .speaker-icon-symbol {
+    font-size: 20px;
+    color: white; /* 항상 흰색 */
+    z-index: 10;
+    /* Step 7 하이라이트는 이 아이콘의 색상을 바꾸지 않습니다. */
 }
 
 /* -------------------- 4. 입력 필드 (Translation 색상 수정) -------------------- */
@@ -208,6 +242,23 @@
     color: #FF5000; /* 🔥 입력 필드 텍스트 검은색 */
     /* padding 유지 */
 }
+
+/* 🔥 흐림 효과가 적용된 상태에서 원색을 표시하고 싶을 때 사용 (Step 2, 7) */
+.word-display-area-info.highlight-no-fade,
+.input-row-info.highlight-no-fade {
+    /* 카드 전체의 흐림 효과를 뚫고 불투명하게 보이도록 z-index를 높이고 opacity를 1로 설정 */
+    z-index: 10; 
+    position: relative; 
+    opacity: 1 !important; 
+}
+/* 🔥 주황색 테두리 적용 */
+.word-display-area-info.border-highlight-orange {
+    border: 2px solid #FF5000;
+}
+.input-row-info.border-highlight-orange {
+    border: 2px solid #FF5000;
+}
+
 
 
 .mic-button-info {

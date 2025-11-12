@@ -138,11 +138,11 @@ const Survey: React.FC = () => {
 
     const handleSkip = (e: React.MouseEvent) => {
         e.stopPropagation();
-        navigate('../mainpage/learnList');
+        navigate('../learnList');
     };
     
     const handleDoneMessageClick = () => {
-        navigate('../mainpage/learnList');
+        navigate('../learnList');
     };
 
 
