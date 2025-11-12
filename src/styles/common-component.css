@@ -1,10 +1,10 @@
-/*상단 섹션 - tsx파일에 존재하지않으면 header-section으로 상단섹션 묶기*/
+/*로그인아웃 버튼, 상단섹션크기, 하단섹션 크기, 말풍선 위치, 캐릭터 위치&크기*/
 
 .app-container{
     background-color: black;
 }
 
-/*로그인아웃 버튼, 상단섹션크기, 하단섹션 크기, 말풍선 위치, 캐릭터 위치&크기*/
+/*상단 섹션 - tsx파일에 존재하지않으면 header-section으로 상단섹션 묶기*/
 .header-section{
     position: relative;
     height: 300px;

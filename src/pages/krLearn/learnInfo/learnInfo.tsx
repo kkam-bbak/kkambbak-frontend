@@ -1,6 +1,9 @@
 // LearnInfo.tsx
-
 import React, { useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
+import Character1 from '../../../assets/Character1.png';
+import CharacterSmile from '../../../assets/Character-Smile.png';
+import CharacterShine from '../../../assets/Character-Shining.png';
 import './learnInfo.css'; 
 
 // Topic 인터페이스는 유지
@@ -34,45 +37,66 @@ const LearnInfo: React.FC<LearnInfoProps> = ({ topic, tab, isOpen, onClose, onCo
     const modalClassName = `learn-info-modal-overlay ${isOpen ? 'open' : ''}`;
     
     useEffect(() => {
-    if (!isOpen) return;
-    
-    let timer: number | undefined;
-    const totalSteps = INFO_STEPS_TEXT.length;
-    const isMicControlStep = currentStep >= 3 && currentStep <= 5; // 3, 4, 5 단계
-    
-    if (currentStep < totalSteps) {
-        const delay = (currentStep === 0 || currentStep === 1) ? 3000 : 5000;
+        if (!isOpen) return;
         
-        // 🚨 Step 3, 4, 5가 아닐 때만 자동 타이머 설정
-        if (!isMicControlStep) {
+        let timer: number | undefined;
+        const totalSteps = INFO_STEPS_TEXT.length;
+        const isMicControlStep = currentStep >= 3 && currentStep <= 5; // 3, 4, 5 단계
+        
+        if (currentStep < totalSteps) {
+            const delay = (currentStep === 0 || currentStep === 1) ? 3000 : 5000;
+            
+            // 🚨 Step 3, 4, 5가 아닐 때만 자동 타이머 설정
+            if (!isMicControlStep) {
+                timer = setTimeout(() => {
+                    setCurrentStep(prev => prev + 1);
+                }, delay);
+            }
+            
+            // Step 5는 사용자 액션(마이크 떼기)으로 진입하며, 5초 뒤 Step 6으로 자동 전환되어야 함
+            if (currentStep === 5) {
+                  timer = setTimeout(() => {
+                    setCurrentStep(prev => prev + 1);
+                  }, 5000); 
+            }
+
+
+        } else {
+            // 최종 단계 (Step 8) 완료 후 2초 뒤 자동 학습 시작
             timer = setTimeout(() => {
-                setCurrentStep(prev => prev + 1);
-            }, delay);
+                onConfirmStart(); 
+            }, ); // 2000ms = 2초로 설정했습니다.
         }
+
+        return () => { 
+            if (timer) clearTimeout(timer); 
+        };
         
-        // Step 5는 사용자 액션(마이크 떼기)으로 진입하며, 5초 뒤 Step 6으로 자동 전환되어야 함
-        if (currentStep === 5) {
-             timer = setTimeout(() => {
-                setCurrentStep(prev => prev + 1);
-            }, 5000); 
-        }
-
-
-    } else {
-        // 최종 단계 (Step 8) 완료 후 2초 뒤 자동 학습 시작
-        timer = setTimeout(() => {
-            onConfirmStart(); 
-        }, ); 
-    }
-
-    return () => { 
-        if (timer) clearTimeout(timer); 
-    };
+    }, [currentStep, isOpen, onConfirmStart]);
     
-}, [currentStep, isOpen, onConfirmStart]);
     const currentSpeechText = INFO_STEPS_TEXT[currentStep] || "";
     const isFieldsActive = currentStep >= 2 && currentStep <= 5; 
 
+
+    // 🔥 캐릭터 이미지 소스를 결정하는 함수
+    const getCharacterImage = () => {
+        switch (currentStep) {
+            case 0: // "Okay, Let's go!"
+            case 5: // "and then release the button."
+                return CharacterSmile;
+            case 8: // "Okay, now focus on my instructions."
+                return CharacterShine;
+            case 1: // "Before we begin, let me briefly explain."
+            case 2: // "I'll show you an image and play it back in Korean with pronunciation."
+            case 3: // "Then, you hold down the button"
+            case 4: // "Say the words"
+            case 7: // "You can also press the voice to hear it again."
+                return Character1;
+            default:
+                // 6 (If you don't understand after listening,) 은 Character1이나 디폴트 이미지로 설정
+                return Character1; 
+        }
+    };
 
     // 🔥 마이크 버튼 스타일 결정 (ON/OFF/Disabled)
     const getMicButtonState = () => {
@@ -88,9 +112,8 @@ const LearnInfo: React.FC<LearnInfoProps> = ({ topic, tab, isOpen, onClose, onCo
             return 'card-fade'; 
         }
         // Step 2는 흐림 효과가 없고, 개별 요소만 하이라이트되어야 함.
-        // 하지만 요청에 따라 Step 2도 "전체 흐림"이어야 하므로 card-fade를 적용합니다.
         if (currentStep === 2) {
-            return 'card-fade';
+            return 'card-fade'; // 요청에 따라 Step 2도 전체 흐림 적용
         }
         return '';
     };
@@ -128,16 +151,22 @@ const LearnInfo: React.FC<LearnInfoProps> = ({ topic, tab, isOpen, onClose, onCo
 
     return (
         <div className={modalClassName}>
-            <div className="info-card-container">
+            <div className="page-container app-container">
                 
                 {/* 상단 헤더 */}
-                <div className="info-header">
-                    <button className="logout-button" onClick={onClose}>Logout</button>
-                    <div className="speech-bubble-info">
+                <div className="header-section">
+                    <button className="logout" onClick={onClose}>Logout</button>
+                    <div className="speech-bubble info-bubble">
                         {currentSpeechText}
-                        <div className="bubble-tail-info"></div>
+              
                     </div>
-                    <div className="character-placeholder-info"></div>
+                   
+                    
+                    {/* 👇 캐릭터 이미지 렌더링 추가 */}
+                    <div className="character-placeholder">
+                        <img src={getCharacterImage()} alt="Character" className="character-icon" />
+                    </div>
+                    {/* 👆 캐릭터 이미지 렌더링 추가 */}
                 </div>
 
                 {/* 학습 카드 영역 */}
