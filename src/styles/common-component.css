@@ -26,7 +26,12 @@
 }
 
 /*말풍선 - 글자 크기에 따라 따로 변경 가능*/
-.speech-bubble{ 
+ .speech-bubble{ 
+    position: absolute;
+    display: flex; /* Flexbox 활성화 */
+    align-items: center; /* 수직(세로) 중앙 정렬 */
+    justify-content: center; /* 수평(가로) 중앙 정렬 */
+
     background-color: #FF5000; 
     border-radius: 10px;
     font-size: 16px;

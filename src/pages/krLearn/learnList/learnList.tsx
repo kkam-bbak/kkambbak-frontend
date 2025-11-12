@@ -1,7 +1,7 @@
 // learnList.tsx
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Character1 from '../../../assets/Character1.png'; 
 import './learnList.css';
 import LearnInfo from '../learnInfo/learnInfo'; // 🔥 경로 수정
 // Topic 인터페이스는 유지
@@ -130,7 +130,7 @@ const learnList: React.FC = () => {
     }
 
     const activeBubbleText = activeTab === 'topik' 
-        ? 'Should I help you prepare for the exam?' 
+        ? 'Should I help you prepare <br/> for the exam?' 
         : 'Can I help you with daily conversation?';
 
     const topicsToDisplay = activeTab === 'topik' ? topikList : casualList;
@@ -150,18 +150,21 @@ const learnList: React.FC = () => {
 
     
     return (
-        <div className="topic-page-container">
+        <div className="page-container app-container">
             {/* 상단 고정 요소 */}
             <div className="header-section">
-                <button className="logout-button" onClick={() => navigate('/auth/login')}>Logout</button>
-                <div className="speech-bubble">
-                    {activeBubbleText}
-                    <div className="bubble-tail"></div>
+                <button className="logout" onClick={() => navigate('/auth/login')}>Logout</button>
+                <div className="speech-bubble list-bubble">
+                    {/*띄어쓰기 html 적용코드*/} 
+                    <div dangerouslySetInnerHTML={{ __html: activeBubbleText }} />
+                    <div className="speech-tail"></div>
                 </div>
-                <div className="character-placeholder"></div>
+                <div className="character-placeholder">
+                    <img src={Character1} alt="Character" className="character-icon" />
+                </div>
             </div>
 
-            <div className="learning-window">
+            <div className="content-window">
                 {/* 탭 버튼 */}
                 <div className="tab-buttons-container">
                     <button 
