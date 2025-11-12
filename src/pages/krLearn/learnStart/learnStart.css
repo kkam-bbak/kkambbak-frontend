@@ -1,86 +1,19 @@
 /* learnStart.css */
+@import '../../../styles/page-base.css';
 
+@import '../../../styles/common-component.css';
 
-/* -------------------- 0. 전체 컨테이너 및 레이아웃 -------------------- */
-
-.learn-page-container {
-    width: 360px;
-    height: 720px;
-    background-color: #000;
-    position: relative; 
-    font-family: 'Inter', sans-serif;
-    color: white;
-    overflow: hidden; 
-}
-
-/* -------------------- 1. 상단 헤더 및 로그아웃 -------------------- */
-.learn-header {
-    position: relative;
-    /* 하단 창 시작 위치(290px)까지 영역 확보 */
-    height: 300px; 
-}
-
-.logout-button {
-    position: absolute;
-    width: 64px;
-    height: 32px;
-    top: 5px; 
-    left: 296px;
-    background-color: transparent;
-    border: none;
-    color: gray;
-    font-size: 14px;
-    cursor: pointer;
-    z-index: 20;
-}
-
-/* -------------------- 2. 캐릭터 및 말풍선 -------------------- */
-.character-section {
-    display: flex;
-    align-items: center;
-    position: absolute;
-    top: 60px; 
-    left: 180px;
-    width: 100%;
-    z-index: 5;
-}
-
-/* 말풍선 스타일 */
-.speech-bubble-top {
+.start-bubble{
     width: 222px;
-    height: 58px;
-    background-color: #FF5000;
-    color: black;
-    border: none;
-    border-radius: 10px;
-   
-    display: flex; /* Flexbox 활성화 */
-    justify-content: center; /* 수평 중앙 정렬 (텍스트) */
-    align-items: center; /* 수직 중앙 정렬 (글자를 아래로 내림) */
-    text-align: center; /* 텍스트가 여러 줄일 때 대비 */
-
-    font-size: 16px;
-    font-weight: 500; 
-}
-
-/* 말풍선 꼬리 */
-.bubble-tail{
-    width: 28.67px;
-    height: 28.67px;
-    
-    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
-    background-color: #FF5000; 
-    transform: rotate(180deg);
-}
-
-/* 캐릭터 이미지 (플레이스홀더) */
-.character-image {
+    height: 44px;
+    top: 60px;
+    left: 69px;
     
 }
 
-
-
-
+.start-tail{
+    top: 90px;
+}
 /* -------------------- 3. 학습 카드 영역 -------------------- */
 .learning-card {
     position: absolute;

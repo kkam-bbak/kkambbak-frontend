@@ -1,6 +1,17 @@
 /* learnInfo.css */
+@import '../../../styles/page-base.css';
+@import '../../../styles/page-base.css';
 
+/**/
+.info-bubble{
+    width: 298px;
+    height: 72px;
+    top:30px;
+    left: 31px;
+
+}
 /* -------------------- 0. 모달 오버레이 및 기본 컨테이너 -------------------- */
+
 
 /* 🔥 LearnInfo 모달 오버레이: 전체 화면을 덮음 */
 .learn-info-modal-overlay {
@@ -11,7 +22,7 @@
     background-color: rgba(0, 0, 0, 0.7); 
     bottom: 2.8%;
     justify-content: center;
-
+    border-radius: 40px; /*모달 전체 규격 맞춤*/
     z-index: 9999; 
     overflow: hidden;
 }
@@ -20,7 +31,7 @@
 .info-card-container {
     width: 360px;
     height: 720px;
-    background-color: #000; /* LearnStart의 배경색 */
+    background-color: #000; 
     position: relative;
     font-family: 'Inter', sans-serif;
     color: white;
@@ -33,79 +44,6 @@
     transform: translateY(0);
 }
 
-
-/* -------------------- 1. 상단 안내 헤더 (고정 요소) -------------------- */
-.info-header {
-    /* 🔥 수정: info-card-container 상단에 고정 */
-    position: absolute; 
-    top: 0; 
-    left: 0;
-    width: 100%;
-    height: 290px; 
-    padding: 0 16px; 
-    box-sizing: border-box; 
-    background-color: #000; /* 검은색 배경 유지 */
-    z-index: 5;
-}
-
-.logout-button {
-    position: absolute;
-    top: 6px; 
-    right: 16px;
-    background-color: transparent;
-    border: none;
-    color: #757575;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: right;
-    z-index: 20;
-}
-
-/* -------------------- 2. 캐릭터 및 말풍선 -------------------- */
-
-.character-section {
-    display: flex;
-    flex-direction: column; 
-    align-items: center;
-    position: absolute; 
-    top: 60px; 
-    left: 50%;
-    transform: translateX(-50%); 
-    width: auto;
-    z-index: 5;
-}
-
-/* 말풍선 스타일 */
-.speech-bubble-info {
-    position: relative;
-    width: 310px;
-    min-height: 40px; 
-    height: auto; 
-    margin: 40px auto 0; 
-    background-color: #FF5000; 
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 15px;
-    color: black;
-    padding: 10px 16px; 
-    text-align: center;
-    z-index: 10;
-}
-
-/* 꼬리 스타일 유지 */
-.bubble-tail-info {
-    position: absolute; width: 30px; height: 13px; bottom: -10px; left: 50%;
-    transform: translateX(-50%) rotate(180deg);
-    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
-    background-color: #FF5000; 
-}
-.character-placeholder-info {
-    position: absolute; width: 92px; height: 124px; top: 150px; left: 134px;
-    background-color: #FF5000; border-radius: 50%; 
-}
 
 /* -------------------- 3. 학습 카드 영역 (슬라이드 애니메이션 적용) -------------------- */
 
