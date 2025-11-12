@@ -1,99 +1,13 @@
-/* -------------------- 0. 전체 컨테이너 및 레이아웃 -------------------- */
+@import '../../../styles/page-base.css';
 
-.topic-page-container {
-    width: 360px;
-    height: 720px;
-    background-color: #000;
-    position: relative; 
-    font-family: 'Inter', sans-serif;
-    color: white;
-    overflow: hidden; /* 페이지 전체 스크롤 방지 */
-}
+@import '../../../styles/common-component.css';
 
-.header-section {
-    position: relative;
-    /* 하단 창 시작 위치(290px)까지 영역 확보 */
-    height: 290px; 
-}
 
-/* -------------------- 1. 상단 요소 (기존 코드 유지) -------------------- */
-
-/* Logout 버튼 (44x20, Top: 6px, Left: 296px, Color: #757575) */
-.logout-button {
-    position: absolute;
-    width: 44px;
-    height: 20px;
-    top: 6px; 
-    left: 296px; 
-    background-color: transparent;
-    border: none;
-    color: #757575; /* #757575 */
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: right;
-    z-index: 20;
-}
-
-/* 말풍선 (228x72, Top: 32px, Left: 66px, Color: #FF5000) */
-.speech-bubble {
-    position: absolute;
-    width: 234px;
-    height: 75px;
-    top: 32px; 
-    left: 66px;
-    background-color: #FF5000; 
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px; 
-    color: black;
-    padding: 12px 16px; 
-    box-sizing: border-box;
-    z-index: 10;
-    text-align: center;
-}
-
-/* 말풍선 꼬리 (28.67x28.67, Top: 89.33px, Left: 165.67px) */
-.bubble-tail {
-    position: absolute;
-    width: 28.67px;
-    height: 28.67px;
-    /* 부모 말풍선(Top 32px, Left 66px) 기준으로 계산 */
-    top: 72px; 
-    left: 100px; 
-    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
-    background-color: #FF5000; 
-    transform: rotate(180deg);
-}
-
-/* 캐릭터 (92x124, Top: 150px, Left: 134px) */
-.character-placeholder {
-    position: absolute;
-    width: 92px;
-    height: 124px;
-    top: 150px; 
-    left: 134px;
-    background-color: #FF5000; 
-    border-radius: 50%; 
-    z-index: 10;
-}
-
-/* -------------------- 2. 하단 학습 창 영역 및 탭 버튼 (수정) -------------------- */
-
-.learning-window {
-    position: absolute;
-    width: 100%; 
-    height: 430px; 
-    top: 290px;
-    left: 0;
-    background-color: #FF5000; /* 탭 버튼 바깥쪽 배경색 */
-    color: black; 
-    border-radius: 15px 15px 0 0; 
-    box-sizing: border-box;
-    /* 이 컨테이너는 탭 버튼을 포함하므로 전체 스크롤을 갖지 않습니다. */
-    overflow: hidden; 
+.list-bubble {
+    width: 228px !important;
+    height: 72px !important;
+    top: 32px !important;
+    left: 66px !important;
 }
 
 /* 탭 버튼 컨테이너 - Sticky 고정을 위해 부모 요소의 top:0 기준으로 설정 */
