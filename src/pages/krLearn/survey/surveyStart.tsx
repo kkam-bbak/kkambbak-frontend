@@ -1,7 +1,7 @@
 // SurveyStart.tsx (메인 페이지에서 처음 접근하는 파일)
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Character1 from '../../../assets/Character1.png'
 import './surveyStart.css'; 
 
 // --- 데이터 및 타입 정의 (유지) ---
@@ -10,18 +10,20 @@ const INTRO_BUBBLE_TEXT = "Before we start, Answer a few simple questions and we
 
 // --- 컴포넌트 분리 (SpeechBubble, CharacterSection 유지) ---
 const SpeechBubble: React.FC<{ text: string }> = ({ text }) => (
-    <div className="speech-bubble">
+    <div className="speech-bubble survey-bubble">
         {text}
-        <div className="bubble-tail"></div>
+        <div className="speech-tail suvery-tail"></div>
     </div>
 );
 
 const CharacterSection: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     return (
-        <div className="survey-header-section">
-            <button className="logout-button" onClick={onLogout}>Logout</button>
+        <div className="header-section">
+            <button className="logout" onClick={onLogout}>Logout</button>
             <SpeechBubble text={INTRO_BUBBLE_TEXT} />
-            <div className="character-placeholder"></div>
+            <div className="character-placeholder">
+                <img src={Character1} alt="Character" className="character-icon" />
+            </div>
         </div>
     );
 };
@@ -49,12 +51,12 @@ const SurveyStart: React.FC = () => {
     };
 
     return (
-        <div className="survey-container">
+        <div className="page-container app-container">
             {/* 상단 섹션 */}
             <CharacterSection onLogout={handleLogout} />
 
             {/* 하단 Survey 내용 창 */}
-            <div className="survey-content-window">
+            <div className="content-window">
                 <h1 className="survey-title">Survey</h1>
                 
                 
