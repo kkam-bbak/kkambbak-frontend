@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Character1 from '../../assets/Character1.png'
 import './mainPage.css'; 
 
 // Navigate Prop 타입 정의
@@ -192,7 +193,7 @@ const MainPage: React.FC = () => {
     };
 
     return (
-        <div className="app-container">
+        <div className="page-container app-container">
             {/* 상단 고정 요소들은 Profile 탭이 활성화되면 숨겨짐 */}
             {activeMenu !== 'profile' && (
                 <>
@@ -204,7 +205,9 @@ const MainPage: React.FC = () => {
                         {activeBubbleText}
                         <div className="bubble-tail"></div>
                     </div>
-                    <div className="character-placeholder"></div>
+                    <div className="character-placeholder">
+                        <img src={Character1} alt="Character" className="character-icon" />
+                    </div>
                 </>
             )}
 
