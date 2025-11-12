@@ -1,26 +1,10 @@
-/* 1. HTML/Body에 전체 화면 높이 설정 및 중앙 정렬을 위한 Flexbox 적용 */
-html, body, #root {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    display: flex; /* 중앙 정렬을 위해 body에 flex 적용 */
-    justify-content: center; /* 가로 중앙 정렬 */
-    align-items: center; /* 세로 중앙 정렬 */
-    background-color: #484848; /* 앱 배경과 구분되는 배경색 (선택 사항) */
-}
-
-/* 전체 컨테이너 규격 */
-.app-container {
-    width: 360px;
-    height: 720px;
-    background-color: #000;
-    position: relative; 
-    font-family: 'Inter', sans-serif;
-    color: white;
-    overflow: hidden;
-}
+@import '../../styles/page-base.css';
 
 /* -------------------- 1. 상단 고정 요소 (Profile 비활성 시) -------------------- */
+
+.app-container{
+    background-color: black;
+}
 /* 기존 로그아웃 버튼 */
 .logout-button {
     position: absolute;
@@ -65,15 +49,13 @@ html, body, #root {
 }
 
 /* 캐릭터 */
-.character-placeholder {
-    position: absolute;
-    width: 92px;
-    height: 124px;
-    top: 150px;
-    left: 134px;
-
-    background-color: #FF5000; 
-    border-radius: 50%;
+.character-icon {
+  width: 100px;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  position: absolute;
+  top: 130px;
 }
 
 /* -------------------- 2. 하단 메뉴 영역 (애니메이션) -------------------- */
