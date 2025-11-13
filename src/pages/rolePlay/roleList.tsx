@@ -73,7 +73,7 @@ const RoleList: React.FC = () => {
             </div>
 
             {/* 하단 역할극 목록 섹션 */}
-            <div className="content-window">
+            <div className="role-content-window">
                 <div className="role-list-content-header">
                     <h2 className="role-list-title">Role Play</h2>
                     <button className="subscribe-button" onClick={handleSubscribe}>
@@ -99,7 +99,7 @@ const RoleList: React.FC = () => {
                                     
                                     {isStartVisible && (
                                         <button 
-                                            className="start-button" 
+                                            className="role-start-button" 
                                             onClick={(e) => { e.stopPropagation(); handleStart(role.id); }} // 🔥 이벤트 버블링 방지
                                         >
                                             Start
