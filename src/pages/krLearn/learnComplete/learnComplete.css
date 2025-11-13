@@ -1,76 +1,15 @@
 /* learnComplete.css */
+@import '../../../styles/page-base.css';
 
-/* -------------------- 0. 기본 컨테이너 재활용 -------------------- */
+@import '../../../styles/common-component.css';
 
-/* learnStart.css의 .learn-page-container를 재활용합니다. */
-.learn-complete-view {
-    width: 360px;
-    height: 720px;
-    background-color: #000;
-    position: relative; 
-    font-family: 'Inter', sans-serif;
-    color: white;
-    overflow: hidden; 
+
+.complete-bubble{
+    width: 130px;
+    height: 49px;
+    top: 60px;
+    left: 115px;
 }
-
-/* -------------------- 1. 상단 헤더 및 로그아웃 -------------------- */
-
-.header-section {
-    position: relative;
-    /* learnStart.css의 .learn-header가 차지하던 공간을 활용합니다. */
-    height: 290px;
-}
-
-/* 로그아웃 버튼의 위치는 TSX 파일에서 inline style로 조정되었습니다. (top: 5px, right: 16px) */
-
-
-/* -------------------- 2. 캐릭터 및 말풍선 -------------------- */
-
-/* learnStart.css의 .character-section 재활용 */
-.complete-char-section {
-    display: flex;
-    align-items: center;
-    position: absolute;
-    top: 60px; 
-    left: 180px;
-    width: 100%;
-    z-index: 5;
-}
-
-/* 말풍선 (.speech-bubble-top) 스타일 재활용 */
-.complete-bubble {
-    width: 222px;
-    height: 58px;
-    background-color: #FF5000;
-    color: black;
-    border: none;
-    border-radius: 10px;
-   
-    display: flex; /* Flexbox 활성화 */
-    justify-content: center; /* 수평 중앙 정렬 (텍스트) */
-    align-items: center; /* 수직 중앙 정렬 (글자를 아래로 내림) */
-    text-align: center; /* 텍스트가 여러 줄일 때 대비 */
-
-    font-size: 16px;
-    font-weight: 500; 
-}
-
-/* 말풍선 꼬리 (.bubble-tail) 스타일 재활용 */
-.complete-bubble .bubble-tail {
-    width: 28.67px;
-    height: 28.67px;
-    left: 170px;
-    top: 58px;
-    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
-    background-color: #FF5000; 
-    transform: rotate(180deg);
-}
-
-/* 캐릭터 이미지 스타일 (주황색 물고기/캐릭터 모양) */
-.complete-char-image {
-   
-}
-
 
 /* -------------------- 3. 학습 결과 카드 영역 -------------------- */
 

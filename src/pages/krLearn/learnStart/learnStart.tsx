@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Character1 from '../../../assets/Character1.png';
 import CharacterSmile from '../../../assets/Character-Smile.png';
+import CharacterJump from '../../../assets/Character-Jump.png';
 import CharacterWrong from '../../../assets/Character-Wrong.png';
 import './learnStart.css';
 
@@ -95,7 +96,7 @@ const LearnStart: React.FC = () => {
             setIsProcessing(false);
             
             // 오답설정
-            const isCorrect = false;
+            const isCorrect = true;
             
             setResultStatus(isCorrect ? 'correct' : 'incorrect');
             setDisplayStatus('initial_feedback');
@@ -239,11 +240,14 @@ const LearnStart: React.FC = () => {
     })();
     
     const getCharacterImage = () => {
+        if (resultStatus === 'none'){
+            return CharacterSmile;
+        }
         if (resultStatus === 'incorrect') {
             return CharacterWrong;
         }
-        if (resultStatus === 'correct' || status === 'initial') {
-            return CharacterSmile;
+        if (resultStatus === 'correct') {
+            return CharacterJump;
         }
         return Character1;
     };

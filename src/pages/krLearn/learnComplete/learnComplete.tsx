@@ -1,6 +1,11 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
+import CharacterShine from '../../../assets/Character-Shining.png';
+import CharacterSmile from '../../../assets/Character-Smile.png';
+import CharacterSoso from '../../../assets/Character-Soso.png';
+import CharacterGloomy from '../../../assets/Character-Gloomy.png';
+
 import './learnComplete.css'; // CSS 파일 임포트
 
 // --- 유틸리티 함수: 시간 및 날짜 처리 ---
@@ -42,7 +47,7 @@ const getFormattedCompletionDate = (): string => {
 // --- 더미 결과 데이터 ---
 const DUMMY_RESULTS = {
     topicName: "Casual_Emotions", 
-    correctCount: 12, // <-- 이 값을 변경하여 테스트해보세요 (예: 25, 17, 12, 5)
+    correctCount: 12, // <-- 이 값을 변경하여 테스트
     totalCount: 26,
 };
 // --- END DUMMY DATA ---
@@ -70,30 +75,25 @@ const LearnComplete: React.FC = () => {
     // 3. 말풍선 텍스트 및 캐릭터 이미지 결정 로직
     const { speechBubbleText, characterImageSrc } = useMemo(() => {
         let text = '';
-        // 💡 나중에 이미지 경로를 여기에 추가해주세요.
-        // const perfectImg = '/images/perfect_char.png'; 
-        // const goodImg = '/images/good_char.png';
-        // const sosoImg = '/images/soso_char.png';
-        // const badImg = '/images/bad_char.png';
-        let imgSrc = '/images/default_char.png'; // 기본 이미지 경로 (추후 업데이트)
+        let imgSrc = '';
 
         if (correctCount === totalCount) {
             text = 'Perfect!!!';
             // imgSrc = perfectImg; 
             // 🚨 나중에 이미지 경로로 대체 (예: imgSrc = '/path/to/perfect_image.png')
-            imgSrc = '/images/perfect_char.png'; 
+            imgSrc = CharacterShine; 
         } else if (correctCount >= totalCount * (2 / 3)) { // 3분의 2 이상
             text = "It's not bad~";
             // imgSrc = goodImg;
-            imgSrc = '/images/good_char.png';
+            imgSrc = CharacterSmile;
         } else if (correctCount >= totalCount * (1 / 2)) { // 절반 이상
             text = "So so~";
             // imgSrc = sosoImg;
-            imgSrc = '/images/soso_char.png';
+            imgSrc = CharacterSoso;
         } else { // 절반 이하
             text = "I'm sorry ..";
             // imgSrc = badImg;
-            imgSrc = '/images/bad_char.png';
+            imgSrc = CharacterGloomy;
         }
         return { speechBubbleText: text, characterImageSrc: imgSrc };
     }, [correctCount, totalCount]); // correctCount 또는 totalCount가 변경될 때마다 재계산
@@ -116,42 +116,23 @@ const LearnComplete: React.FC = () => {
     };
 
     return (
-        <div className="learn-page-container learn-complete-view">
-            
-            {/* 2. 헤더 / 로그아웃 버튼 (learnStart.css 기반) */}
+        <div className="page-container app-container">
             <div className="header-section">
                 <button 
                     onClick={handleLogout} 
-                    className="logout-button"
-                    style={{ position: 'absolute', top: '5px', right: '16px' }}
+                    className="logout"
                 >
                     Logout
                 </button>
-            </div>
-
-            {/* 3. 캐릭터 및 말풍선 섹션 */}
-            <div className="character-section complete-char-section">
+        
                 {/* 말풍선: 조건에 따라 텍스트 변경 */}
-                <div className="speech-bubble-top complete-bubble">
-                    {speechBubbleText} {/* 동적으로 변경되는 텍스트 */}
-                    <div className="bubble-tail"></div>
+                <div className="speech-bubble complete-bubble">
+                    {speechBubbleText} 
+                    <div className="speech-tail"></div>
                 </div>
-                {/* 캐릭터 이미지: 조건에 따라 이미지 변경 */}
-                <div className="character-image complete-char-image">
-                    {/* 🚨 실제 이미지를 사용하려면 <img> 태그를 사용하세요.
-                       예: <img src={characterImageSrc} alt="Character" style={{ width: '100px', height: '100px' }} />
-                       현재는 배경색만 있는 div이므로, 이미지를 여기에 직접 렌더링하도록 변경해야 합니다.
-                    */}
-                    {/* 임시로 배경 이미지로 처리 (실제 이미지는 <img/> 태그 권장) */}
-                    <div style={{ 
-                        width: '100px', 
-                        height: '100px', 
-                        backgroundColor: 'transparent', // 기본 배경색은 투명하게
-                        backgroundImage: `url(${characterImageSrc})`, // 이미지 경로를 배경 이미지로 사용
-                        backgroundSize: 'contain', // 이미지 비율 유지하며 컨테이너에 맞춤
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center'
-                    }}></div>
+            
+                <div className="character-placeholder">
+                    <img src={characterImageSrc} alt="Character" className="character-icon"></img>
                 </div>
             </div>
 
