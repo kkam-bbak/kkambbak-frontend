@@ -16,7 +16,7 @@ export default function Home() {
     try {
       setIsLoading(true)
       // Guest 로그인 API 호출
-      const response = await http.post('/users/guest-login')
+      const response = await http.post('/v1/users/guest-login')
 
       // API 응답에서 필요한 정보 추출
       const { body } = response.data
@@ -30,7 +30,7 @@ export default function Home() {
         isGuest,
       })
 
-      navigate('/mainpage')
+      navigate('/introduction')
     } catch (error) {
       console.error('Guest login failed:', error)
       alert('게스트 로그인에 실패했습니다.')

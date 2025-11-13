@@ -19,7 +19,12 @@ export const useUser = create<State>()(
     (set) => ({
       user: null,
       login: (u) => set({ user: u }),
-      logout: () => set({ user: null }),
+      logout: () => {
+        set({ user: null })
+        // localStorage 완전히 정리
+        localStorage.removeItem('auth')
+        localStorage.clear()
+      },
     }),
     { name: 'auth', partialize: (s) => ({ user: s.user }) }
   )

@@ -80,7 +80,7 @@ export default function VerifyEmail() {
         isGuest: false,
       })
 
-      navigate('/mainpage')
+      navigate('/introduction')
     } catch (err: any) {
       const errorCode = err.response?.data?.status?.statusCode
 
