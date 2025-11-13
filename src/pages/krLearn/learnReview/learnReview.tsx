@@ -153,6 +153,7 @@ const LearnReview: React.FC = () => {
 
 
     return (
+        <div className="page-container">
 
         <div className="Review-page-container">
 
@@ -268,6 +269,7 @@ const LearnReview: React.FC = () => {
 
            
 
+        </div>
         </div>
 
     );
