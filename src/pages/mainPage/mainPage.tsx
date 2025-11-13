@@ -32,7 +32,7 @@ const RoleContent: React.FC<NavigateProp> = ({ navigate }) => (
         <div className="extended-content">
             <div className="content-image-box blue">이미지 들어감</div>
             <div className="content-buttons center">
-                <button className="action-button white full-width" onClick={() => navigate('/roleplay/start')}>Start Role Playing</button>
+                <button className="action-button white full-width" onClick={() => navigate('/mainPage/roleList')}>Start Role Playing</button>
             </div>
         </div>
     </>
