@@ -73,7 +73,9 @@ function Introduction() {
   }
 
   const handleLogout = () => {
-    logout()
+    if (!user?.isGuest) {
+      logout()
+    }
     navigate('/login')
   }
 

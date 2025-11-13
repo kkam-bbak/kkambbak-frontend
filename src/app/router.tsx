@@ -6,6 +6,7 @@ import Splash from '../pages/Splash/Splash'
 import Login from '../pages/Login/Login'
 import VerifyEmail from '../pages/VerifyEmail/VerifyEmail'
 import Introduction from '../pages/Introduction/Introduction'
+import OAuthRedirect from '../pages/OAuthRedirect/OAuthRedirect'
 import MainPage from '../pages/mainPage/mainPage'
 import SurveyStart from '../pages/krLearn/survey/surveyStart'
 import Survey from '../pages/krLearn/survey/survey'
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
   {
     path: '/introduction',
     element: <Introduction />,
+  },
+  {
+    path: '/oauth2/redirect',
+    element: <OAuthRedirect />,
   },
   {
     path: '/mainpage',
