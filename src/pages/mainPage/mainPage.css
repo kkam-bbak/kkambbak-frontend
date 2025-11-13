@@ -5,10 +5,10 @@
 @import '../../styles/common-component.css';
 
 .main-bubble{
-    width: 266px !important;
-    height: 44px !important;
-    top: 60px !important;
-    left: 47px !important;
+    width: 260px !important;
+    height: 72px !important;
+    top: 32px !important;
+    left: 50px !important;
     
 }
 
