@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../../stores/user'
 import { http } from '../../apis/http'
@@ -43,6 +43,7 @@ function Introduction() {
   const { user, logout } = useUser()
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const navigateTimeoutRef = useRef<number | null>(null)
 
   const currentMessage = MESSAGES[currentMessageIndex]
 
@@ -55,7 +56,7 @@ function Introduction() {
 
         if (nextIndex >= MESSAGES.length) {
           setIsAutoPlaying(false)
-          setTimeout(() => {
+          navigateTimeoutRef.current = window.setTimeout(() => {
             navigate('/profile-creation')
           }, 1000)
           return prev
@@ -65,7 +66,12 @@ function Introduction() {
       })
     }, MESSAGE_INTERVAL)
 
-    return () => clearInterval(timer)
+    return () => {
+      clearInterval(timer)
+      if (navigateTimeoutRef.current !== null) {
+        clearTimeout(navigateTimeoutRef.current)
+      }
+    }
   }, [isAutoPlaying, navigate])
 
   const handleGoToNaming = () => {
