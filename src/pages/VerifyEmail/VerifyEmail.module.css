@@ -1,12 +1,37 @@
 @import '../../styles/page-base.css';
 
-.verify-email-container {
-  background-color: #1b1b1b;
+.pageContainer {
+  composes: page-container from '../../styles/page-base.css';
+}
+
+/* 뒤로가기 버튼 */
+.backButton {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backIcon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.verifyEmailContainer {
+  background-color: #000000;
   align-items: center;
   position: relative;
 }
 
-.verify-email-content {
+.verifyEmailContent {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,11 +47,11 @@
 }
 
 /* 안내 메시지 말풍선 */
-.info-bubble {
+.infoBubble {
   background-color: #FF5000;
   color: #1b1b1b;
   padding: 20px 24px;
-  border-radius: 20px;
+  border-radius: 10px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -38,7 +63,7 @@
 }
 
 /* 말풍선 꼬리 */
-.info-bubble::after {
+.infoBubble::after {
   content: '';
   position: absolute;
   bottom: -12px;
@@ -51,23 +76,23 @@
   border-top: 12px solid #FF5000;
 }
 
-.info-title {
+.infoTitle {
   font-size: 15px;
   font-weight: 500;
 }
 
-.info-text {
+.infoText {
   font-size: 15px;
   font-weight: 500;
   line-height: 1.5;
 }
 
 /* 캐릭터 */
-.character-placeholder {
+.characterPlaceholder {
   display: contents;
 }
 
-.character-icon {
+.characterIcon {
   width: 100px;
   height: auto;
   aspect-ratio: auto;
@@ -76,7 +101,7 @@
 }
 
 /* 입력 박스 (주황색 배경 - 버튼 포함) */
-.input-box {
+.inputBox {
   background-color: #FF5000;
   color: #1b1b1b;
   padding: 20px 20px 80px 20px;
@@ -93,19 +118,23 @@
 }
 
 /* 만료 상태 - 배경 어둡게 */
-.input-box.expired {
+.inputBox.expired {
+  background-color: #A53818;
+}
+
+.expired {
   background-color: #A53818;
 }
 
 /* 입력 라벨 */
-.input-label {
+.inputLabel {
   font-size: 14px;
   font-weight: 600;
   color: #1b1b1b;
 }
 
 /* OTP 입력 필드 */
-.otp-input {
+.otpInput {
   width: 100%;
   padding: 14px;
   border: none;
@@ -119,27 +148,31 @@
   transition: all 0.3s ease;
 }
 
-.otp-input:focus {
+.otpInput:focus {
   outline: none;
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
 }
 
-.otp-input:disabled {
+.otpInput:disabled {
   background-color: #333333;
   color: #666666;
   cursor: not-allowed;
 }
 
-.otp-input::placeholder {
+.otpInput::placeholder {
   color: #999999;
 }
 
-.otp-input.error {
+.otpInput.error {
+  color: #FF0000 !important;
+}
+
+.error {
   color: #FF0000 !important;
 }
 
 /* 타이머 */
-.timer-display {
+.timerDisplay {
   font-size: 14px;
   font-weight: 600;
   text-align: left;
@@ -147,13 +180,13 @@
   margin: 2px 0;
 }
 
-.timer-display.expired {
+.timerDisplay.expired {
   color: #8B0000;
   font-weight: 700;
 }
 
 /* 에러 메시지 */
-.error-message {
+.errorMessage {
   color: #8B0000;
   font-size: 12px;
   font-weight: 600;
@@ -165,7 +198,7 @@
 }
 
 /* 시간 초과 메시지 */
-.expired-message {
+.expiredMessage {
   color: #1b1b1b;
   font-size: 12px;
   font-weight: 600;
@@ -177,7 +210,7 @@
 }
 
 /* 만료 상태 큰 박스 - Modal */
-.expired-message-box {
+.expiredMessageBox {
   color: #1b1b1b;
   font-size: 17px;
   font-weight: 600;
@@ -199,7 +232,7 @@
 }
 
 /* 버튼 그룹 */
-.button-group {
+.buttonGroup {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -213,7 +246,7 @@
 }
 
 /* 검증 버튼 */
-.verify-button {
+.verifyButton {
   width: 100%;
   padding: 12px 16px;
   border: none;
@@ -224,42 +257,42 @@
   transition: all 0.3s ease;
 }
 
-.confirm-btn {
+.confirmBtn {
   background-color: #ffffff;
   color: #1b1b1b;
 }
 
-.confirm-btn:hover:not(:disabled) {
+.confirmBtn:hover:not(:disabled) {
   background-color: #e3e3e3;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.confirm-btn:active:not(:disabled) {
+.confirmBtn:active:not(:disabled) {
   background-color: #cccccc;
 }
 
-.confirm-btn:disabled {
+.confirmBtn:disabled {
   background-color: #cccccc;
   color: #999999;
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.resend-btn {
+.resendBtn {
   background-color: #ffffff;
   color: #1b1b1b;
 }
 
-.resend-btn:hover:not(:disabled) {
+.resendBtn:hover:not(:disabled) {
   background-color: #e3e3e3;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.resend-btn:active:not(:disabled) {
+.resendBtn:active:not(:disabled) {
   background-color: #cccccc;
 }
 
-.resend-btn:disabled {
+.resendBtn:disabled {
   background-color: #cccccc;
   color: #999999;
   cursor: not-allowed;
@@ -268,15 +301,15 @@
 
 /* 모바일 반응형 */
 @media (max-width: 600px) {
-  .verify-email-content {
+  .verifyEmailContent {
     min-height: 100vh;
   }
 
-  .input-box {
+  .inputBox {
     padding-bottom: 140px;
   }
 
-  .button-group {
+  .buttonGroup {
     width: calc(100% - 40px);
     max-width: none;
   }

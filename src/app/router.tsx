@@ -5,6 +5,9 @@ import AppLayout from '../components/layout/AppLayout'
 import Splash from '../pages/Splash/Splash'
 import Login from '../pages/Login/Login'
 import VerifyEmail from '../pages/VerifyEmail/VerifyEmail'
+import Introduction from '../pages/Introduction/Introduction'
+import OAuthRedirect from '../pages/OAuthRedirect/OAuthRedirect'
+import ProfileCreation from '../pages/ProfileCreation/ProfileCreation'
 import MainPage from '../pages/mainPage/mainPage'
 import SurveyStart from '../pages/krLearn/survey/surveyStart'
 import Survey from '../pages/krLearn/survey/survey'
@@ -34,6 +37,18 @@ export const router = createBrowserRouter([
   {
     path: '/verify-email',
     element: <VerifyEmail />,
+  },
+  {
+    path: '/introduction',
+    element: <Introduction />,
+  },
+  {
+    path: '/oauth2/redirect',
+    element: <OAuthRedirect />,
+  },
+  {
+    path: '/profile-creation',
+    element: <ProfileCreation />,
   },
   {
     path: '/mainpage',

@@ -5,7 +5,8 @@ import { http } from '../../apis/http'
 import Character1 from '../../assets/Character1.png'
 import CharacterWrong from '../../assets/Character-wrong.png'
 import CharacterGloomy from '../../assets/Character-Gloomy.png'
-import './VerifyEmail.css'
+import ArrowBack from '../../assets/Arrow-back.png'
+import styles from './VerifyEmail.module.css'
 
 type ErrorCode = 'AT004' | 'AT005' | 'AT006' | 'AT007' | 'AT008' | 'AT009' | 'AT010' | 'MI001' | null
 
@@ -51,7 +52,7 @@ export default function VerifyEmail() {
     try {
       setIsLoading(true)
 
-      const emailResponse = await http.get('/v1/auth/current-email', {
+      const emailResponse = await http.get('/api/v1/auth/current-email', {
         params: { code }
       })
 
@@ -65,7 +66,7 @@ export default function VerifyEmail() {
       const currentEmail = emailResponse.data.body.email
       setEmail(currentEmail)
 
-      const response = await http.post('/v1/auth/verify-email', {
+      const response = await http.post('/api/v1/auth/verify-email', {
         email: currentEmail,
         otpCode: otp,
       })
@@ -80,7 +81,7 @@ export default function VerifyEmail() {
         isGuest: false,
       })
 
-      navigate('/mainpage')
+      navigate('/introduction')
     } catch (err: any) {
       const errorCode = err.response?.data?.status?.statusCode
 
@@ -107,7 +108,7 @@ export default function VerifyEmail() {
 
       let currentEmail = email
       if (!currentEmail) {
-        const emailResponse = await http.get('/v1/auth/current-email', {
+        const emailResponse = await http.get('/api/v1/auth/current-email', {
           params: { code }
         })
 
@@ -121,7 +122,7 @@ export default function VerifyEmail() {
         setEmail(currentEmail)
       }
 
-      await http.post('/v1/auth/resend-otp', { email: currentEmail })
+      await http.post('/api/v1/auth/resend-otp', { email: currentEmail })
 
       setTimeLeft(180)
       setOtp('')
@@ -155,34 +156,37 @@ export default function VerifyEmail() {
   const characterSrc = isExpired || isRateLimitExceeded ? CharacterGloomy : error ? CharacterWrong : Character1
 
   return (
-    <div className="page-container verify-email-container">
-      <div className="verify-email-content">
+    <div className={`${styles.pageContainer} ${styles.verifyEmailContainer}`}>
+      <button className={styles.backButton} onClick={() => navigate('/login')}>
+        <img src={ArrowBack} alt="Back" className={styles.backIcon} />
+      </button>
+      <div className={styles.verifyEmailContent}>
         {/* 안내 메시지 말풍선 */}
-        <div className="info-bubble">
+        <div className={styles.infoBubble}>
           {isRateLimitExceeded ? (
             <>
-              <div className="info-text">
+              <div className={styles.infoText}>
                 Too bad. Please wait 1 hour<br />
                 to reactivate the OTP
               </div>
             </>
           ) : error && !isExpired ? (
             <>
-              <div className="info-text">
+              <div className={styles.infoText}>
                 Your password is incorrect!<br />
                 Please re-enter it correctly.
               </div>
             </>
           ) : isExpired ? (
             <>
-              <div className="info-text">
+              <div className={styles.infoText}>
                 If you haven&apos;t received the email within a few minutes, please check your spam folder. If the issue persists, click on the &quot;Resend Email&quot; button.
               </div>
             </>
           ) : (
             <>
-              <div className="info-title">verify your account</div>
-              <div className="info-text">
+              <div className={styles.infoTitle}>verify your account</div>
+              <div className={styles.infoText}>
                 We&apos;ve sent a verification Code to your registered email address.
               </div>
             </>
@@ -190,17 +194,17 @@ export default function VerifyEmail() {
         </div>
 
         {/* 캐릭터 */}
-        <div className="character-placeholder">
-          <img src={characterSrc} alt="Character" className="character-icon" />
+        <div className={styles.characterPlaceholder}>
+          <img src={characterSrc} alt="Character" className={styles.characterIcon} />
         </div>
 
         {/* 입력 박스 (주황색 배경 - 버튼 포함) */}
-        <div className={`input-box ${isExpired || isRateLimitExceeded ? 'expired' : ''}`}>
+        <div className={`${styles.inputBox} ${isExpired || isRateLimitExceeded ? styles.expired : ''}`}>
           {/* 정상 상태 - 입력 필드 표시 */}
           {!isExpired && !isRateLimitExceeded && (
             <>
               {/* 라벨 */}
-              <div className="input-label">Email Verification *</div>
+              <div className={styles.inputLabel}>Email Verification *</div>
 
               {/* OTP 입력 필드 */}
               <input
@@ -211,11 +215,11 @@ export default function VerifyEmail() {
                 onChange={handleOtpChange}
                 maxLength={6}
                 disabled={isLoading}
-                className={`otp-input ${error ? ((error as string) !== 'AT007' ? 'error' : '') : ''}`}
+                className={`${styles.otpInput} ${error ? ((error as string) !== 'AT007' ? styles.error : '') : ''}`}
               />
 
               {/* 타이머 */}
-              <div className="timer-display">
+              <div className={styles.timerDisplay}>
                 {formatTime(timeLeft)}
               </div>
             </>
@@ -223,24 +227,24 @@ export default function VerifyEmail() {
 
           {/* 만료 상태 - 만료 메시지 표시 */}
           {isExpired && (
-            <div className="expired-message-box">
+            <div className={styles.expiredMessageBox}>
               The OTP has expired<br />
               (valid for 3 minutes).
             </div>
           )}
 
           {isRateLimitExceeded && (
-            <div className="expired-message-box">
+            <div className={styles.expiredMessageBox}>
               Resend limit reached. You can<br />
               resend up to 30 times per hour.
             </div>
           )}
 
           {/* 버튼 그룹 */}
-          <div className="button-group">
+          <div className={styles.buttonGroup}>
             {!isExpired && !isRateLimitExceeded && (
               <button
-                className="verify-button confirm-btn"
+                className={`${styles.verifyButton} ${styles.confirmBtn}`}
                 onClick={handleVerifyOtp}
                 disabled={isLoading || otp.length === 0}
               >
@@ -248,7 +252,7 @@ export default function VerifyEmail() {
               </button>
             )}
             <button
-              className="verify-button resend-btn"
+              className={`${styles.verifyButton} ${styles.resendBtn}`}
               onClick={isRateLimitExceeded ? () => navigate('/login') : handleResendEmail}
               disabled={isLoading && !isRateLimitExceeded}
             >
