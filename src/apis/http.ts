@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useUser } from '../stores/user'
 
 export const http = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://kkambbak.duckdns.org/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://kkambbak.duckdns.org',
   withCredentials: true,
 })
 

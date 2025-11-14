@@ -11,7 +11,7 @@ export type User = {
 type State = {
   user: User
   login: (u: NonNullable<User>) => void
-  logout: () => void
+  logout: (clearStorage?: boolean) => void
 }
 
 export const useUser = create<State>()(
@@ -19,7 +19,12 @@ export const useUser = create<State>()(
     (set) => ({
       user: null,
       login: (u) => set({ user: u }),
-      logout: () => set({ user: null }),
+      logout: (clearStorage = true) => {
+        set({ user: null })
+        if (clearStorage) {
+          localStorage.clear()
+        }
+      },
     }),
     { name: 'auth', partialize: (s) => ({ user: s.user }) }
   )

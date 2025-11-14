@@ -1,0 +1,215 @@
+@import '../../styles/page-base.css';
+
+.pageContainer {
+  composes: page-container from '../../styles/page-base.css';
+}
+
+.introductionContainer {
+  background-color: #000000;
+  align-items: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* logout or login */
+.introductionHeader {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.logoutButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #757575;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: color 0.2s ease;
+  z-index: 100;
+}
+
+.logoutButton:hover {
+  color: #FFFFFF;
+}
+
+.introductionContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  padding-top: 145px;
+  padding-bottom: 120px;
+  box-sizing: border-box;
+  overflow: visible;
+  position: relative;
+  width: 100%;
+  margin: 0;
+}
+
+.speechBubble {
+  background-color: #FF5000;
+  border-radius: 10px;
+  padding: 20px 24px;
+  width: 280px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: fadeInScale 0.5s ease-out;
+  height: auto;
+  overflow: visible;
+  left: auto;
+  right: auto;
+  top: auto;
+}
+
+.speechBubble::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 12px solid #FF5000;
+}
+
+.bubbleText {
+  color: #1b1b1b;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  margin: 0;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.characterWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0;
+}
+
+.characterImage {
+  width: 100px;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  animation: slideUp 0.5s ease-out;
+}
+
+.introductionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+}
+
+.introButton {
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #484848;
+  color: #FFFFFF;
+}
+
+.introButton:hover:not(:disabled) {
+  background-color: #1b1b1b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.introButton:active:not(:disabled) {
+  background-color: #1b1b1b;
+  transform: translateY(0);
+}
+
+.introButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #757575;
+}
+
+.buttonNaming {
+  background-color: #1B1B1B;
+}
+
+.buttonNaming:hover {
+  background-color: #2D2D2D;
+}
+
+.buttonNaming:active {
+  background-color: #2D2D2D;
+}
+
+.progress-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #484848;
+  transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+  background-color: #FF5000;
+  transform: scale(1.2);
+}
+
+.progress-dot.completed {
+  background-color: #39FF14;
+}
+
+/* Animations */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
