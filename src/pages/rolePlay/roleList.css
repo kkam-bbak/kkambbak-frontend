@@ -115,7 +115,7 @@
 
 }
 
-.start-button {
+.role-start-button {
     /* 이 버튼은 isSelected가 아닐 때 JSX에서 렌더링되지 않으므로, 스타일은 Selected 상태를 반영 */
     width: 65px;
     height: 20px;

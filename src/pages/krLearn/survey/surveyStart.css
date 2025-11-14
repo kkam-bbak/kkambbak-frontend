@@ -41,6 +41,7 @@
 /* Skip to learning 버튼 (가장 하단 고정) */
 .skip-button-container {
     bottom: 20px; 
+    height: 40px;
 }
 
 /* ⭐️ Start 버튼 컨테이너 (Skip 버튼 위에 위치) */
