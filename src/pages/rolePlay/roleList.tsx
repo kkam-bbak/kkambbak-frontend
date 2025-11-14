@@ -37,7 +37,7 @@ const RoleList: React.FC = () => {
 
     const handleStart = (roleId: number) => {
         console.log(`Starting role play for ID: ${roleId}`);
-        navigate(`/role/play/${roleId}`);
+        navigate(`/mainpage/rolePlay/${roleId}`);
     };
     
     // 🔥 항목 클릭 시 상태 업데이트 핸들러

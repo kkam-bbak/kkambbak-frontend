@@ -13,6 +13,7 @@ import LearnStart from '../pages/krLearn/learnStart/learnStart'
 import LearnComplete from '../pages/krLearn/learnComplete/learnComplete'
 import LearnRiview from '../pages/krLearn/learnReview/learnReview'
 import RoleList from '../pages/rolePlay/roleList'
+import RolePlay from '../pages/rolePlay/rolePlay'
 
 import { useUser } from '../stores/user'
 
@@ -48,6 +49,7 @@ export const router = createBrowserRouter([
           { path: 'survey', element: <Survey /> },
           { path: 'learnList', element: <LearnList /> },
           { path: 'roleList', element: <RoleList /> },
+          { path: 'rolePlay/:roleId', element: <RolePlay /> },
           
 
           // LearnList.tsx에서 navigate(`/mainpage/learn/${topicId}`) 로 사용해야 합니다.
