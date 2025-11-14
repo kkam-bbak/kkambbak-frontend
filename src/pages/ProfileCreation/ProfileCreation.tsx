@@ -11,17 +11,14 @@ export default function ProfileCreation() {
   const user = useUser((s) => s.user)
   const { logout } = useUser()
 
-  // Form state
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [gender, setGender] = useState('')
   const [country, setCountry] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  // Validation state
   const isFormValid = profileImage && name.trim() && gender && country
 
-  // Country list
   const countries = [
     'Direct input',
     'South Korea',
@@ -126,81 +123,80 @@ export default function ProfileCreation() {
         />
       </div>
 
-      {/* Orange Form Container */}
       <div className={styles.orangeBox}>
-        {/* Profile Image Section */}
-        <div className={styles.formSection}>
-          <label className={styles.formLabel}>Profile image *</label>
-          <div className={styles.imageUploadArea}>
+        <div className={styles.formContainer}>
+          <div className={styles.formSection}>
+            <label className={styles.formLabel}>Profile image *</label>
+            <div className={styles.imageUploadArea}>
+              <input
+                type="file"
+                id="image-input"
+                accept="image/*"
+                onChange={handleImageUpload}
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="image-input" className={styles.imageUploadLabel}>
+                {profileImage ? (
+                  <img
+                    src={profileImage}
+                    alt="Profile"
+                    className={styles.profileImagePreview}
+                  />
+                ) : (
+                  <div className={styles.imagePlaceholder}>
+                    <span className={styles.plusIcon}>+</span>
+                  </div>
+                )}
+              </label>
+            </div>
+          </div>
+
+          {/* Name Input Section */}
+          <div className={styles.formSection}>
+            <label className={styles.formLabel}>Name *</label>
             <input
-              type="file"
-              id="image-input"
-              accept="image/*"
-              onChange={handleImageUpload}
-              style={{ display: 'none' }}
+              type="text"
+              className={styles.formInput}
+              placeholder="Enter Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
-            <label htmlFor="image-input" className={styles.imageUploadLabel}>
-              {profileImage ? (
-                <img
-                  src={profileImage}
-                  alt="Profile"
-                  className={styles.profileImagePreview}
-                />
-              ) : (
-                <div className={styles.imagePlaceholder}>
-                  <span className={styles.plusIcon}>+</span>
-                </div>
-              )}
-            </label>
+          </div>
+
+          {/* Gender and Country Row */}
+          <div className={styles.formRow}>
+            {/* Gender Dropdown Section */}
+            <div className={styles.formSection}>
+              <label className={styles.formLabel}>Gender *</label>
+              <select
+                className={styles.formSelect}
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+              >
+                <option value="">Direct input</option>
+                <option value="MALE">MALE</option>
+                <option value="FEMALE">FEMALE</option>
+              </select>
+            </div>
+
+            {/* Country Dropdown Section */}
+            <div className={styles.formSection}>
+              <label className={styles.formLabel}>Country of origin *</label>
+              <select
+                className={styles.formSelect}
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              >
+                {countries.map((c) => (
+                  <option key={c} value={c === 'Direct input' ? '' : c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Name Input Section */}
-        <div className={styles.formSection}>
-          <label className={styles.formLabel}>Name *</label>
-          <input
-            type="text"
-            className={styles.formInput}
-            placeholder="Enter Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-
-        {/* Gender and Country Row */}
-        <div className={styles.formRow}>
-          {/* Gender Dropdown Section */}
-          <div className={styles.formSection}>
-            <label className={styles.formLabel}>Gender *</label>
-            <select
-              className={styles.formSelect}
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-            >
-              <option value="">Direct input</option>
-              <option value="MALE">MALE</option>
-              <option value="FEMALE">FEMALE</option>
-            </select>
-          </div>
-
-          {/* Country Dropdown Section */}
-          <div className={styles.formSection}>
-            <label className={styles.formLabel}>Country of origin *</label>
-            <select
-              className={styles.formSelect}
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            >
-              {countries.map((c) => (
-                <option key={c} value={c === 'Direct input' ? '' : c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Next Button */}
         <button
           className={`${styles.nextButton} ${isFormValid && !isLoading ? styles.active : styles.disabled}`}
           onClick={handleNext}
