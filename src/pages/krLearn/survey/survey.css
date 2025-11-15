@@ -1,180 +1,177 @@
 /* survey.css */
-@import '../../../styles/page-base.css';
 
 @import '../../../styles/common-component.css';
 
-.surveyIng-bubble{
-    width:278px !important;
-    height:72px !important;
-    top: 32px !important;
-    left: 41px !important;
+.survey-container {
+  width: 100%;
+}
+
+.surveyIng-bubble {
+  width: 278px !important;
+  height: 72px !important;
+  top: 32px !important;
+  left: 41px !important;
 }
 
 /* Survey Title Text */
 .survey-title {
-    font-size: 18px;
-    font-weight: normal; 
-    color: black; 
-    padding: 16px 16px 0 16px;
-    margin: 0;
+  font-size: 18px;
+  font-weight: normal;
+  color: black;
+  padding: 16px 16px 0 16px;
+  margin: 0;
 }
 
 /* 설문 폼 영역 */
 .survey-form-area {
-    padding: 10px 16px; 
-    height: calc(100% - 70px); 
-    color: black; 
-    display: flex; 
-    flex-direction: column;
-    justify-content: flex-start;
+  padding: 10px 16px;
+  height: calc(100% - 70px);
+  color: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 /* -------------------- 3. 옵션/질문 뷰 -------------------- */
 .survey-question-view {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; 
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .survey-options-list {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .survey-option-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px; 
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
 }
 
 .bullet-point {
-    display: inline-block;
-    color: black;
-    font-size: 10px;
-    margin-left: 5px;
+  display: inline-block;
+  color: black;
+  font-size: 10px;
+  margin-left: 5px;
 }
 
 /* 설문 옵션 버튼 스타일 (이미지 기반) */
 .survey-option-button {
-    width: 304px; 
-    height: 40px; 
-    background-color: #000000; 
-    border-radius: 10px; 
-    border: none;
-    font-size: 13px;
-    font-weight: 500;
-    color: #757575; 
-    cursor: pointer;
-    text-align: left;
-    padding: 0 10px;
-    transition: background-color 0.1s;
+  width: 304px;
+  height: 40px;
+  background-color: #000000;
+  border-radius: 10px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #757575;
+  cursor: pointer;
+  text-align: left;
+  padding: 0 10px;
+  transition: background-color 0.1s;
 }
 
 .survey-option-button.selected {
-    color: white; 
+  color: white;
 }
-
 
 /* -------------------- 4. 시작/완료/스킵 버튼 (크기 일치 및 위치 조정) -------------------- */
 
 .skip-button-container {
-    width: 328px; 
-    box-sizing: border-box;
-    margin: 0 auto;
+  width: 328px;
+  box-sizing: border-box;
+  margin: 0 auto;
 }
 
 /* Skip to learning 버튼 (기본 스타일 및 크기 기준) */
-.skip-button{
-    width: 100%;
-    height: 40px; 
-    background-color: #FFFFFF; 
-    border-radius: 10px; 
-    border: none;
-    font-weight: 600;
-    font-size: 14px;
-    color: black;
-    cursor: pointer;
+.skip-button {
+  width: 100%;
+  height: 40px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  color: black;
+  cursor: pointer;
 }
 
-.start-button{
-    width: 100%;
-    height: 40px; 
-    background-color: #FFFFFF; 
-    border-radius: 10px; 
-    border: none;
-    font-weight: 600;
-    font-size: 14px;
-    color: black;
-    cursor: pointer;
+.start-button {
+  width: 100%;
+  height: 40px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  color: black;
+  cursor: pointer;
 }
 
 /* ⭐️ Start 버튼 컨테이너 (시작 화면의 Start 버튼 위치) */
 .start-button-container {
-    position: absolute;
-    bottom: 70px;
-    left: 16px;
-    width: 328px; /* Skip 버튼 컨테이너와 동일한 너비 */
-   
+  position: absolute;
+  bottom: 70px;
+  left: 16px;
+  width: 328px; /* Skip 버튼 컨테이너와 동일한 너비 */
 }
 
 /* ⭐️ Skip to learning 시작 화면 컨테이너 (시작 화면의 Skip 버튼 위치) */
 .skip-start-button-container {
-    position: absolute;
-    bottom: 20px; 
-    left: 16px;
-    width: 328px; /* Start 버튼 컨테이너와 동일한 너비 */
+  position: absolute;
+  bottom: 20px;
+  left: 16px;
+  width: 328px; /* Start 버튼 컨테이너와 동일한 너비 */
 }
-
 
 /* -------------------- 5. 페이지네이션 및 완료 화면 -------------------- */
 
-
-
-
 /* ⭐️ 페이지네이션 영역 (Skip 버튼 위에 위치) */
 .pagination-area {
-    width: 100%; 
-    left: 134px;
-    /* 🔥 Skip 버튼 (40px)과 간격 확보 */
-    bottom: 84px;
-    position: absolute;
+  width: 100%;
+  left: 134px;
+  /* 🔥 Skip 버튼 (40px)과 간격 확보 */
+  bottom: 84px;
+  position: absolute;
 }
 
 /* 페이지네이션 도트 */
 .pagination-dots {
-    display: flex;
-    gap: 10px;
- 
-    /* margin-bottom: 20px; 제거 */
+  display: flex;
+  gap: 10px;
+
+  /* margin-bottom: 20px; 제거 */
 }
 
 /* 도트 스타일은 유지 */
 .dot {
-    width: 8px;
-    height: 8px;
-    background-color: rgba(0, 0, 0, 0.2); 
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  width: 8px;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .dot.active {
-    background-color: white; 
+  background-color: white;
 }
 /* 설문 완료 메시지 "Done!" */
 .survey-done-view {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 100px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 100px;
 }
 
 .survey-done-message {
-    font-size: 18px;
-    font-weight: 500;
-    color: black; 
-    cursor: pointer;
-    margin-bottom: 100px;
+  font-size: 18px;
+  font-weight: 500;
+  color: black;
+  cursor: pointer;
+  margin-bottom: 100px;
 }

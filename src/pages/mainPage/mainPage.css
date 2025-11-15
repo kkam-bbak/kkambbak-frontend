@@ -1,253 +1,252 @@
-/*전체창*/
-@import '../../styles/page-base.css'; 
-
 /*로그인아웃 버튼, 상단섹션크기, 하단섹션 크기, 말풍선 위치, 캐릭터 위치&크기*/
 @import '../../styles/common-component.css';
 
-.main-bubble{
-    width: 260px !important;
-    height: 72px !important;
-    top: 32px !important;
-    left: 50px !important;
-    
+.main-container {
+  width: 100%;
+  position: relative;
+}
+
+.main-bubble {
+  width: 260px !important;
+  height: 72px !important;
+  top: 32px !important;
+  left: 50px !important;
 }
 
 /* -------------------- 2. 하단 메뉴 영역 (애니메이션) -------------------- */
 .menu-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%; 
+  /* position: absolute; */
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* height: 100%; */
 }
 
 .menu-item {
-    position: absolute;
-    width: 100%; 
-    left: 0;
-    /* 애니메이션: Top과 Height 모두 트랜지션 적용 */
-    transition: top 0.5s ease-in-out, height 0.5s ease-in-out, z-index 0.1s;
-    cursor: pointer;
-    box-sizing: border-box;
-    color: black;
-    /* 상단 좌우 모서리만 둥글게 유지 */
-    border-radius: 15px 15px 0 0; 
-    overflow: hidden; 
+  position: absolute;
+  width: 100%;
+  left: 0;
+  /* 애니메이션: Top과 Height 모두 트랜지션 적용 */
+  transition: top 0.5s ease-in-out, height 0.5s ease-in-out, z-index 0.1s;
+  cursor: pointer;
+  box-sizing: border-box;
+  color: black;
+  /* 상단 좌우 모서리만 둥글게 유지 */
+  border-radius: 15px 15px 0 0;
+  overflow: hidden;
 }
 
 /* 프로필이 활성화되어 전체 화면을 덮을 때의 스타일 */
 .menu-item.profile-active {
-    border-radius: 0; /* 모든 둥근 모서리 제거 (앱 컨테이너가 둥근 모서리를 담당) */
-    padding-top: 0; 
+  border-radius: 0; /* 모든 둥근 모서리 제거 (앱 컨테이너가 둥근 모서리를 담당) */
+  padding-top: 0;
 }
 
 /* 탭 헤더 (접혀있을 때 보이는 부분: 40px 높이) */
 .tab-header {
-    height: 40px; 
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
+  height: 40px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .tab-header h3 {
-    top: 16px;
-    left: 16px;
-    font-weight: 500; /* 탭 제목 굵기 통일 */
-    font-size: 18px; 
+  top: 16px;
+  left: 16px;
+  font-weight: 500; /* 탭 제목 굵기 통일 */
+  font-size: 18px;
 }
-
-
 
 /* 확장된 콘텐츠 영역 */
 .tab-content {
-    /* 탭 헤더 40px를 제외한 나머지 영역에 패딩 적용 (Profile은 예외 처리) */
-    padding: 10px 20px 20px 20px;
-    
-    /* 1️⃣ Flexbox 컨테이너로 지정 */
-    display: flex;
-    flex-direction: column; 
-    
-    /* 탭 헤더(40px)를 제외한 나머지 높이를 100%로 채워야 함 */
-    height: calc(100% - 40px); /* .menu-item 전체 높이에서 탭 헤더 높이(40px) 제외 */
+  /* 탭 헤더 40px를 제외한 나머지 영역에 패딩 적용 (Profile은 예외 처리) */
+  padding: 10px 20px 20px 20px;
+
+  /* 1️⃣ Flexbox 컨테이너로 지정 */
+  display: flex;
+  flex-direction: column;
+
+  /* 탭 헤더(40px)를 제외한 나머지 높이를 100%로 채워야 함 */
+  height: calc(
+    100% - 40px
+  ); /* .menu-item 전체 높이에서 탭 헤더 높이(40px) 제외 */
 }
 
 .extended-content {
-    /* 2️⃣ 남은 공간을 모두 차지하도록 flex-grow 설정 */
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1; /* 이 영역이 남은 수직 공간을 모두 차지 */
+  /* 2️⃣ 남은 공간을 모두 차지하도록 flex-grow 설정 */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* 이 영역이 남은 수직 공간을 모두 차지 */
 }
 
 .content-buttons {
-    margin-top: auto; 
-    padding-bottom: 0; 
-    display: flex;
-    justify-content: center;
-    align-items: center;    
+  margin-top: auto;
+  padding-bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .menu-header {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 /* 확장된 콘텐츠의 h2 제목 */
 .menu-header h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 500; /* 굵기 제거 */
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500; /* 굵기 제거 */
 }
 
 /* --- Content Styles (Learn, Role, Game) --- */
 
 .content-image-box {
-    text-align: center;
-    padding: 50px 0;
-    background-color: #FF5000; 
-    border-radius: 10px;
-    margin: 20px 0;
+  text-align: center;
+  padding: 50px 0;
+  background-color: #ff5000;
+  border-radius: 10px;
+  margin: 20px 0;
 }
 
 .menu-item-role .content-image-box.blue {
-    background-color: #007CFF; 
+  background-color: #007cff;
 }
 
 .menu-item-1vs1 .content-image-box.green {
-    background-color: #39FF14; 
+  background-color: #39ff14;
 }
 
 .action-button {
-    height: 45px;
-    border-radius: 10px;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    color: black;
+  height: 45px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: black;
 }
 
 .action-button.white {
-    height: 40px;
-    background-color: white;
-    width: 48%;
+  height: 40px;
+  background-color: white;
+  width: 48%;
 }
 
 .action-button.full-width {
-    Height: 40px;
-    width: 328px;
-    border-radius: 10px;
-    font-weight: 600;
-    background-color: white;
-    color: black;
-    font-size: 14px;
+  height: 40px;
+  width: 328px;
+  border-radius: 10px;
+  font-weight: 600;
+  background-color: white;
+  color: black;
+  font-size: 14px;
 
-    font-family: 'Inter', sans-serif;
-    
-    display: flex;
-    justify-content: center; 
-    align-items: center;     
-    
-    padding: 0;
+  font-family: 'Inter', sans-serif;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 0;
 }
-
 
 /* --- Profile Styles (Full Screen Mode) --- */
 
-
 .profile-top-bar {
-    display: flex;
-    flex-direction: column; 
-    align-items: center; 
-    padding: 20px; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
 .profile-top-header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .profile-title {
-    font-size: 18px;
-    font-weight: normal; 
-    margin: 0;
+  font-size: 18px;
+  font-weight: normal;
+  margin: 0;
 }
 
 .profile-image-box {
-    width: 100px; 
-    height: 100px;
-    border-radius: 50%;
-    overflow: hidden; 
-    background-color: #FB14FF; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 10px auto 30px auto; 
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #fb14ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px auto 30px auto;
 }
 
 .profile-image-box .profile-avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-
 .profile-fields-container {
-    display: grid;
-    gap: 15px; 
-    padding: 0 20px;
+  display: grid;
+  gap: 15px;
+  padding: 0 20px;
 }
 
 .profile-field label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: black;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: black;
 }
 
-.profile-field input, .profile-description-box {
-    width: 100%;
-    padding: 12px 15px; 
-    border-radius: 8px;
-    border: none;
-    background-color: rgba(255, 255, 255, 0.1); 
-    color: white;
-    box-sizing: border-box;
-    min-height: 45px; 
-    display: flex;
-    align-items: center;
+.profile-field input,
+.profile-description-box {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  box-sizing: border-box;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
 }
 
 .profile-description-box {
-    min-height: 70px; 
+  min-height: 70px;
 }
 
 .profile-row-fields {
-    display: flex;
-    gap: 15px; 
+  display: flex;
+  gap: 15px;
 }
 
 .profile-row-fields .half-width {
-    flex: 1; 
+  flex: 1;
 }
 
 .no-rounds-left {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
-    margin-top: 5px;
-    text-align: right;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 5px;
+  text-align: right;
 }
 
 .profile-buttons {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px; 
-    position: sticky; 
-    bottom: 0;
-    width: 100%;
-    box-sizing: border-box;
-    background-color: #DA70D6; 
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #da70d6;
 }
 .profile-buttons .action-button {
-    width: 30%;
+  width: 30%;
 }

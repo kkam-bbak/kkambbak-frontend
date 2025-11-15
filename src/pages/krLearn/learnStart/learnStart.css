@@ -1,213 +1,208 @@
 /* learnStart.css */
-@import '../../../styles/page-base.css';
 
 @import '../../../styles/common-component.css';
 
-.start-bubble{
-    width: 222px;
-    height: 44px;
-    top: 60px;
-    left: 69px;
-    
+.learn-start-container {
+  width: 100%;
 }
 
-.start-tail{
-    top: 90px;
+.start-bubble {
+  width: 222px;
+  height: 44px;
+  top: 60px;
+  left: 69px;
+}
+
+.start-tail {
+  top: 90px;
 }
 /* -------------------- 3. 학습 카드 영역 -------------------- */
 .learning-card {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 430px; 
-    background-color: #FF5000;
-    border-radius: 15px 15px 0 0;
-    padding: 15px;
-    box-sizing: border-box;
-    color: black;
-    overflow: hidden; 
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 430px;
+  background-color: #ff5000;
+  border-radius: 15px 15px 0 0;
+  padding: 15px;
+  box-sizing: border-box;
+  color: black;
+  overflow: hidden;
 }
 
 /* 카운트다운 바 컨테이너 */
 .countdown-bar-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 15px;
-    background-color: black;
-    z-index: 10; 
-    overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 15px;
+  background-color: black;
+  z-index: 10;
+  overflow: hidden;
 }
 
 .countdown-bar-fill {
-
-    border-radius: 10px;
-    top: 3px;
-    padding: 3px;
-    background-color: #FF5000; 
-    transition: width 0.1s linear; 
-    left: 0;
-    position: absolute;
+  border-radius: 10px;
+  top: 3px;
+  padding: 3px;
+  background-color: #ff5000;
+  transition: width 0.1s linear;
+  left: 0;
+  position: absolute;
 }
 
 /* 제목 바 */
 .card-title-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 500;
-    font-size: 16px;
-    margin-bottom: 15px;
-    color: black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: black;
 }
 
 /* 단어 표시 영역 (이미지) */
 .word-display-area {
-    width: 100%;
-    height: 160px;
-    background-color: #000;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* 🔥🔥 수정: 자식인 countdown-bar-container의 위치 기준점 */
-    position: relative; 
-    overflow: hidden;
+  width: 100%;
+  height: 160px;
+  background-color: #000;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* 🔥🔥 수정: 자식인 countdown-bar-container의 위치 기준점 */
+  position: relative;
+  overflow: hidden;
 }
 
 /* 이미지 Placeholder (사과 이미지 구현) */
 
-
-
 /* -------------------- 4. 입력 필드 -------------------- */
 .input-fields-container {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.topic-name{
-    top: 16px;
-    left: 16px;
-    font-size: 18px;
-    font-weight: 500;
+.topic-name {
+  top: 16px;
+  left: 16px;
+  font-size: 18px;
+  font-weight: 500;
 }
 
 .input-row {
-    display: flex;
-    align-items: center;
-    height: 40px; 
-    background-color: #000; 
-    border-radius: 10px;
-    color: white;
-    overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  background-color: #000;
+  border-radius: 10px;
+  color: white;
+  overflow: hidden;
 }
 
 .input-row label {
-    width: 90px;
-    padding: 0 10px;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: left;
-    color: #757575; 
+  width: 90px;
+  padding: 0 10px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  color: #757575;
 }
 
 .input-row input {
-    flex-grow: 1;
-    height: 100%;
-    border: none;
-    background-color: #000;
-    color: white;
+  flex-grow: 1;
+  height: 100%;
+  border: none;
+  background-color: #000;
+  color: white;
 
-    font-weight: 500;
-    font-size: 16px;
-    outline: none;
+  font-weight: 500;
+  font-size: 16px;
+  outline: none;
 }
 
 /* Translation 행 (주황색 배경) */
 .input-row.translation {
-    background-color: #FF5000;
+  background-color: #ff5000;
 }
 .input-row.translation label {
-    width: 90px;
-    background-color: black;
-    color: #757575;
-    height: 100%;
-    line-height: 44px;
-
- 
+  width: 90px;
+  background-color: black;
+  color: #757575;
+  height: 100%;
+  line-height: 44px;
 }
 .input-row.translation input {
-    background-color: black;
-    color: white;
+  background-color: black;
+  color: white;
 }
-
 
 /* 스피커 아이콘 */
 .speaker-icon {
-    width: 44px;
-    height: 100%;
-    background-color: #000;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
+  width: 44px;
+  height: 100%;
+  background-color: #000;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
 }
 .speaker-icon:disabled {
-    color: #333; /* 비활성화 시 색상 */
-    cursor: not-allowed;
+  color: #333; /* 비활성화 시 색상 */
+  cursor: not-allowed;
 }
 
 /* -------------------- 5. 마이크 버튼 -------------------- */
 .mic-button {
-    width: 100%;
-    height: 50px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    gap: 8px;
-    transition: background-color 0.1s, color 0.1s;
+  width: 100%;
+  height: 50px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  gap: 8px;
+  transition: background-color 0.1s, color 0.1s;
 }
 
 .action-buttons-container {
-    display: flex;
-   
-    gap: 10px;
-    margin-top: 10px;
+  display: flex;
+
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.action-button{
-    width: 156px;
-    height: 40px;
+.action-button {
+  width: 156px;
+  height: 40px;
 }
 
 .mic-button.off {
-    background-color: white;
-    color: black;
+  background-color: white;
+  color: black;
 }
 
 .mic-button.on {
-    background-color: black;
-    color: white;
-    
+  background-color: black;
+  color: white;
 }
 .mic-button.on .mic-icon {
-    color: white;
+  color: white;
 }
 
 /* 비활성화 상태 */
 .mic-button.disabled {
-    cursor: not-allowed;
-    background-color: white; 
-    color: #e3e3e3; 
+  cursor: not-allowed;
+  background-color: white;
+  color: #e3e3e3;
 }
