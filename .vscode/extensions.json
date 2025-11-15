@@ -2,6 +2,8 @@
   "recommendations": [
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "clinyong.vscode-css-modules"
+    "clinyong.vscode-css-modules",
+    "stylelint.vscode-stylelint",
+    "pucelle.vscode-css-navigation"
   ]
 }
