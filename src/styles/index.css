@@ -14,6 +14,7 @@
   --color-primary-green: rgb(57 255 20 / 100%);
   --color-primary-pink: rgb(251 20 255 / 100%);
   --color-primary-red: rgb(255 0 0 / 100%);
+  --drop-shadow: 0px 0px 30px 0px rgb(0 0 0 / 40%);
 }
 
 @supports (font-variation-settings: normal) {
