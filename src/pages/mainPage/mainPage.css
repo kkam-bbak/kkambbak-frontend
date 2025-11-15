@@ -1,10 +1,10 @@
+/*로그인아웃 버튼, 상단섹션크기, 하단섹션 크기, 말풍선 위치, 캐릭터 위치&크기*/
+@import '../../styles/common-component.css';
+
 .main-container {
   width: 100%;
   position: relative;
 }
-
-/*로그인아웃 버튼, 상단섹션크기, 하단섹션 크기, 말풍선 위치, 캐릭터 위치&크기*/
-@import '../../styles/common-component.css';
 
 .main-bubble {
   width: 260px !important;
