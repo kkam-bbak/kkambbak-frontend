@@ -3,6 +3,7 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "clinyong.vscode-css-modules",
-    "stylelint.vscode-stylelint"
+    "stylelint.vscode-stylelint",
+    "pucelle.vscode-css-navigation"
   ]
 }
