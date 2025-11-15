@@ -16,6 +16,7 @@ import LearnStart from '../pages/krLearn/learnStart/learnStart';
 import LearnComplete from '../pages/krLearn/learnComplete/learnComplete';
 import LearnReview from '../pages/krLearn/learnReview/learnReview';
 import RoleList from '../pages/rolePlay/roleList';
+import RolePlay from '../pages/rolePlay/rolePlay';
 
 import { useUser } from '../stores/user';
 import BaseLayout from '@/components/layout/BaseLayout/BaseLayout';
@@ -41,19 +42,19 @@ export const router = createBrowserRouter([
         element: <VerifyEmail />,
       },
       {
-        path: '/introduction',
+        path: 'introduction',
         element: <Introduction />,
       },
       {
-        path: '/oauth2/redirect',
+        path: 'oauth2/redirect',
         element: <OAuthRedirect />,
       },
       {
-        path: '/profile-creation',
+        path: 'profile-creation',
         element: <ProfileCreation />,
       },
       {
-        path: '/mainpage',
+        path: 'mainpage',
         //element: <Protected />,
         children: [
           {
@@ -64,6 +65,7 @@ export const router = createBrowserRouter([
               { path: 'survey', element: <Survey /> },
               { path: 'learnList', element: <LearnList /> },
               { path: 'roleList', element: <RoleList /> },
+              { path: 'rolePlay/:roleId', element: <RolePlay /> },
 
               // LearnList.tsx에서 navigate(`/mainpage/learn/${topicId}`) 로 사용해야 합니다.
               {

@@ -5,7 +5,7 @@ import { http } from '../../apis/http';
 import Character2 from '../../assets/Character-Smile.png';
 import Character1 from '../../assets/Character1.png';
 import Character3 from '../../assets/Character-Jump.png';
-import CharacterShining from '../../assets/Character-shining.png';
+import CharacterShining from '../../assets/Character-Shining.png';
 import styles from './Introduction.module.css';
 
 const MESSAGES = [
