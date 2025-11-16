@@ -44,6 +44,32 @@
     font-weight: 500;
 }
 
+
+/* 대화 기록 스크롤 영역 */
+.turn-history-area {
+    /* 카드 타이틀(약 30px)과 활성 입력 영역 높이(약 130px)를 제외한 공간 */
+    height: calc(100% - 145px); 
+    overflow-y: auto;
+    padding-right: 10px; /* 스크롤바 공간 확보 */
+}
+
+/* 활성 입력 턴 영역 (하단에 고정) */
+.active-turn-input-area {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    background-color: #3b82f6; /* 부모 배경색과 동일 */
+    z-index: 25;
+}
+
+/* 활성 턴의 공간 확보 (스크롤이 Active Input Area를 침범하지 않도록) */
+.active-turn-placeholder {
+    height: 150px; 
+}
+
+
 /* 텍스트 표시 박스 (검은색) */
 .text-display-box {
     width: 328px;
@@ -153,8 +179,35 @@
     
 }
 .role-tag {
-    color: black; /* Blue-300 */
-    font-weight: 600;
+    color: black; background-color: white; font-weight: 600;
+    width: 44px; height: 20px; border-radius: 5px; font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* -------------------- 4. 턴 2 (선택지) 스타일 -------------------- */
+.choice-options-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.choice-item { display: flex; align-items: center; gap: 10px; width: 100%; }
+
+.choice-button {
+    width: 40px; min-width: 40px; height: 40px; border-radius: 10px; border: none;
+    background-color: white; color: black; font-size: 18px; font-weight: bold;
+    transition: background-color 0.15s, color 0.15s; cursor: pointer;
+}
+
+.choice-button.selected {
+    background-color: black;
+    color: white;
+}
+
+.choice-text-box {
+    flex-grow: 1; background-color: #101010; border-radius: 10px;
+    padding: 0; overflow: hidden; color: white;
 }
 
 
@@ -233,4 +286,9 @@
     font-size: 10px;
     font-weight: 700;
     margin-top: 4px;
+}
+
+.choice-options-area{
+    position:absolute;
+    top: 180px;
 }

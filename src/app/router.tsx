@@ -17,6 +17,7 @@ import LearnComplete from '../pages/krLearn/learnComplete/learnComplete'
 import LearnRiview from '../pages/krLearn/learnReview/learnReview'
 import RoleList from '../pages/rolePlay/roleList'
 import RolePlay from '../pages/rolePlay/rolePlay'
+import RolePlayComplete  from '../pages/rolePlay/rolePlayComplete'
 
 import { useUser } from '../stores/user'
 
@@ -74,7 +75,9 @@ export const router = createBrowserRouter([
           },
           { path: 'learn/complete', element: <LearnComplete /> },
           
-          { path: 'learn/review', element: <LearnRiview /> }
+          { path: 'learn/review', element: <LearnRiview /> },
+
+          { path: 'rolePlay/complete', element: <RolePlayComplete/>},
         ],
       },
     ],

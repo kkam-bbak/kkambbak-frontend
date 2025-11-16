@@ -1,0 +1,132 @@
+/* -------------------- 외부 스타일 import (유지) -------------------- */
+/* 실제 프로젝트 경로에 맞게 수정해주세요 */
+@import '../../styles/page-base.css';
+@import '../../styles/Role-common.css';
+
+
+
+/* -------------------- 3. 요약 카드 (Session Complete!) -------------------- */
+.summary-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: black;
+}
+
+.summary-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+.detail-item {
+    font-size: 14px;
+}
+.role-name {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* -------------------- 4. 히스토리 영역 -------------------- */
+
+.complete-history-area {
+    /* 스크롤 영역 */
+    max-height: 250px; /* 임시 높이 설정, 화면 크기에 따라 조정 필요 */
+    overflow-y: auto;
+    padding-top: 15px;
+    padding-bottom: 15px; /* 액션 버튼과의 간격 */
+}
+
+.turn-display-box {
+    background-color: #101010;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    padding: 10px 0;
+    position: relative;
+}
+
+.turn-display-box .content-box {
+    padding: 0 15px;
+}
+
+/* 역할 태그 */
+.role-tag-container {
+    width: 60px;
+    height: 25px;
+    border-radius: 5px;
+    font-size: 12px;
+    margin-left: 15px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    color: black;
+    font-weight: 600;
+}
+
+/* 텍스트 줄 */
+.text-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+.korean-text {
+    font-size: 14px;
+    color: white;
+}
+.romanized-text {
+    font-size: 14px;
+    color: #ffffffa0;
+}
+.romanized-text.correct {
+    color: lime; /* 이미지의 초록색 */
+}
+.romanized-text.incorrect {
+    color: red;
+}
+.english-text {
+    color: #007CFF;
+    font-size: 14px;
+    display: block;
+    padding-bottom: 5px;
+}
+.small-mic-icon.active {
+    color: white;
+    font-size: 14px;
+}
+
+/* -------------------- 5. 하단 액션 버튼 -------------------- */
+
+.completion-actions {
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 15px;
+    gap: 10px;
+}
+
+.action-button {
+    flex: 1;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+.try-again-button {
+    background-color: white;
+    color: black;
+}
+.next-learning-button {
+    background-color: black;
+    color: white;
+}
