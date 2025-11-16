@@ -10,7 +10,6 @@ export const http = axios.create({
   withCredentials: true,
 })
 
-let isRefreshing = false
 let refreshPromise: Promise<string> | null = null
 
 http.interceptors.request.use(
@@ -33,7 +32,7 @@ http.interceptors.response.use(
     if (errorCode === API_ERROR_CODES.TOKEN_EXPIRED && !originalRequest._retry) {
       originalRequest._retry = true
 
-      if (isRefreshing) {
+      if (refreshPromise) {
         try {
           const newAccessToken = await refreshPromise
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
@@ -43,8 +42,7 @@ http.interceptors.response.use(
         }
       }
 
-      isRefreshing = true
-      refreshPromise = new Promise(async (resolve, reject) => {
+      refreshPromise = (async () => {
         try {
           const { user } = useUser.getState()
 
@@ -76,7 +74,7 @@ http.interceptors.response.use(
             },
           })
 
-          resolve(accessToken)
+          return accessToken
         } catch (refreshErr) {
           console.error('Token refresh failed:', refreshErr)
           const { user } = useUser.getState()
@@ -84,12 +82,11 @@ http.interceptors.response.use(
             useUser.getState().logout()
           }
           window.location.href = '/login'
-          reject(refreshErr)
+          throw refreshErr
         } finally {
-          isRefreshing = false
           refreshPromise = null
         }
-      })
+      })()
 
       try {
         const newAccessToken = await refreshPromise
