@@ -8,7 +8,7 @@ import wrong from '@/assets/Character-Wrong.png';
 import jump from '@/assets/Character-Jump.png';
 import styles from './Mascot.module.css';
 
-type ImageType =
+export type MascotImage =
   | 'basic'
   | 'shining'
   | 'cute'
@@ -19,11 +19,11 @@ type ImageType =
   | 'jump';
 
 type MascotProps = {
-  image: ImageType;
+  image: MascotImage;
   text: string;
 };
 
-const IMAGE_MAP: Record<ImageType, string> = {
+const IMAGE_MAP: Record<MascotImage, string> = {
   basic,
   shining,
   cute,
