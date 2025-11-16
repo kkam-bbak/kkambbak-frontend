@@ -21,5 +21,54 @@ http.interceptors.request.use(
 // Response interceptor - 에러 처리
 http.interceptors.response.use(
   (res) => res,
-  (err) => Promise.reject(err)
+  async (err) => {
+    const originalRequest = err.config
+    const errorCode = err.response?.data?.status?.statusCode
+
+    if (errorCode === 'J001' && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      try {
+        const { user } = useUser.getState()
+
+        if (!user?.refreshToken) {
+          throw new Error('No refresh token available')
+        }
+
+        const response = await axios.post(
+          `${http.defaults.baseURL}/api/v1/users/refresh`,
+          {},
+          {
+            headers: {
+              RefreshToken: user.refreshToken,
+            },
+          }
+        )
+
+        const { accessToken, refreshToken } = response.data?.body
+
+        if (!accessToken || !refreshToken) {
+          throw new Error('Failed to get new tokens')
+        }
+
+        useUser.setState({
+          user: {
+            ...user,
+            accessToken,
+            refreshToken,
+          },
+        })
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`
+        return http(originalRequest)
+      } catch (refreshErr) {
+        console.error('Token refresh failed:', refreshErr)
+        useUser.getState().logout()
+        window.location.href = '/login'
+        return Promise.reject(refreshErr)
+      }
+    }
+
+    return Promise.reject(err)
+  }
 )
