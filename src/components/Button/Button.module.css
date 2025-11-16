@@ -1,0 +1,40 @@
+.button {
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.button:disabled {
+  color: var(--color-grayscale-2);
+  cursor: not-allowed;
+}
+
+/** contained */
+.button.contained {
+  background-color: var(--color-grayscale-1);
+  border-radius: 10px;
+}
+
+.button.contained:not(:disabled):hover {
+  color: var(--color-grayscale-1);
+  background-color: var(--color-grayscale-7);
+}
+
+/** text */
+.button.text {
+  background-color: transparent;
+}
+
+.button.text:not(:disabled):hover {
+  color: var(--color-grayscale-1);
+}
+
+/** width full */
+.button.full {
+  width: 100%;
+}
