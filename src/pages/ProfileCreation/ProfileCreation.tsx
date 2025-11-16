@@ -12,12 +12,13 @@ export default function ProfileCreation() {
   const { logout } = useUser();
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [name, setName] = useState('');
   const [gender, setGender] = useState('');
   const [country, setCountry] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const isFormValid = profileImage && name.trim() && gender && country;
+  const isFormValid = name.trim() && gender && country;
 
   const countries = [
     'Direct input',
@@ -73,6 +74,7 @@ export default function ProfileCreation() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setProfileImageFile(file);
       const reader = new FileReader();
       reader.onload = (event) => {
         setProfileImage(event.target?.result as string);
@@ -86,17 +88,40 @@ export default function ProfileCreation() {
       try {
         setIsLoading(true);
 
-        await http.put('/api/v1/users/register', {
+        let imageUrl: string | undefined;
+
+        if (profileImageFile) {
+          const formData = new FormData();
+          formData.append('file', profileImageFile);
+
+          const uploadResponse = await http.post('/api/v1/upload/image', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+
+          imageUrl = uploadResponse.data?.body?.url;
+
+          if (!imageUrl) {
+            throw new Error('Failed to get image URL from upload');
+          }
+        }
+
+        const registrationData: any = {
           name,
           gender,
           countryOfOrigin: country,
-          profileImage,
-        });
+        };
+
+        if (imageUrl) {
+          registrationData.profileImage = imageUrl;
+        }
+
+        await http.patch('/api/v1/users/register', registrationData);
 
         navigate('/mainpage');
       } catch (error) {
         console.error('Failed to register profile:', error);
-        alert('프로필 저장에 실패했습니다.');
       } finally {
         setIsLoading(false);
       }
