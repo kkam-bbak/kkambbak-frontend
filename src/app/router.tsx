@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
-import AppLayout from '../components/layout/AppLayout';
+import MainLayout from '../components/layout/MainLayout/MainLayout';
 
 import Splash from '../pages/Splash/Splash';
 import Login from '../pages/Login/Login';
@@ -58,7 +58,7 @@ export const router = createBrowserRouter([
         //element: <Protected />,
         children: [
           {
-            element: <AppLayout />,
+            element: <MainLayout />,
             children: [
               { index: true, element: <MainPage /> },
               { path: 'surveyStart', element: <SurveyStart /> },
