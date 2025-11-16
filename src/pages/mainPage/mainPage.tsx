@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Character1 from '../../assets/Character1.png';
 import './mainPage.css';
+import Header from '@/components/layout/Header/Header';
 
 // Navigate Prop 타입 정의
 interface NavigateProp {
@@ -250,15 +251,11 @@ const MainPage: React.FC = () => {
 
   return (
     <div className="main-container">
+      <Header />
       {/* 상단 고정 요소들은 Profile 탭이 활성화되면 숨겨짐 */}
       {activeMenu !== 'profile' && (
         <div className="header-section">
           <>
-            {/* Logout 버튼 (비활성 시) */}
-            <button className="logout" onClick={() => navigate('/login')}>
-              Logout
-            </button>
-
             {/* 말풍선과 꼬리 */}
             <div className="speech-bubble main-bubble">
               {activeBubbleText}

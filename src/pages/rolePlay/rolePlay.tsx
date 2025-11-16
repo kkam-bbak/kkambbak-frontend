@@ -5,6 +5,7 @@ import CharacterJump from '../../assets/Character-Jump.png';
 import CharacterWrong from '../../assets/Character-Wrong.png';
 import CharacterGloomy from '../../assets/Character-Gloomy.png';
 import './rolePlay.css';
+import Header from '@/components/layout/Header/Header';
 
 // --- 상수 및 데이터 정의 ---
 
@@ -191,14 +192,10 @@ const RolePlay = () => {
   const characterImage = getCharacterImage(step, gradingResult);
 
   return (
-    // ⭐ page-container, app-container 사용
-    <div className="role-play-container app-container">
+    <div className="role-play-container">
+      <Header hasBackButton />
       {/* ⬆️ 상단 영역 (캐릭터 및 말풍선) */}
       <div className="header-section">
-        <button className="logout" onClick={() => navigate('/logout')}>
-          Logout
-        </button>
-
         {/* 말풍선 */}
         <div className="speech-bubble rolePlay-bubble">
           {currentBubbleText}

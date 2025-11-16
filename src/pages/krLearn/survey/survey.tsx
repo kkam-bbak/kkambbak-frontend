@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Character1 from '../../../assets/Character1.png';
 import CharacterCute from '../../../assets/Character-Cute.png';
 import './survey.css';
+import Header from '@/components/layout/Header/Header';
 
 // --- 데이터 및 타입 정의 ---
 
@@ -113,9 +114,7 @@ const CharacterSection: React.FC<{
 
   return (
     <div className="header-section">
-      <button className="logout" onClick={onLogout}>
-        Logout
-      </button>
+      <Header hasBackButton />
       <SpeechBubble text={currentBubbleText} isFinal={isDone} />
 
       {/* ⭐ 3. 이미지 태그를 사용하여 캐릭터 이미지 표시 */}

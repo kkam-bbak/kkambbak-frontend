@@ -7,6 +7,7 @@ import CharacterSoso from '../../../assets/Character-Soso.png';
 import CharacterGloomy from '../../../assets/Character-Gloomy.png';
 
 import './learnComplete.css'; // CSS 파일 임포트
+import Header from '@/components/layout/Header/Header';
 
 // --- 유틸리티 함수: 시간 및 날짜 처리 ---
 
@@ -110,7 +111,7 @@ const LearnComplete: React.FC = () => {
   }, [correctCount, totalCount]); // correctCount 또는 totalCount가 변경될 때마다 재계산
 
   // 1. 로그아웃 핸들러
-  const handleLogout = () => navigate('/auth/login');
+  // const handleLogout = () => navigate('/auth/login');
 
   // 2. Review 페이지 이동 핸들러
   const handleReview = () => navigate('/mainpage/learn/review');
@@ -126,12 +127,10 @@ const LearnComplete: React.FC = () => {
   };
 
   return (
-    <div className="learn-complete-container app-container">
-      <div className="header-section">
-        <button onClick={handleLogout} className="logout">
-          Logout
-        </button>
+    <div className="learn-complete-container">
+      <Header hasBackButton />
 
+      <div>
         {/* 말풍선: 조건에 따라 텍스트 변경 */}
         <div className="speech-bubble complete-bubble">
           {speechBubbleText}

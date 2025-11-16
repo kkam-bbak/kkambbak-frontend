@@ -5,6 +5,7 @@ import CharacterSmile from '../../../assets/Character-Smile.png';
 import CharacterJump from '../../../assets/Character-Jump.png';
 import CharacterWrong from '../../../assets/Character-Wrong.png';
 import './learnStart.css';
+import Header from '@/components/layout/Header/Header';
 
 // 학습 데이터 타입을 정의합니다.
 interface LearningContent {
@@ -289,11 +290,9 @@ const LearnStart: React.FC = () => {
   };
 
   return (
-    <div className="learn-start-container app-container">
+    <div className="learn-start-container">
+      <Header hasBackButton />
       <div className="header-section">
-        <button className="logout" onClick={handleLogout}>
-          Logout
-        </button>
         <div className="character-section">
           <div className="speech-bubble start-bubble">{bubbleText}</div>
           <div className="speech-tail start-tail"></div>

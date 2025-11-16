@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Clock } from 'lucide-react'; // 시간 아이콘
 import Character1 from '../../assets/Character1.png'; // 캐릭터 이미지 경로 가정
 import './roleList.css';
+import Header from '@/components/layout/Header/Header';
 
 // --- 데이터 구조 정의 ---
 interface RolePlayItem {
@@ -52,13 +53,9 @@ const RoleList: React.FC = () => {
   };
 
   return (
-    <div className="role-list-container app-container">
+    <div className="role-list-container">
+      <Header hasBackButton />
       <div className="header-section">
-        {/* 로그아웃 버튼 */}
-        <button className="logout" onClick={handleLogout}>
-          Logout
-        </button>
-
         {/* 캐릭터 및 말풍선 섹션 */}
         <div className="speech-bubble roleList-bubble">
           {speechBubbleText}

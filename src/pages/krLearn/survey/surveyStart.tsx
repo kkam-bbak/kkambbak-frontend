@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Character1 from '../../../assets/Character1.png';
 import './surveyStart.css';
+import Header from '@/components/layout/Header/Header';
 
 // --- 데이터 및 타입 정의 (유지) ---
 const surveyData = [
@@ -19,12 +20,10 @@ const SpeechBubble: React.FC<{ text: string }> = ({ text }) => (
   </div>
 );
 
-const CharacterSection: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
+const CharacterSection = () => {
   return (
     <div className="header-section">
-      <button className="logout" onClick={onLogout}>
-        Logout
-      </button>
+      <Header hasBackButton />
       <SpeechBubble text={INTRO_BUBBLE_TEXT} />
       <div className="character-placeholder">
         <img src={Character1} alt="Character" className="character-icon" />
@@ -50,14 +49,10 @@ const SurveyStart: React.FC = () => {
     navigate('../learnList');
   };
 
-  const handleLogout = () => {
-    navigate('/auth/login');
-  };
-
   return (
-    <div className="survey-start-container app-container">
+    <div className="survey-start-container">
       {/* 상단 섹션 */}
-      <CharacterSection onLogout={handleLogout} />
+      <CharacterSection />
 
       {/* 하단 Survey 내용 창 */}
       <div className="content-window">
