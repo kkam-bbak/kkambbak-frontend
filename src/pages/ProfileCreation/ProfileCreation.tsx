@@ -6,6 +6,13 @@ import Character1 from '../../assets/Character1.png';
 import CharacterJump from '../../assets/Character-Jump.png';
 import styles from './ProfileCreation.module.css';
 
+interface RegistrationData {
+  name: string;
+  gender: string;
+  countryOfOrigin: string;
+  profileImage?: string;
+}
+
 export default function ProfileCreation() {
   const navigate = useNavigate();
   const user = useUser((s) => s.user);
@@ -107,7 +114,7 @@ export default function ProfileCreation() {
           }
         }
 
-        const registrationData: any = {
+        const registrationData: RegistrationData = {
           name,
           gender,
           countryOfOrigin: country,
