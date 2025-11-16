@@ -1,10 +1,10 @@
 // learnList.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Character1 from '../../../assets/Character1.png';
 import './learnList.css';
 import LearnInfo from '../learnInfo/learnInfo'; // 🔥 경로 수정
 import Header from '@/components/layout/Header/Header';
+import Mascot from '@/components/Mascot/Mascot';
 // Topic 인터페이스는 유지
 interface Topic {
   id: number;
@@ -196,7 +196,7 @@ const LearnList: React.FC = () => {
 
   const activeBubbleText =
     activeTab === 'topik'
-      ? 'Should I help you prepare <br/> for the exam?'
+      ? 'Should I help you prepare\nfor the exam?'
       : 'Can I help you with daily conversation?';
 
   const topicsToDisplay = activeTab === 'topik' ? topikList : casualList;
@@ -217,17 +217,8 @@ const LearnList: React.FC = () => {
   return (
     <div className="content-lit-container">
       <Header hasBackButton />
-      {/* 상단 고정 요소 */}
-      <div className="header-section">
-        <div className="speech-bubble list-bubble">
-          {/*띄어쓰기 html 적용코드*/}
-          <div dangerouslySetInnerHTML={{ __html: activeBubbleText }} />
-          <div className="speech-tail"></div>
-        </div>
-        <div className="character-placeholder">
-          <img src={Character1} alt="Character" className="character-icon" />
-        </div>
-      </div>
+
+      <Mascot image="basic" text={activeBubbleText} />
 
       <div className="content-window">
         {/* 탭 버튼 */}

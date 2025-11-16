@@ -1,10 +1,8 @@
 // LearnInfo.tsx
 import React, { useState, useEffect } from 'react';
-import Character1 from '../../../assets/Character1.png';
-import CharacterSmile from '../../../assets/Character-Smile.png';
-import CharacterShine from '../../../assets/Character-Shining.png';
 import './learnInfo.css';
 import Header from '@/components/layout/Header/Header';
+import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 
 // Topic 인터페이스는 유지
 interface Topic {
@@ -88,22 +86,22 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
   const isFieldsActive = currentStep >= 2 && currentStep <= 5;
 
   // 🔥 캐릭터 이미지 소스를 결정하는 함수
-  const getCharacterImage = () => {
+  const getMascotImage = (): MascotImage => {
     switch (currentStep) {
       case 0: // "Okay, Let's go!"
       case 5: // "and then release the button."
-        return CharacterSmile;
+        return 'smile';
       case 8: // "Okay, now focus on my instructions."
-        return CharacterShine;
+        return 'shining';
       case 1: // "Before we begin, let me briefly explain."
       case 2: // "I'll show you an image and play it back in Korean with pronunciation."
       case 3: // "Then, you hold down the button"
       case 4: // "Say the words"
       case 7: // "You can also press the voice to hear it again."
-        return Character1;
+        return 'basic';
       default:
         // 6 (If you don't understand after listening,) 은 Character1이나 디폴트 이미지로 설정
-        return Character1;
+        return 'basic';
     }
   };
 
@@ -163,22 +161,9 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
   return (
     <div className={modalClassName}>
       <Header hasBackButton />
+
+      <Mascot image={getMascotImage()} text={currentSpeechText} />
       <div className="page-container ">
-        {/* 상단 헤더 */}
-        <div className="header-section">
-          <div className="speech-bubble info-bubble">{currentSpeechText}</div>
-
-          {/* 👇 캐릭터 이미지 렌더링 추가 */}
-          <div className="character-placeholder">
-            <img
-              src={getCharacterImage()}
-              alt="Character"
-              className="character-icon"
-            />
-          </div>
-          {/* 👆 캐릭터 이미지 렌더링 추가 */}
-        </div>
-
         {/* 학습 카드 영역 */}
         <div className={`learning-card-info ${getCardClass()}`}>
           {/* 제목 및 페이지 */}

@@ -1,46 +1,5 @@
 /* for rolePlay design */
 
-/* 말풍선 - 글자 크기에 따라 따로 변경 가능 */
-.speech-bubble {
-  position: absolute;
-  z-index: 10;
-  display: flex; /* Flexbox 활성화 */
-  align-items: center; /* 수직(세로) 중앙 정렬 */
-  justify-content: center; /* 수평(가로) 중앙 정렬 */
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--color-grayscale-7);
-  text-align: center;
-  background-color: var(--color-primary-orange);
-  border-radius: 10px;
-}
-
-.speech-tail {
-  position: absolute;
-  bottom: -15px;
-  left: 50%;
-  width: 28px;
-  height: 28px;
-  background-color: var(--color-primary-orange);
-  clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
-  transform: translateX(-50%) rotate(180deg);
-}
-
-/* 캐릭터 이미지 */
-.character-placeholder {
-  display: contents;
-}
-
-.character-icon {
-  position: absolute;
-  top: 140px;
-  left: 134px;
-  width: 92px;
-  height: 124px;
-  aspect-ratio: auto;
-  object-fit: contain;
-}
-
 /* 하단 섹션 */
 .role-content-window {
   position: absolute;

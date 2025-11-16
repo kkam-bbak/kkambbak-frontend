@@ -1,13 +1,9 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
-import CharacterShine from '../../../assets/Character-Shining.png';
-import CharacterSmile from '../../../assets/Character-Smile.png';
-import CharacterSoso from '../../../assets/Character-Soso.png';
-import CharacterGloomy from '../../../assets/Character-Gloomy.png';
-
 import './learnComplete.css'; // CSS 파일 임포트
 import Header from '@/components/layout/Header/Header';
+import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 
 // --- 유틸리티 함수: 시간 및 날짜 처리 ---
 
@@ -82,32 +78,30 @@ const LearnComplete: React.FC = () => {
   const completionDate = useMemo(() => getFormattedCompletionDate(), []);
 
   // 3. 말풍선 텍스트 및 캐릭터 이미지 결정 로직
-  const { speechBubbleText, characterImageSrc } = useMemo(() => {
+  const { speechBubbleText, mascotImage: characterImageSrc } = useMemo(() => {
     let text = '';
-    let imgSrc = '';
+    let mascot: MascotImage;
 
     if (correctCount === totalCount) {
       text = 'Perfect!!!';
-      // imgSrc = perfectImg;
-      // 🚨 나중에 이미지 경로로 대체 (예: imgSrc = '/path/to/perfect_image.png')
-      imgSrc = CharacterShine;
+      mascot = 'shining';
     } else if (correctCount >= totalCount * (2 / 3)) {
       // 3분의 2 이상
       text = "It's not bad~";
       // imgSrc = goodImg;
-      imgSrc = CharacterSmile;
+      mascot = 'smile';
     } else if (correctCount >= totalCount * (1 / 2)) {
       // 절반 이상
       text = 'So so~';
       // imgSrc = sosoImg;
-      imgSrc = CharacterSoso;
+      mascot = 'thinking';
     } else {
       // 절반 이하
       text = "I'm sorry ..";
       // imgSrc = badImg;
-      imgSrc = CharacterGloomy;
+      mascot = 'gloomy';
     }
-    return { speechBubbleText: text, characterImageSrc: imgSrc };
+    return { speechBubbleText: text, mascotImage: mascot };
   }, [correctCount, totalCount]); // correctCount 또는 totalCount가 변경될 때마다 재계산
 
   // 1. 로그아웃 핸들러
@@ -130,21 +124,7 @@ const LearnComplete: React.FC = () => {
     <div className="learn-complete-container">
       <Header hasBackButton />
 
-      <div>
-        {/* 말풍선: 조건에 따라 텍스트 변경 */}
-        <div className="speech-bubble complete-bubble">
-          {speechBubbleText}
-          <div className="speech-tail"></div>
-        </div>
-
-        <div className="character-placeholder">
-          <img
-            src={characterImageSrc}
-            alt="Character"
-            className="character-icon"
-          ></img>
-        </div>
-      </div>
+      <Mascot image={characterImageSrc} text={speechBubbleText} />
 
       {/* 4. 세션 완료 결과 카드 (주황색 배경) */}
       <div className="learning-card complete-card">

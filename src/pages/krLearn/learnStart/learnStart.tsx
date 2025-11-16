@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Character1 from '../../../assets/Character1.png';
-import CharacterSmile from '../../../assets/Character-Smile.png';
-import CharacterJump from '../../../assets/Character-Jump.png';
-import CharacterWrong from '../../../assets/Character-Wrong.png';
 import './learnStart.css';
 import Header from '@/components/layout/Header/Header';
+import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 
 // 학습 데이터 타입을 정의합니다.
 interface LearningContent {
@@ -255,17 +252,17 @@ const LearnStart: React.FC = () => {
     return 'Listen carefully';
   })();
 
-  const getCharacterImage = () => {
+  const getMascotImage = (): MascotImage => {
     if (resultStatus === 'none') {
-      return CharacterSmile;
+      return 'smile';
     }
     if (resultStatus === 'incorrect') {
-      return CharacterWrong;
+      return 'wrong';
     }
     if (resultStatus === 'correct') {
-      return CharacterJump;
+      return 'jump';
     }
-    return Character1;
+    return 'basic';
   };
 
   const characterImageClass =
@@ -292,19 +289,8 @@ const LearnStart: React.FC = () => {
   return (
     <div className="learn-start-container">
       <Header hasBackButton />
-      <div className="header-section">
-        <div className="character-section">
-          <div className="speech-bubble start-bubble">{bubbleText}</div>
-          <div className="speech-tail start-tail"></div>
-          <div className={characterImageClass}>
-            <img
-              src={getCharacterImage()}
-              alt="Character"
-              className="character-icon"
-            />
-          </div>
-        </div>
-      </div>
+
+      <Mascot image={getMascotImage()} text={bubbleText} />
 
       <div className="learning-card">
         <div className="card-title-bar">

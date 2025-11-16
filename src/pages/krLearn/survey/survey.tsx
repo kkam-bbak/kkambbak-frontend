@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Character1 from '../../../assets/Character1.png';
-import CharacterCute from '../../../assets/Character-Cute.png';
 import './survey.css';
 import Header from '@/components/layout/Header/Header';
+import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 
 // --- 데이터 및 타입 정의 ---
 
@@ -63,16 +62,6 @@ const DONE_PAGE_INDEX = surveyData.length;
 
 // --- 컴포넌트 분리 (SpeechBubble, CharacterSection, PaginationDots) ---
 
-const SpeechBubble: React.FC<{ text: string; isFinal?: boolean }> = ({
-  text,
-  isFinal = false,
-}) => (
-  <div className="speech-bubble surveyIng-bubble">
-    {text}
-    <div className={`speech-tail ${isFinal ? 'final-tail' : ''}`}></div>
-  </div>
-);
-
 // const CharacterSection: React.FC<{ pageIndex: number, isStarted: boolean, onLogout: () => void }> = ({ pageIndex, isStarted, onLogout }) => {
 //     let currentBubbleText;
 //     if (pageIndex === DONE_PAGE_INDEX) {
@@ -110,28 +99,13 @@ const CharacterSection: React.FC<{
   }
 
   // ⭐ 2. 페이지에 따라 사용할 이미지 경로 결정
-  const characterImage = isDone ? CharacterCute : Character1;
+  const characterImage: MascotImage = isDone ? 'cute' : 'basic';
 
   return (
     <div className="header-section">
       <Header hasBackButton />
-      <SpeechBubble text={currentBubbleText} isFinal={isDone} />
 
-      {/* ⭐ 3. 이미지 태그를 사용하여 캐릭터 이미지 표시 */}
-      <div
-        className={`character-placeholder ${isDone ? 'final-character' : ''}`}
-      >
-        <img
-          src={characterImage}
-          alt={
-            isDone
-              ? 'Cute Character for Success'
-              : 'Instructor Character for Survey'
-          }
-          // 필요하다면 이미지 스타일링을 위한 클래스를 추가합니다.
-          className="character-icon"
-        />
-      </div>
+      <Mascot image={characterImage} text={currentBubbleText} />
     </div>
   );
 };

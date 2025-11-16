@@ -1,9 +1,9 @@
 // SurveyStart.tsx (메인 페이지에서 처음 접근하는 파일)
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Character1 from '../../../assets/Character1.png';
 import './surveyStart.css';
 import Header from '@/components/layout/Header/Header';
+import Mascot from '@/components/Mascot/Mascot';
 
 // --- 데이터 및 타입 정의 (유지) ---
 const surveyData = [
@@ -13,21 +13,12 @@ const INTRO_BUBBLE_TEXT =
   "Before we start, Answer a few simple questions and we'll tailor your learning to your needs.";
 
 // --- 컴포넌트 분리 (SpeechBubble, CharacterSection 유지) ---
-const SpeechBubble: React.FC<{ text: string }> = ({ text }) => (
-  <div className="speech-bubble survey-bubble">
-    {text}
-    <div className="speech-tail suvery-tail"></div>
-  </div>
-);
 
 const CharacterSection = () => {
   return (
     <div className="header-section">
       <Header hasBackButton />
-      <SpeechBubble text={INTRO_BUBBLE_TEXT} />
-      <div className="character-placeholder">
-        <img src={Character1} alt="Character" className="character-icon" />
-      </div>
+      <Mascot image="basic" text={INTRO_BUBBLE_TEXT} />
     </div>
   );
 };
