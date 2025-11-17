@@ -20,9 +20,9 @@ function Header({ hasBackButton = false }: HeaderProps) {
 
     try {
       await http.post('/api/v1/users/logout');
-      logout();
     } catch (error) {
       console.error('Logout failed:', error);
+    } finally {
       logout();
     }
   };
