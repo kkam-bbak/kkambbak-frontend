@@ -1,268 +1,177 @@
-/* -------------------- 0. 전체 컨테이너 및 레이아웃 -------------------- */
-
-.topic-page-container {
-    width: 360px;
-    height: 720px;
-    background-color: #000;
-    position: relative; 
-    font-family: 'Inter', sans-serif;
-    color: white;
-    overflow: hidden; /* 페이지 전체 스크롤 방지 */
+.content-lit-container {
+  width: 100%;
 }
 
-.header-section {
-    position: relative;
-    /* 하단 창 시작 위치(290px)까지 영역 확보 */
-    height: 290px; 
-}
-
-/* -------------------- 1. 상단 요소 (기존 코드 유지) -------------------- */
-
-/* Logout 버튼 (44x20, Top: 6px, Left: 296px, Color: #757575) */
-.logout-button {
-    position: absolute;
-    width: 44px;
-    height: 20px;
-    top: 6px; 
-    left: 296px; 
-    background-color: transparent;
-    border: none;
-    color: #757575; /* #757575 */
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: right;
-    z-index: 20;
-}
-
-/* 말풍선 (228x72, Top: 32px, Left: 66px, Color: #FF5000) */
-.speech-bubble {
-    position: absolute;
-    width: 234px;
-    height: 75px;
-    top: 32px; 
-    left: 66px;
-    background-color: #FF5000; 
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px; 
-    color: black;
-    padding: 12px 16px; 
-    box-sizing: border-box;
-    z-index: 10;
-    text-align: center;
-}
-
-/* 말풍선 꼬리 (28.67x28.67, Top: 89.33px, Left: 165.67px) */
-.bubble-tail {
-    position: absolute;
-    width: 28.67px;
-    height: 28.67px;
-    /* 부모 말풍선(Top 32px, Left 66px) 기준으로 계산 */
-    top: 72px; 
-    left: 100px; 
-    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
-    background-color: #FF5000; 
-    transform: rotate(180deg);
-}
-
-/* 캐릭터 (92x124, Top: 150px, Left: 134px) */
-.character-placeholder {
-    position: absolute;
-    width: 92px;
-    height: 124px;
-    top: 150px; 
-    left: 134px;
-    background-color: #FF5000; 
-    border-radius: 50%; 
-    z-index: 10;
-}
-
-/* -------------------- 2. 하단 학습 창 영역 및 탭 버튼 (수정) -------------------- */
-
-.learning-window {
-    position: absolute;
-    width: 100%; 
-    height: 430px; 
-    top: 290px;
-    left: 0;
-    background-color: #FF5000; /* 탭 버튼 바깥쪽 배경색 */
-    color: black; 
-    border-radius: 15px 15px 0 0; 
-    box-sizing: border-box;
-    /* 이 컨테이너는 탭 버튼을 포함하므로 전체 스크롤을 갖지 않습니다. */
-    overflow: hidden; 
+.list-bubble {
+  top: 32px !important;
+  left: 66px !important;
+  width: 228px !important;
+  height: 72px !important;
 }
 
 /* 탭 버튼 컨테이너 - Sticky 고정을 위해 부모 요소의 top:0 기준으로 설정 */
 .tab-buttons-container {
-    display: flex;
-    width: 100%;
-    height: 52px;
-    background-color: #FF5000; /* 탭 아래 배경색 */
-    position: sticky; /* 고정 */
-    top: 0; /* learning-window의 top:0에 고정 */
-    z-index: 5;
-    border-radius:15px;
+  position: sticky; /* 고정 */
+  top: 0; /* learning-window의 top:0에 고정 */
+  z-index: 5;
+  display: flex;
+  width: 100%;
+  height: 52px;
+  background-color: #ff5000; /* 탭 아래 배경색 */
+  border-radius: 15px;
 }
 
 /* 탭 버튼 공통 */
 .tab-button {
-    flex: 1; /* 180px 대신 flex 사용 */
-    height: 52px; 
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    font-size: 18px; 
-    font-weight: 500;
-    text-align: center;
-    box-sizing: border-box;
-    transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+  flex: 1; /* 180px 대신 flex 사용 */
+  height: 52px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease-in-out;
 }
 
 /* 탭 활성/비활성 스타일 */
 .tab-button.active {
-    background-color: white; 
-    color: black;
-    
-    border-radius: 15px;
+  color: black;
+  background-color: white;
+  border-radius: 15px;
 }
 
 .tab-button:not(.active) {
-    background-color: #FF5000;
-    color: rgba(0, 0, 0, 0.3);
-    border-radius: 15px;
+  color: rgb(0 0 0 / 30%);
+  background-color: #ff5000;
+  border-radius: 15px;
 }
 
 /* -------------------- 3. 학습 목록 (스크롤 영역) -------------------- */
 
 .scrollable-list {
-    /* 탭 버튼 (52px) 아래에서 시작 */
-    height: calc(100% - 52px); 
-    overflow-y: auto; /* 목록만 스크롤되도록 설정 */
-    background-color: #FF5000; /* 목록 배경색 */
-    padding: 20px 0; /* 상하 패딩 */
+  /* 탭 버튼 (52px) 아래에서 시작 */
+  height: calc(100% - 52px);
+  padding: 20px 0; /* 상하 패딩 */
+  overflow-y: auto; /* 목록만 스크롤되도록 설정 */
 
-    /* 스크롤바 숨기기 (핵심)  */
-    &::-webkit-scrollbar {
-        display: none;
-    }
-    /* IE, Edge */
-    -ms-overflow-style: none;  
-    /* Firefox */
-    scrollbar-width: none;
+  /* Firefox */
+  scrollbar-width: none;
+  background-color: #ff5000; /* 목록 배경색 */
+
+  /* IE, Edge */
+  -ms-overflow-style: none;
+
+  /* 스크롤바 숨기기 (핵심)  */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
-
-
-
 
 /* -------------------- 4. 개별 학습 카드 디자인 -------------------- */
 
 .topic-card {
-    width: 328px;
-    height: 82px;
-    margin: 0 auto 16px auto; /* 중앙 정렬 및 하단 간격 */
-    background-color: #101010;
-    border-radius: 15px;
-    color: white;
-    padding: 16px;
-    box-sizing: border-box;
-    transition: background-color 0.2s;
+  box-sizing: border-box;
+  width: 328px;
+  height: 82px;
+  padding: 16px;
+  margin: 0 auto 16px; /* 중앙 정렬 및 하단 간격 */
+  color: white;
+  background-color: #101010;
+  border-radius: 15px;
+  transition: background-color 0.2s;
 }
 
 /* Emotions 등 제목 */
 .card-header h3 {
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 30px;
-   
+  margin-bottom: 30px;
+  font-size: 18px;
+  font-weight: 500;
 }
 
 .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 20px;
-    
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 20px;
 }
 
 /* Start 버튼 */
 .topic-start-button {
-    width: 65px;
-    height: 20px;
-    background-color: white;
-    color: black;
-    border: none;
-    border-radius: 5px;
-    font-size: 10px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    cursor: pointer;
+  width: 65px;
+  height: 20px;
+  margin-bottom: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: black;
+  cursor: pointer;
+  background-color: white;
+  border: none;
+  border-radius: 5px;
 }
 
 /* Completed (Topik 2)의 Learn Again 버튼 스타일 */
 .start-button.learn-again {
-    background-color: #757575;
-    color: white; /* 흰색 텍스트 */
+  color: white; /* 흰색 텍스트 */
+  background-color: #757575;
 }
 
 /* 구분선 */
 .card-divider {
-    width: 100%;
-    height: 1.5px;
-    background-color: black; /* 연한 흰색 선 */
-    margin: 4px 0 10px 0;
+  width: 100%;
+  height: 1.5px;
+  margin: 4px 0 10px;
+  background-color: black; /* 연한 흰색 선 */
 }
 
 /* 하단 정보 (단어 수 / 시간) */
 .card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    color: #484848; /* 연한 회색 텍스트 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #484848; /* 연한 회색 텍스트 */
 }
 
 .vocab-count {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .time-info {
-    display: flex;
-    align-items: center;
-    font-weight: 500;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
 }
 
 .time-icon {
-    font-size: 12px;
-    margin-left: 3px;
+  margin-left: 3px;
+  font-size: 12px;
 }
 
 /* -------------------- 5. 텍스트 활성화/비활성화 스타일 (유지) -------------------- */
 
 /* 비활성화 텍스트 (회색: 모든 완료된 토픽과 잠긴 토픽의 텍스트 색상) */
 .inactive-text {
-    color: #484848; 
+  color: #484848;
 }
 
 /* 활성화 텍스트 (흰색: 다음에 시작해야 할 토픽의 텍스트 색상) */
 .active-text {
-    color: white !important; 
+  color: white !important;
 }
 
 /* 하단 정보 (단어 수 / 시간) 기본값은 비활성화 색상 */
 .card-footer {
-    color: #484848; 
+  color: #484848;
 }
 
 /* 활성 텍스트가 적용된 경우에만 흰색으로 오버라이드 */
 .card-footer .active-text {
-    color: white !important;
+  color: white !important;
 }
 
 /* 시간 아이콘도 활성화 상태에 따라 색상 변경 */
 .time-info.active-text .time-icon {
-    color: white !important;
+  color: white !important;
 }

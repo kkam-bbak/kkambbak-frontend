@@ -1,0 +1,113 @@
+.loginContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 16px;
+}
+
+.characterContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  align-items: center;
+}
+
+.loginContent {
+  display: flex;
+  flex-direction: column;
+  gap: 45px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* 인사말 말풍선 */
+.greetingBubble {
+  position: relative;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1b1b1b;
+  text-align: center;
+  background-color: #ff5000;
+  border-radius: 10px;
+}
+
+/* 말풍선 꼬리 */
+.greetingBubble::after {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  content: '';
+  border-top: 12px solid #ff5000;
+  border-right: 10px solid transparent;
+  border-left: 10px solid transparent;
+  transform: translateX(-50%);
+}
+
+/* 캐릭터 플레이스홀더 */
+.characterPlaceholder {
+  display: contents;
+}
+
+.characterIcon {
+  width: 100px;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
+/* 버튼 그룹 */
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* 로그인 버튼 */
+.loginButton {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1b1b1b;
+  cursor: pointer;
+  background-color: #fff;
+  border: none;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.loginButton:hover {
+  background-color: #e3e3e3;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
+}
+
+.loginButton:active {
+  color: #fff;
+  background-color: #757575;
+}
+
+.loginButton:disabled {
+  color: #757575;
+  cursor: not-allowed;
+  background-color: #e3e3e3;
+  opacity: 0.6;
+}
+
+.googleIcon {
+  font-size: 16px;
+  font-weight: 700;
+  color: #4285f4;
+}

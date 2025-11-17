@@ -1,0 +1,310 @@
+.verifyEmailContainer {
+  width: 100%;
+  align-items: center;
+  position: relative;
+}
+
+/* 뒤로가기 버튼 */
+.backButton {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backIcon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+}
+
+.verifyEmailContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  height: 100%;
+  padding: 20px 0px 0px 0px;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  margin: 0;
+}
+
+/* 안내 메시지 말풍선 */
+.infoBubble {
+  background-color: #ff5000;
+  color: #1b1b1b;
+  padding: 20px 24px;
+  border-radius: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 340px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* 말풍선 꼬리 */
+.infoBubble::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid #ff5000;
+}
+
+.infoTitle {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.infoText {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* 캐릭터 */
+.characterPlaceholder {
+  display: contents;
+}
+
+.characterIcon {
+  width: 100px;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  margin: 10px 0 0 0;
+}
+
+/* 입력 박스 (주황색 배경 - 버튼 포함) */
+.inputBox {
+  background-color: #ff5000;
+  color: #1b1b1b;
+  padding: 20px 20px 80px 20px;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  position: relative;
+  min-height: 255px;
+  transition: background-color 0.3s ease;
+}
+
+/* 만료 상태 - 배경 어둡게 */
+.inputBox.expired {
+  background-color: #a53818;
+}
+
+.expired {
+  background-color: #a53818;
+}
+
+/* 입력 라벨 */
+.inputLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1b1b1b;
+}
+
+/* OTP 입력 필드 */
+.otpInput {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  background-color: #1b1b1b;
+  color: #ffffff;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.otpInput:focus {
+  outline: none;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
+}
+
+.otpInput:disabled {
+  background-color: #333333;
+  color: #666666;
+  cursor: not-allowed;
+}
+
+.otpInput::placeholder {
+  color: #999999;
+}
+
+.otpInput.error {
+  color: #ff0000 !important;
+}
+
+.error {
+  color: #ff0000 !important;
+}
+
+/* 타이머 */
+.timerDisplay {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  color: #ffffff;
+  margin: 2px 0;
+}
+
+.timerDisplay.expired {
+  color: #8b0000;
+  font-weight: 700;
+}
+
+/* 에러 메시지 */
+.errorMessage {
+  color: #8b0000;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px;
+  background-color: rgba(139, 0, 0, 0.15);
+  border-radius: 6px;
+  margin: 0;
+}
+
+/* 시간 초과 메시지 */
+.expiredMessage {
+  color: #1b1b1b;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  margin: 0;
+}
+
+/* 만료 상태 큰 박스 - Modal */
+.expiredMessageBox {
+  color: #1b1b1b;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  padding: 50px 30px 191px 30px;
+  line-height: 1.6;
+  position: absolute;
+  top: 5%;
+  left: 0;
+  right: 0;
+  background-color: #ff5000;
+  border-radius: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 20;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* 버튼 그룹 */
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+}
+
+/* 검증 버튼 */
+.verifyButton {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.confirmBtn {
+  background-color: #ffffff;
+  color: #1b1b1b;
+}
+
+.confirmBtn:hover:not(:disabled) {
+  background-color: #e3e3e3;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.confirmBtn:active:not(:disabled) {
+  background-color: #cccccc;
+}
+
+.confirmBtn:disabled {
+  background-color: #cccccc;
+  color: #999999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.resendBtn {
+  background-color: #ffffff;
+  color: #1b1b1b;
+}
+
+.resendBtn:hover:not(:disabled) {
+  background-color: #e3e3e3;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.resendBtn:active:not(:disabled) {
+  background-color: #cccccc;
+}
+
+.resendBtn:disabled {
+  background-color: #cccccc;
+  color: #999999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 600px) {
+  .verifyEmailContent {
+    min-height: 100vh;
+  }
+
+  .inputBox {
+    padding-bottom: 140px;
+  }
+
+  .buttonGroup {
+    width: calc(100% - 40px);
+    max-width: none;
+  }
+}

@@ -1,0 +1,33 @@
+.splash-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-primary-orange);
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-icon {
+  width: 150px;
+  height: 150px;
+  animation: splash-bounce 2s ease-in-out infinite;
+}
+
+@keyframes splash-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}

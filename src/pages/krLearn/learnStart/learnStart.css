@@ -1,266 +1,209 @@
 /* learnStart.css */
 
-/* -------------------- 0. 전체 컨테이너 및 레이아웃 -------------------- */
-
-.learn-page-container {
-    width: 360px;
-    height: 720px;
-    background-color: #000;
-    position: relative; 
-    font-family: 'Inter', sans-serif;
-    color: white;
-    overflow: hidden; 
+.learn-start-container {
+  width: 100%;
 }
 
-/* -------------------- 1. 상단 헤더 및 로그아웃 -------------------- */
-.learn-header {
-    position: relative;
-    /* 하단 창 시작 위치(290px)까지 영역 확보 */
-    height: 290px; 
+.start-bubble {
+  top: 60px;
+  left: 69px;
+  width: 222px;
+  height: 44px;
 }
 
-.logout-button {
-    background-color: transparent;
-    border: none;
-    color: #757575;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: right;
+.start-tail {
+  top: 90px;
 }
-
-/* -------------------- 2. 캐릭터 및 말풍선 -------------------- */
-.character-section {
-    display: flex;
-    align-items: center;
-    position: absolute;
-    top: 60px; 
-    left: 81px;
-    width: 100%;
-    z-index: 5;
-}
-
-/* 말풍선 스타일 */
-.speech-bubble-top {
-    width: 198px;
-    height: 44px;
-    background-color: #FF5000;
-    color: black;
-    border: none;
-    border-radius: 10px;
-    position: relative;
-    text-align: center;
-    
-    font-size: 15px; 
-}
-
-/* 말풍선 꼬리 */
-.bubble-tail{
-    width: 28.67px;
-    height: 28.67px;
-    
-    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
-    background-color: #FF5000; 
-    transform: rotate(180deg);
-}
-
-/* 캐릭터 이미지 (플레이스홀더) */
-.character-image {
-    
-}
-
-
-
 
 /* -------------------- 3. 학습 카드 영역 -------------------- */
 .learning-card {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 430px; 
-    background-color: #FF5000;
-    border-radius: 15px 15px 0 0;
-    padding: 15px;
-    box-sizing: border-box;
-    color: black;
-    overflow: hidden; 
+  position: absolute;
+  bottom: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 430px;
+  padding: 15px;
+  overflow: hidden;
+  color: black;
+  background-color: #ff5000;
+  border-radius: 15px 15px 0 0;
 }
 
 /* 카운트다운 바 컨테이너 */
 .countdown-bar-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 15px;
-    background-color: black;
-    z-index: 10; 
-    overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 15px;
+  overflow: hidden;
+  background-color: black;
 }
 
 .countdown-bar-fill {
-
-    border-radius: 10px;
-    top: 3px;
-    padding: 3px;
-    background-color: #FF5000; 
-    transition: width 0.1s linear; 
-    left: 0;
-    position: absolute;
+  position: absolute;
+  top: 3px;
+  left: 0;
+  padding: 3px;
+  background-color: #ff5000;
+  border-radius: 10px;
+  transition: width 0.1s linear;
 }
 
 /* 제목 바 */
 .card-title-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 500;
-    font-size: 16px;
-    margin-bottom: 15px;
-    color: black;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 500;
+  color: black;
 }
 
 /* 단어 표시 영역 (이미지) */
 .word-display-area {
-    width: 100%;
-    height: 160px;
-    background-color: #000;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* 🔥🔥 수정: 자식인 countdown-bar-container의 위치 기준점 */
-    position: relative; 
-    overflow: hidden;
+  /* 🔥🔥 수정: 자식인 countdown-bar-container의 위치 기준점 */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 160px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  background-color: #000;
+  border-radius: 10px;
 }
 
 /* 이미지 Placeholder (사과 이미지 구현) */
 
-
-
 /* -------------------- 4. 입력 필드 -------------------- */
 .input-fields-container {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.topic-name{
-    top: 16px;
-    left: 16px;
-    font-size: 18px;
-    font-weight: 500;
+.topic-name {
+  top: 16px;
+  left: 16px;
+  font-size: 18px;
+  font-weight: 500;
 }
 
 .input-row {
-    display: flex;
-    align-items: center;
-    height: 40px; 
-    background-color: #000; 
-    border-radius: 10px;
-    color: white;
-    overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  overflow: hidden;
+  color: white;
+  background-color: #000;
+  border-radius: 10px;
 }
 
 .input-row label {
-    width: 90px;
-    padding: 0 10px;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: left;
-    color: #757575; 
+  width: 90px;
+  padding: 0 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #757575;
+  text-align: left;
 }
 
 .input-row input {
-    flex-grow: 1;
-    height: 100%;
-    border: none;
-    background-color: #000;
-    color: white;
-
-    font-weight: 500;
-    font-size: 16px;
-    outline: none;
+  flex-grow: 1;
+  height: 100%;
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+  outline: none;
+  background-color: #000;
+  border: none;
 }
 
 /* Translation 행 (주황색 배경) */
 .input-row.translation {
-    background-color: #FF5000;
+  background-color: #ff5000;
 }
+
 .input-row.translation label {
-    width: 90px;
-    background-color: black;
-    color: #757575;
-    height: 100%;
-    line-height: 44px;
-
- 
+  width: 90px;
+  height: 100%;
+  line-height: 44px;
+  color: #757575;
+  background-color: black;
 }
+
 .input-row.translation input {
-    background-color: black;
-    color: white;
+  color: white;
+  background-color: black;
 }
-
 
 /* 스피커 아이콘 */
 .speaker-icon {
-    width: 44px;
-    height: 100%;
-    background-color: #000;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 100%;
+  color: white;
+  cursor: pointer;
+  background-color: #000;
+  border: none;
 }
+
 .speaker-icon:disabled {
-    color: #333; /* 비활성화 시 색상 */
-    cursor: not-allowed;
+  color: #333; /* 비활성화 시 색상 */
+  cursor: not-allowed;
 }
 
 /* -------------------- 5. 마이크 버튼 -------------------- */
 .mic-button {
-    width: 100%;
-    height: 50px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    gap: 8px;
-    transition: background-color 0.1s, color 0.1s;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  border-radius: 15px;
+  transition: background-color 0.1s, color 0.1s;
 }
 
 .action-buttons-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    margin-top: 20px; /* 🔥 마진을 10px 줄여서 전체적으로 위로 올림 */
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.action-button {
+  width: 156px;
+  height: 40px;
 }
 
 .mic-button.off {
-    background-color: white;
-    color: black;
+  color: black;
+  background-color: white;
 }
 
 .mic-button.on {
-    background-color: black;
-    color: white;
-    
+  color: white;
+  background-color: black;
 }
+
 .mic-button.on .mic-icon {
-    color: white;
+  color: white;
 }
 
 /* 비활성화 상태 */
 .mic-button.disabled {
-    cursor: not-allowed;
-    background-color: white; 
-    color: #e3e3e3; 
+  color: #e3e3e3;
+  cursor: not-allowed;
+  background-color: white;
 }

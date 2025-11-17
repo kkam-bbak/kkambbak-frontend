@@ -1,0 +1,240 @@
+.role-play-container {
+  width: 100%;
+}
+
+.rolePlay-bubble {
+  top: 60px;
+  left: 50px;
+  width: 274px;
+  height: 72px;
+}
+
+/* 하단 섹션 (슬라이딩 카드) */
+.rolePlay-content-window {
+  z-index: 20;
+  padding: 15px;
+  transition: transform 0.3s ease-out;
+}
+
+/* START 단계에서 카드를 숨기기 위한 클래스 */
+
+/* .role-content-window.slide-out {
+    transform: translateY(100%);
+} */
+
+/* ================================================= */
+
+/* 2. 카드 내부 컴포넌트 스타일             */
+
+/* ================================================= */
+
+/* 카드 타이틀 바 (상단 'Role Play_At a Cafe 01/02' 줄) */
+.card-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: black;
+  background-color: transparent; /* content-window의 파란색 배경을 사용 */
+}
+
+.card-title-text {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.card-step-text {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* 텍스트 표시 박스 (검은색) */
+.text-display-box {
+  top: 52px;
+  left: 15px;
+  width: 328px;
+  height: 120px;
+  background-color: #101010;
+  border-radius: 10px;
+}
+
+.divider-line {
+  width: 328px;
+  border: 1px solid black;
+}
+
+.text-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 15px;
+}
+
+/* 한국어 원문 텍스트 (이미지 1번처럼 위에 위치) */
+.korean-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: white;
+}
+
+/* 🎧 듣기 버튼 */
+.tts-button {
+  width: 20px;
+  height: 20px;
+  color: #757575; /* Gray-500 (비활성화 기본 - 회색) */
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: color 0.2s;
+}
+
+.tts-button.active {
+  color: white; /* 활성화 시 흰색 */
+}
+
+/* 📝 로마자 발음 (이미지 1번처럼 두 번째 줄에 위치) */
+.romanized-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: white;
+  transition: color 0.3s;
+}
+
+.romanized-text.correct {
+  color: rgb(57 255 20 / 100%); /* Green-400 (초록색) */
+}
+
+.romanized-text.incorrect,
+.romanized-text.oos {
+  color: rgb(255 0 0 / 100%); /* Red-400 (빨간색) */
+}
+
+/* 🎙️ 작은 마이크 아이콘 (검은색 박스 내) */
+.small-mic-icon {
+  width: 20px;
+  height: 20px;
+  color: #757575; /* Gray-500 (비활성화 기본) */
+  transition: color 0.2s;
+}
+
+.small-mic-icon.active {
+  color: white; /* 녹음 중 흰색 */
+}
+
+/* 영어 번역 텍스트 (이미지 1번처럼 세 번째 줄에 위치) */
+.english-text {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #007cff; /* Gray-400 */
+}
+
+.content-tail {
+  position: absolute;
+
+  /* 꼬리가 검은색 박스(text-display-box)의 왼쪽 상단 밖으로 나가도록 조정 */
+  top: 172px; /* 꼬리 높이만큼 위로 이동 */
+  left: 29px; /* 좌측 여백 설정 (이미지에서 보이는 위치) */
+  z-index: 15; /* 박스보다 위에 위치하도록 설정 */
+  width: 12px;
+  height: 12px;
+  background-color: black; /* 꼬리 색상 (검은색 박스와 동일) */
+  clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+  transform: translateX(0) rotate(70deg); /* 이미지에 맞게 회전 없음 */
+}
+
+/* 역할 태그 컨테이너 */
+.role-tag-container {
+  /* 완벽한 정중앙 정렬을 위한 Flexbox */
+  display: flex;
+  align-items: center; /* 수직(세로) 중앙 정렬 */
+  justify-content: center; /* 수평(가로) 중앙 정렬 */
+  width: 44px;
+  height: 20px;
+  margin-top: 23px;
+  font-size: 10px;
+  font-weight: 600;
+  color: black;
+  background-color: white;
+  border-radius: 5px;
+}
+
+.role-tag {
+  font-weight: 600;
+  color: black; /* Blue-300 */
+}
+
+/* -------------------- 4. 메인 마이크 버튼 -------------------- */
+.mic-area {
+  /* ⭐ 수정: 화면 하단에 고정 */
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px; /* 고정 영역 높이 */
+  background-color: transparent; /* 파란색 부모 창 배경 사용 */
+}
+
+/* .mic-button-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+} */
+
+.main-mic-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 328px; /* ⭐ 수정: 크기 증가 */
+  height: 40px; /* ⭐ 수정: 크기 증가 */
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.main-mic-icon {
+  font-size: 20px; /* ⭐ 수정: 아이콘 크기 증가 */
+  transition: color 0.3s;
+}
+
+/* 마이크 버튼 상태 */
+.main-mic-button.off {
+  background-color: white;
+}
+
+.main-mic-button.off .main-mic-icon {
+  color: black;
+}
+
+.main-mic-button.on {
+  color: white;
+  background-color: black;
+}
+
+.main-mic-button.on .main-mic-icon {
+  color: white;
+}
+
+.main-mic-button.disabled {
+  cursor: not-allowed;
+  background-color: #e3e3e3;
+  opacity: 0.3;
+}
+
+/* 10초 카운트다운 텍스트 */
+
+/* .countdown-text {
+    color: #d1d5db; Gray-300
+    font-size: 12px;
+    margin-bottom: 4px;
+} */
+
+/* 마이크 상태 텍스트 (ON/OFF) */
+.mic-status-text {
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
