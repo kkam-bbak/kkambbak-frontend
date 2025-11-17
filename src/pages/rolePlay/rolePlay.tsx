@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+
 import Character1 from '../../assets/Character1.png';
+
 import CharacterSmile from '../../assets/Character-Smile.png';
 import CharacterJump from '../../assets/Character-Jump.png';
 import CharacterWrong from '../../assets/Character-Wrong.png';
 import CharacterGloomy from '../../assets/Character-Gloomy.png';
+import CharacterSullen from '../../assets/Character-Sullen.png';
 import './rolePlay.css';
 
 // --- 다중 턴 시나리오 데이터 구조 정의 ---
@@ -28,43 +31,43 @@ const SCENARIO_SEQUENCE = [
         ]
     },
     // Turn 3 (index 2): Staff Speaks (User Recording) - 03/06
-    { 
-        turnIndex: 3, id: '03/06', speaker: 'Staff', type: 'RECORDING', 
-        korean: "다른 메뉴도 보시겠어요?", romanized: "Da-reun me-nyu-do bo-si-gess-eo-yo?", english: "Would you like to see other menus?"
-    },
-    // Turn 4 (index 3): Customer Choices (User Selects) - 04/06
-    { 
-        turnIndex: 4, id: '04/06', speaker: 'Customer', type: 'CHOICE', 
-        contextLine: { 
-             korean: "다른 메뉴도 보시겠어요?", 
-             romanized: "Da-reun me-nyu-do bo-si-gess-eo-yo?", 
-             english: "Would you like to see other menus?", 
-             role: "Staff" 
-        },
-        choices: [
-             { id: 1, korean: "네, 다른메뉴도 보고싶어요", romanized: "a-ni-yo, a-jik-i-yeo-yo", english: "Not yet, thank you.", isCorrect: false },
-             { id: 2, korean: "안녕하세요", romanized: "An-nyeong-ha-se-yo", english: "Hello.", isCorrect: true }
-        ]
-    },
-     // Turn 5 (index 4): Staff Speaks (User Recording) - 05/06
-    { 
-        turnIndex: 5, id: '05/06', speaker: 'Staff', type: 'RECORDING', 
-        korean: "메뉴 고르신 후 알려주세요?", romanized: "Me-nyu go-reu-sin hu al-lyeo-ju-se-yo?", english: "Please let me know after choosing the menu."
-    },
-    // Turn 6 (index 5): Customer Choices (User Selects) - 06/06
-    { 
-        turnIndex: 6, id: '06/06', speaker: 'Customer', type: 'CHOICE', 
-        contextLine: { 
-            korean: "메뉴 고르신 후 알려주세요", 
-            romanized: "Me-nyu go-reu-sin hu al-lyeo-ju-se-yo?", 
-            english: "Please let me know after choosing the menu.", 
-            role: "Staff" 
-        },
-        choices: [
-            { id: 1, korean: "감사합니다", romanized: "Gam-sa-ham-ni-da", english: "Thank you.", isCorrect: true },
-            { id: 2, korean: "안녕하세요", romanized: "An-nyeong-ha-se-yo", english: "Hello.", isCorrect: false }
-        ]
-    },
+//     { 
+//         turnIndex: 3, id: '03/06', speaker: 'Staff', type: 'RECORDING', 
+//         korean: "다른 메뉴도 보시겠어요?", romanized: "Da-reun me-nyu-do bo-si-gess-eo-yo?", english: "Would you like to see other menus?"
+//     },
+//     // Turn 4 (index 3): Customer Choices (User Selects) - 04/06
+//     { 
+//         turnIndex: 4, id: '04/06', speaker: 'Customer', type: 'CHOICE', 
+//         contextLine: { 
+//              korean: "다른 메뉴도 보시겠어요?", 
+//              romanized: "Da-reun me-nyu-do bo-si-gess-eo-yo?", 
+//              english: "Would you like to see other menus?", 
+//              role: "Staff" 
+//         },
+//         choices: [
+//              { id: 1, korean: "네, 다른메뉴도 보고싶어요", romanized: "a-ni-yo, a-jik-i-yeo-yo", english: "Not yet, thank you.", isCorrect: false },
+//              { id: 2, korean: "안녕하세요", romanized: "An-nyeong-ha-se-yo", english: "Hello.", isCorrect: true }
+//         ]
+//     },
+//      // Turn 5 (index 4): Staff Speaks (User Recording) - 05/06
+//     { 
+//         turnIndex: 5, id: '05/06', speaker: 'Staff', type: 'RECORDING', 
+//         korean: "메뉴 고르신 후 알려주세요?", romanized: "Me-nyu go-reu-sin hu al-lyeo-ju-se-yo?", english: "Please let me know after choosing the menu."
+//     },
+//     // Turn 6 (index 5): Customer Choices (User Selects) - 06/06
+//     { 
+//         turnIndex: 6, id: '06/06', speaker: 'Customer', type: 'CHOICE', 
+//         contextLine: { 
+//             korean: "메뉴 고르신 후 알려주세요", 
+//             romanized: "Me-nyu go-reu-sin hu al-lyeo-ju-se-yo?", 
+//             english: "Please let me know after choosing the menu.", 
+//             role: "Staff" 
+//         },
+//         choices: [
+//             { id: 1, korean: "감사합니다", romanized: "Gam-sa-ham-ni-da", english: "Thank you.", isCorrect: true },
+//             { id: 2, korean: "안녕하세요", romanized: "An-nyeong-ha-se-yo", english: "Hello.", isCorrect: false }
+//         ]
+//     },
 ];
 
 
@@ -89,18 +92,18 @@ const STEPS = {
 // 상태별 말풍선 텍스트 (요청에 따라 통일 및 TTS 지침 추가)
 const BUBBLE_TEXT = {
     [STEPS.START]: "Okay, Let's go!",
-    [STEPS.LISTEN]: "Listen carefully. (Click 🔊 to proceed)", // TTS 유도 텍스트 추가 및 진행 안내
-    [STEPS.LISTEN_DONE]: "Ready to speak? Push the mic button.",
+    [STEPS.LISTEN]: "Listen carefully.", // TTS 유도 텍스트 추가 및 진행 안내
+    //[STEPS.LISTEN_DONE]: "Ready to speak? Push the mic button.",
     [STEPS.SPEAK_SETUP]: "Speak!",
     [STEPS.RECORDING]: "Speak!",
     
     // 연습 단계 텍스트는 일반 단계 텍스트로 대체하여 사용
-    [STEPS.PRACTICE_LISTEN]: "Listen carefully. (Click 🔊 to proceed)",
-    [STEPS.PRACTICE_LISTEN_DONE]: "Ready to speak? Push the mic button.",
+    [STEPS.PRACTICE_LISTEN]: "Listen carefully.",
+    //[STEPS.PRACTICE_LISTEN_DONE]: "Ready to speak? Push the mic button.",
     [STEPS.PRACTICE_SPEAK]: "Speak!",
     
     [STEPS.CHOICE_SETUP]: "Which is correct?", 
-    CORRECT: "good job!",
+    CORRECT: "good jo!",
     INCORRECT: "It's a waste.",
     OOS: "That's out of our Learning Scope\ntry to focus on your Study", 
 };
@@ -111,11 +114,11 @@ const useNavigate = () => (path) => console.log(`Navigating to: ${path}`);
 
 // 🧪 상태에 따른 캐릭터 이미지 결정 함수
 const getCharacterImage = (step, gradingResult) => {
-    if (step === STEPS.START) return CharacterJump;
+    if (step === STEPS.START) return CharacterSmile;
     if (step === STEPS.GRADING || step === STEPS.CHOICE_FEEDBACK || step === STEPS.PRACTICE_GRADING) {
-        if (gradingResult === 'CORRECT') return CharacterSmile;
+        if (gradingResult === 'CORRECT') return CharacterJump;
         if (gradingResult === 'INCORRECT') return CharacterGloomy; 
-        if (gradingResult === 'OOS') return CharacterWrong; 
+        if (gradingResult === 'OOS') return CharacterSullen; 
     }
     return Character1; 
 };
@@ -170,6 +173,19 @@ const RolePlay = () => {
 
     const activeTurnData = SCENARIO_SEQUENCE[activeTurnIndex];
 
+// ⭐ 추가: activeTurnData가 없거나, DONE 상태일 경우 렌더링 중단
+    if (!activeTurnData && step !== STEPS.DONE) {
+        // 시나리오가 끝났는데 DONE 상태가 아니라면, DONE 상태로 강제 전환
+        // 이 경우 activeTurnIndex가 SCENARIO_SEQUENCE.length(6)이 됩니다.
+        setStep(STEPS.DONE);
+        return null; // 렌더링 중단
+    }
+    
+    // activeTurnData가 없지만 (index 6), 이미 DONE 상태라면,
+    if (!activeTurnData && step === STEPS.DONE) {
+        return <div className="loading-screen">Scenario complete. Redirecting...</div>;
+    }
+
     // ✅ 스크롤 자동 이동 로직
     useEffect(() => {
         if (scrollRef.current) {
@@ -184,7 +200,7 @@ const RolePlay = () => {
         setTurnHistory(prev => [...prev, finalTurnData]);
         
         const nextIndex = activeTurnIndex + 1;
-        if (nextIndex < SCENARIO_SEQUENCE.length) {
+        if (nextIndex <= SCENARIO_SEQUENCE.length) {
             setActiveTurnIndex(nextIndex);
             const nextTurn = SCENARIO_SEQUENCE[nextIndex];
             const nextStep = nextTurn.type === 'CHOICE' ? STEPS.CHOICE_SETUP : STEPS.LISTEN;
@@ -214,7 +230,7 @@ const handleRecordingGrading = useCallback((mockResult) => {
 
         // ⭐ 다음 단계 결정 (completeTurn 대체 로직)
         const nextIndex = activeTurnIndex + 1;
-        if (nextIndex >= SCENARIO_SEQUENCE.length) {
+        if (nextIndex === SCENARIO_SEQUENCE.length) {
             setStep(STEPS.DONE);
         } else {
             setActiveTurnIndex(nextIndex);
@@ -228,20 +244,21 @@ const handleRecordingGrading = useCallback((mockResult) => {
     }, 1500);
 }, [activeTurnData, activeTurnIndex]);
 
-   // ⭐ 연습 단계 녹음 채점 로직
+  // ⭐ 연습 단계 녹음 채점 로직
 const handlePracticeGrading = useCallback((mockResult) => {
     clearInterval(timerRef.current);
     setStep(STEPS.PRACTICE_GRADING);
     setGradingResult(mockResult);
     
-    // 연습 완료 후 1.5초 뒤 다음 턴으로 이동 (원래 턴 2 완료 처리)
+    // 채점 결과 표시 후 1.5초 뒤 다음 턴으로 이동/완료
     setTimeout(() => {
         const selectedOption = activeTurnData.choices.find(c => c.id === selectedChoiceId);
         
-        // ⭐ 1. turnHistory에 현재 턴(CHOICE) 결과 기록
+        // ⭐ 1. turnHistory에 현재 턴(CHOICE) 결과 기록 (채점까지 완료된 최종 결과)
         const finalTurnData = { 
             ...activeTurnData, 
-            result: 'PRACTICE_DONE', 
+            result: selectedOption.isCorrect ? 'CORRECT' : 'INCORRECT', // 선택지 결과
+            practiceResult: mockResult, // 연습 결과 추가 (옵션)
             userResponseData: { 
                 selectedId: selectedChoiceId, 
                 text: selectedOption.korean, 
@@ -252,20 +269,22 @@ const handlePracticeGrading = useCallback((mockResult) => {
         };
         setTurnHistory(prev => [...prev, finalTurnData]);
 
-        // ⭐ 2. 다음 단계 결정: 현재가 마지막 턴(index 5)이면 DONE으로, 아니면 다음 턴으로.
+        // ⭐ 2. 다음 단계 결정: 현재가 마지막 턴(index 5)인지 확인
         const nextIndex = activeTurnIndex + 1;
-        if (nextIndex >= SCENARIO_SEQUENCE.length) {
-            // 마지막 턴 완료: DONE 단계로 전환
+        
+        if (nextIndex > SCENARIO_SEQUENCE.length) {
+            // 마지막 턴 완료: DONE 단계로 전환하여 페이지 이동
             setStep(STEPS.DONE);
         } else {
             // 다음 턴으로 이동
             setActiveTurnIndex(nextIndex);
             const nextTurn = SCENARIO_SEQUENCE[nextIndex];
             const nextStep = nextTurn.type === 'CHOICE' ? STEPS.CHOICE_SETUP : STEPS.LISTEN;
-            setStep(nextStep); 
+            setStep(nextStep); 
             setSelectedChoiceId(null);
             setGradingResult(null);
         }
+        setPracticeLineData(null); // 연습 데이터 초기화
 
     }, 1500);
 
@@ -349,24 +368,27 @@ const handlePracticeGrading = useCallback((mockResult) => {
 
 
 
-    // ⭐ 선택 제출 로직 (턴 2, 4, 6)
-    const handleChoiceSelect = useCallback(() => {
-        if (selectedChoiceId === null || step !== STEPS.CHOICE_SETUP) return;
-        
-        const selectedOption = activeTurnData.choices.find(c => c.id === selectedChoiceId);
-        const result = selectedOption && selectedOption.isCorrect ? 'CORRECT' : 'INCORRECT';
+// ⭐ 선택 제출 로직 (턴 2, 4, 6)
+const handleChoiceSelect = useCallback(() => {
+    if (selectedChoiceId === null || step !== STEPS.CHOICE_SETUP) return;
+    
+    const selectedOption = activeTurnData.choices.find(c => c.id === selectedChoiceId);
+    const result = selectedOption && selectedOption.isCorrect ? 'CORRECT' : 'INCORRECT';
 
-        setStep(STEPS.CHOICE_FEEDBACK);
-        setGradingResult(result);
-        
-        setTimeout(() => {
-            // ⭐ 정답 문장으로 연습 단계 진입
-            const practiceData = activeTurnData.choices.find(c => c.isCorrect); // 정답 문장을 가져옴
-            setPracticeLineData(practiceData);
-            setStep(STEPS.PRACTICE_LISTEN);
-        }, 1500); // 1.5초 후 연습 듣기 단계로 전환
+    setStep(STEPS.CHOICE_FEEDBACK);
+    setGradingResult(result);
+    
+    setTimeout(() => {
+        // ⭐ 마지막 턴인지 여부와 관계없이 연습 단계 진입 (요청 사항)
+        const practiceData = activeTurnData.choices.find(c => c.isCorrect); 
+        setPracticeLineData(practiceData);
+        setStep(STEPS.PRACTICE_LISTEN);
+        
+    }, 1500); // 1.5초 후 피드백 완료
 
-    }, [selectedChoiceId, step, activeTurnData]);
+}, [selectedChoiceId, step, activeTurnData]); 
+// activeTurnIndex 의존성을 제거하고, activeTurnData만으로 충분합니다.
+
 
 
     // 🎙️ 마이크 누름/뗌 핸들러
@@ -426,7 +448,7 @@ const handlePracticeGrading = useCallback((mockResult) => {
         if (step === STEPS.LISTEN_DONE) {
             flowTimerRef.current = setTimeout(() => {
                 setStep(STEPS.SPEAK_SETUP);
-            }, 2000); 
+            }, 0); 
         }
 
         // 3. SPEAK_SETUP (10초 카운트다운 시작 - 녹음 턴)
@@ -446,17 +468,14 @@ const handlePracticeGrading = useCallback((mockResult) => {
         // ⭐ 시나리오 완료 후 페이지 이동 로직 수정 (3초 딜레이 추가)
     if (step === STEPS.DONE) {
         console.log("Scenario Complete. Navigating to RolePlayComplete page in 3 seconds.");
-        flowTimerRef.current = setTimeout(() => {
-            // navigate 함수를 사용하여 목표 페이지로 이동합니다.
-            navigate('/rolePlay/complete'); 
-        }, 3000); // 3초 후 이동
+        navigate('/rolePlay/complete');
     }
         
         // ⭐ PRACTICE_LISTEN_DONE 단계 -> PRACTICE_SPEAK으로 전환 (2초 대기)
         if (step === STEPS.PRACTICE_LISTEN_DONE) {
              flowTimerRef.current = setTimeout(() => {
                  setStep(STEPS.PRACTICE_SPEAK);
-             }, 2000);
+             }, 0);
         }
 
         // ⭐ PRACTICE_SPEAK (연습 단계 카운트다운 시작)
@@ -542,8 +561,9 @@ const handlePracticeGrading = useCallback((mockResult) => {
                     {isRecordingTurn && <span className="small-mic-icon active">🎤</span>}
                 </div>
                 <span className="english-text">{mainEnglishText}</span>
-                <div className="role-tag-container"><span className="role-tag">{role}</span></div>
-
+                {/* <div className='content-tail'></div> */}
+                
+                <div className="role-container"><span className="role-tag">{role}</span></div>
             </div>
         );
     };
@@ -569,7 +589,7 @@ const handlePracticeGrading = useCallback((mockResult) => {
             return (
                 <div className="active-turn-recording-flow">
                     <div className="text-display-box active-turn-box">
-                        <div className="content-tail"></div>
+                 
                         <div className="text-line korean-line">
                             <span className="korean-text">{activeTurnData.korean}</span>
                             <button 
@@ -584,22 +604,24 @@ const handlePracticeGrading = useCallback((mockResult) => {
                             <span className={`small-mic-icon${isRecording || isMicActionable ? ' active' : ''}`}>🎤</span>
                         </div>
                         <span className="english-text">{activeTurnData.english}</span>
-                        <div className="role-tag-container"><span className="role-tag">{activeTurnData.speaker}</span></div>
+                            <div className="role-container"><span className="role-tag">{activeTurnData.speaker}</span></div>
+                        
                     </div>
-                    
+                    {/* <div className='content-tail'></div> */}
+                 
                     <div className="mic-area full-width-mic">
                         <div className="mic-button-wrapper">
-                            {(isMicActionable || isRecording) && (
-                                <span className="countdown-text">{isRecording ? "Recording..." : `Time remaining: ${recordingCountdown}s`}</span>
-                            )}
+                           
                             <button 
                                 className={`main-mic-button ${mainMicButtonClass}`}
                                 onMouseDown={handleMicPress} onMouseUp={handleMicRelease}
                                 onTouchStart={handleMicPress} onTouchEnd={handleMicRelease}
                                 disabled={!isMicActionable || isCurrentlySpeaking}>
-                                <span className="main-mic-icon">🎤</span>
+                                <span className="main-mic-icon">🎤
+                                    <span className="mic-status-text">{isRecording ? "ON" : "OFF"}</span>
+                                </span>
                             </button>
-                            <span className="mic-status-text">{isRecording ? "ON" : "OFF"}</span>
+                            
                         </div>
                     </div>
                 </div>
@@ -635,9 +657,7 @@ const handlePracticeGrading = useCallback((mockResult) => {
 
             return (
                 <>
-
                     {/* 턴 2 중앙 선택지 표시 영역 (내용만 바뀜) */}
-                    <div className="choice-display-area">
                         <div className="choice-options-area center-display">
                             
                             {/* 선택된(또는 피드백 중인) 옵션의 내용을 중앙에 표시 */}
@@ -659,14 +679,15 @@ const handlePracticeGrading = useCallback((mockResult) => {
                                         </span>
                                     </div>
                                     <span className="english-text choice-option-english">{displayOption.english}</span>
-                                    <div className="role-tag-container"><span className="role-tag">{activeTurnData.speaker}</span></div>
+                                   <div className="role-container costomer"><span className="role-tag">{activeTurnData.speaker}</span></div>
                                 </div>
+
                             )}
                         </div>
-                    </div>
+               
                     
                     {/* 선택 버튼 영역 (하단 고정) */}
-                    <div className="mic-area">
+                    <div className="mic-area choice-button">
                         {customerData.map(option => (
                             <button 
                                 key={option.id}
@@ -708,7 +729,7 @@ const handlePracticeGrading = useCallback((mockResult) => {
              return (
                 <div className="active-turn-recording-flow">
                     <div className="text-display-box practice-line-box">
-                        <div className="content-tail"></div>
+                
                         <div className="text-line korean-line">
                             <span className="korean-text">{practiceText.korean}</span>
                             <button 
@@ -723,22 +744,23 @@ const handlePracticeGrading = useCallback((mockResult) => {
                             <span className={`small-mic-icon ${isRecording || step === STEPS.PRACTICE_SPEAK ? ' active' : ''}`}>🎤</span>
                         </div>
                         <span className="english-text">{practiceText.english}</span>
-                        <div className="role-tag-container"><span className="role-tag">{activeTurnData.speaker}</span></div>
+                        {/* <div className='content-tail'></div> */}
+                        <div className="role-container costomer"><span className="role-tag">{activeTurnData.speaker}</span></div>
                     </div>
 
                      <div className="mic-area full-width-mic">
                         <div className="mic-button-wrapper">
-                            {(practiceButtonActive || isRecording) && (
-                                <span className="countdown-text">{isRecording ? "Recording..." : `Time remaining: ${recordingCountdown}s`}</span>
-                            )}
+                  
                             <button 
                                 className={`main-mic-button ${practiceMainMicClass}`}
                                 onMouseDown={handleMicPress} onMouseUp={handleMicRelease}
                                 onTouchStart={handleMicPress} onTouchEnd={handleMicRelease}
                                 disabled={!practiceButtonActive || isCurrentlySpeaking}>
-                                <span className="main-mic-icon">🎤</span>
+                                <span className="main-mic-icon">🎤
+                                    <span className="mic-status-text">{isRecording ? "ON" : "OFF"}</span>
+                                </span>
                             </button>
-                            <span className="mic-status-text">{isRecording ? "ON" : "OFF"}</span>
+                          
                         </div>
                     </div>
                 </div>
@@ -755,11 +777,12 @@ const handlePracticeGrading = useCallback((mockResult) => {
             <div className="header-section">
                 <button className="logout" onClick={() => navigate('/logout')}>Logout</button>
                 
-                <div className="character-bubble-area">
+                <div className="speech-bubble rolePlay-bubble">
                     <div className={bubbleClass}>
                         {currentBubbleText}
-                        <div className="speech-tail" />
+                  
                     </div>
+                        <div className="speech-tail" /> 
                     </div>
 
                     <div className="character-placeholder">
@@ -770,7 +793,7 @@ const handlePracticeGrading = useCallback((mockResult) => {
                             onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = Character1; }}
                         />
                     </div>
-               
+               </div>
 
                 <div className="role-content-window rolePlay-content-window">
                     <div className="card-title-bar">
@@ -785,16 +808,16 @@ const handlePracticeGrading = useCallback((mockResult) => {
                             <TurnContentBox key={index} data={turn} />
                         ))}
                        {renderActiveInput()}    
-                        {/* 활성 턴의 공간을 미리 확보하여 스크롤 위치를 예상 */}
+{/*                         활성 턴의 공간을 미리 확보하여 스크롤 위치를 예상
                         {activeTurnIndex < SCENARIO_SEQUENCE.length && (
                            <div className="active-turn-placeholder"></div>
-                        )}
+                        )} */}
        
                     </div>
 
-        
+                
                 </div>
-        </div>
+        
 </div>
     );
 };
