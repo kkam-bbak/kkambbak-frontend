@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react';
 import styles from './ContentSection.module.css';
 
 type ContentSectionProps = {
-  color?: 'orange' | 'blue' | 'green' | 'pink' | 'red';
+  color?: 'orange' | 'blue' | 'green' | 'pink';
 };
 
 function ContentSection({
