@@ -74,7 +74,7 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
       // 최종 단계 (Step 8) 완료 후 2초 뒤 자동 학습 시작
       timer = setTimeout(() => {
         onConfirmStart();
-      }); // 2000ms = 2초로 설정했습니다.
+      }, 2000); // 2000ms = 2초로 설정했습니다.
     }
 
     return () => {
