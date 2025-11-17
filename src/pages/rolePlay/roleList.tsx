@@ -4,6 +4,7 @@ import { Clock } from 'lucide-react'; // 시간 아이콘
 import './roleList.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // --- 데이터 구조 정의 ---
 interface RolePlayItem {
@@ -54,7 +55,7 @@ const RoleList: React.FC = () => {
       <Mascot image="basic" text={speechBubbleText} />
 
       {/* 하단 역할극 목록 섹션 */}
-      <div className="role-content-window">
+      <ContentSection color="blue">
         <div className="role-list-content-header">
           <h2 className="role-list-title">Role Play</h2>
           <button className="subscribe-button" onClick={handleSubscribe}>
@@ -100,7 +101,7 @@ const RoleList: React.FC = () => {
             );
           })}
         </div>
-      </div>
+      </ContentSection>
     </div>
   );
 };

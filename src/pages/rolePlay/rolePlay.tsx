@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './rolePlay.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // --- 상수 및 데이터 정의 ---
 
@@ -195,11 +196,7 @@ const RolePlay = () => {
 
       {/* ⬇️ 하단 컨텐츠 영역 (슬라이드 애니메이션) */}
       {/* ⭐ START 단계에서 slide-out 클래스만 적용 (초기에는 숨겨짐) */}
-      <div
-        className={`role-content-window rolePlay-content-window ${
-          step === STEPS.START ? 'slide-out' : ''
-        }`}
-      >
+      <ContentSection color="blue">
         <div className="card-title-bar">
           {' '}
           {/* 카드 타이틀/스텝 바 */}
@@ -263,7 +260,7 @@ const RolePlay = () => {
             </button>
           </div>
         </div>
-      </div>
+      </ContentSection>
     </div>
   );
 };

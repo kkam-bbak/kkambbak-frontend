@@ -5,6 +5,7 @@ import './learnList.css';
 import LearnInfo from '../learnInfo/learnInfo'; // 🔥 경로 수정
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 // Topic 인터페이스는 유지
 interface Topic {
   id: number;
@@ -220,7 +221,7 @@ const LearnList: React.FC = () => {
 
       <Mascot image="basic" text={activeBubbleText} />
 
-      <div className="content-window">
+      <ContentSection>
         {/* 탭 버튼 */}
         <div className="tab-buttons-container">
           <button
@@ -251,7 +252,7 @@ const LearnList: React.FC = () => {
           ))}
           <div style={{ height: '20px' }}></div>
         </div>
-      </div>
+      </ContentSection>
 
       {/* 🔥🔥🔥 LearnInfo 모달 렌더링 🔥🔥🔥 */}
       {isInfoModalOpen && selectedTopic && (

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import './survey.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
+import Button from '@/components/Button/Button';
 
 // --- 데이터 및 타입 정의 ---
 
@@ -230,32 +232,27 @@ const Survey: React.FC = () => {
       />
 
       {/* 하단 Survey 내용 창 */}
-      <div className="content-window">
-        <h1 className="survey-title">Survey</h1>
+      <ContentSection>
+        <h1 className="h1 survey-title">Survey</h1>
 
         <div className="survey-form-area">{renderSurveyContent()}</div>
 
-        {/* ⭐️ Fixed Bottom Controls (페이지네이션과 Skip 버튼) */}
         {currentPage !== DONE_PAGE_INDEX && (
-          <div className="fixed-bottom-controls">
+          <>
             {/* 페이지네이션 도트 (설문 진행 중일 때) */}
-            <div className="pagination-area">
-              <PaginationDots
-                currentPage={currentPage}
-                totalPages={DONE_PAGE_INDEX}
-                onDotClick={handleDotClick}
-              />
-            </div>
 
-            {/* Skip to learning 버튼 (진행 중일 때 고정) */}
-            <div className="skip-button-container skip-bottom-fixed-inner">
-              <button className="skip-button" onClick={handleSkip}>
-                Skip to learning
-              </button>
-            </div>
-          </div>
+            <PaginationDots
+              currentPage={currentPage}
+              totalPages={DONE_PAGE_INDEX}
+              onDotClick={handleDotClick}
+            />
+
+            <Button isFull onClick={handleSkip}>
+              Skip to learning
+            </Button>
+          </>
         )}
-      </div>
+      </ContentSection>
     </div>
   );
 };

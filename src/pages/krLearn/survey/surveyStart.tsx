@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import './surveyStart.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // --- 데이터 및 타입 정의 (유지) ---
 const surveyData = [
@@ -46,7 +47,7 @@ const SurveyStart: React.FC = () => {
       <CharacterSection />
 
       {/* 하단 Survey 내용 창 */}
-      <div className="content-window">
+      <ContentSection>
         <h1 className="survey-title">Survey</h1>
 
         {/* 1. Start 버튼 */}
@@ -62,7 +63,7 @@ const SurveyStart: React.FC = () => {
             Skip to learning
           </button>
         </div>
-      </div>
+      </ContentSection>
     </div>
   );
 };
