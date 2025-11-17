@@ -2,22 +2,30 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../stores/user';
 import { http } from '../../apis/http';
-import Character1 from '../../assets/Character1.png';
-import CharacterJump from '../../assets/Character-Jump.png';
 import styles from './ProfileCreation.module.css';
+import Header from '@/components/layout/Header/Header';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
+import Mascot from '@/components/Mascot/Mascot';
+
+interface RegistrationData {
+  name: string;
+  gender: string;
+  countryOfOrigin: string;
+  profileImage?: string;
+}
 
 export default function ProfileCreation() {
   const navigate = useNavigate();
   const user = useUser((s) => s.user);
-  const { logout } = useUser();
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [name, setName] = useState('');
   const [gender, setGender] = useState('');
   const [country, setCountry] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const isFormValid = profileImage && name.trim() && gender && country;
+  const isFormValid = name.trim() && gender && country;
 
   const countries = [
     'Direct input',
@@ -57,22 +65,10 @@ export default function ProfileCreation() {
     initializeProfile();
   }, [user]);
 
-  const handleLogout = async () => {
-    if (!user?.isGuest) {
-      try {
-        await http.post('/api/v1/users/logout');
-        logout();
-      } catch (error) {
-        console.error('Logout failed:', error);
-        logout();
-      }
-    }
-    navigate('/login');
-  };
-
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setProfileImageFile(file);
       const reader = new FileReader();
       reader.onload = (event) => {
         setProfileImage(event.target?.result as string);
@@ -86,17 +82,44 @@ export default function ProfileCreation() {
       try {
         setIsLoading(true);
 
-        await http.put('/api/v1/users/register', {
+        let imageUrl: string | undefined;
+
+        if (profileImageFile) {
+          const formData = new FormData();
+          formData.append('file', profileImageFile);
+
+          const uploadResponse = await http.post(
+            '/api/v1/upload/image',
+            formData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            },
+          );
+
+          imageUrl = uploadResponse.data?.body?.url;
+
+          if (!imageUrl) {
+            throw new Error('Failed to get image URL from upload');
+          }
+        }
+
+        const registrationData: RegistrationData = {
           name,
           gender,
           countryOfOrigin: country,
-          profileImage,
-        });
+        };
+
+        if (imageUrl) {
+          registrationData.profileImage = imageUrl;
+        }
+
+        await http.patch('/api/v1/users/register', registrationData);
 
         navigate('/mainpage');
       } catch (error) {
         console.error('Failed to register profile:', error);
-        alert('프로필 저장에 실패했습니다.');
       } finally {
         setIsLoading(false);
       }
@@ -106,25 +129,14 @@ export default function ProfileCreation() {
   return (
     <div className={`${styles.profileCreationContainer}`}>
       {/* Header */}
-      <div className={styles.profileHeader}>
-        <button className={styles.logoutButton} onClick={handleLogout}>
-          {user?.isGuest ? 'Login' : 'Logout'}
-        </button>
-      </div>
+      <Header />
 
-      {/* Character and Message */}
-      <div className={styles.characterSection}>
-        <div className={styles.speechBubble}>
-          {isFormValid ? 'Good job!' : 'First, Tell me about you'}
-        </div>
-        <img
-          src={isFormValid ? CharacterJump : Character1}
-          alt="Character"
-          className={styles.characterImage}
-        />
-      </div>
+      <Mascot
+        image={isFormValid ? 'jump' : 'basic'}
+        text={isFormValid ? 'Good job!' : 'First, Tell me about you'}
+      />
 
-      <div className={styles.orangeBox}>
+      <ContentSection>
         <div className={styles.formContainer}>
           <div className={styles.formSection}>
             <label className={styles.formLabel}>Profile image *</label>
@@ -207,7 +219,7 @@ export default function ProfileCreation() {
         >
           {isLoading ? 'Saving...' : 'Next'}
         </button>
-      </div>
+      </ContentSection>
     </div>
   );
 }

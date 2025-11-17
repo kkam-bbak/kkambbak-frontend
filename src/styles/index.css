@@ -33,6 +33,12 @@ body {
   background-color: var(--color-grayscale-6);
 }
 
+button {
+  cursor: pointer;
+  background-color: transparent;
+  border: 0;
+}
+
 #root {
   display: flex;
   align-items: center;

@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Character1 from '../../assets/Character1.png';
-import CharacterSmile from '../../assets/Character-Smile.png';
-import CharacterJump from '../../assets/Character-Jump.png';
-import CharacterWrong from '../../assets/Character-Wrong.png';
-import CharacterGloomy from '../../assets/Character-Gloomy.png';
 import './rolePlay.css';
+import Header from '@/components/layout/Header/Header';
+import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // --- 상수 및 데이터 정의 ---
 
@@ -41,14 +39,14 @@ const BUBBLE_TEXT = {
 const useNavigate = () => (path) => console.log(`Navigating to: ${path}`);
 
 // 🧪 상태에 따른 캐릭터 이미지 결정 함수
-const getCharacterImage = (step, gradingResult) => {
-  if (step === STEPS.START) return CharacterSmile;
+const getMascotImage = (step, gradingResult): MascotImage => {
+  if (step === STEPS.START) return 'smile';
   if (step === STEPS.GRADING) {
-    if (gradingResult === 'CORRECT') return CharacterJump;
-    if (gradingResult === 'INCORRECT') return CharacterGloomy;
-    if (gradingResult === 'OOS') return CharacterWrong;
+    if (gradingResult === 'CORRECT') return 'jump';
+    if (gradingResult === 'INCORRECT') return 'gloomy';
+    if (gradingResult === 'OOS') return 'wrong';
   }
-  return Character1; // LISTEN, SPEAK_SETUP, RECORDING
+  return 'basic'; // LISTEN, SPEAK_SETUP, RECORDING
 };
 
 // --- 핵심 컴포넌트 ---
@@ -188,45 +186,17 @@ const RolePlay = () => {
     return isRecording ? 'on' : 'off';
   };
 
-  const characterImage = getCharacterImage(step, gradingResult);
+  const characterImage = getMascotImage(step, gradingResult);
 
   return (
-    // ⭐ page-container, app-container 사용
-    <div className="role-play-container app-container">
-      {/* ⬆️ 상단 영역 (캐릭터 및 말풍선) */}
-      <div className="header-section">
-        <button className="logout" onClick={() => navigate('/logout')}>
-          Logout
-        </button>
+    <div className="role-play-container">
+      <Header hasBackButton />
 
-        {/* 말풍선 */}
-        <div className="speech-bubble rolePlay-bubble">
-          {currentBubbleText}
-          {/* 말풍선 꼬리 */}
-          <div className="speech-tail" />
-        </div>
-
-        {/* 캐릭터 이미지 */}
-        <div className="character-placeholder">
-          <img
-            src={characterImage}
-            alt="Role Play Character"
-            className="character-icon"
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = Character1;
-            }}
-          />
-        </div>
-      </div>
+      <Mascot image={characterImage} text={currentBubbleText} />
 
       {/* ⬇️ 하단 컨텐츠 영역 (슬라이드 애니메이션) */}
       {/* ⭐ START 단계에서 slide-out 클래스만 적용 (초기에는 숨겨짐) */}
-      <div
-        className={`role-content-window rolePlay-content-window ${
-          step === STEPS.START ? 'slide-out' : ''
-        }`}
-      >
+      <ContentSection color="blue">
         <div className="card-title-bar">
           {' '}
           {/* 카드 타이틀/스텝 바 */}
@@ -290,7 +260,7 @@ const RolePlay = () => {
             </button>
           </div>
         </div>
-      </div>
+      </ContentSection>
     </div>
   );
 };

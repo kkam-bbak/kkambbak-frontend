@@ -1,18 +1,18 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export type User = {
-  providerId: string // 게스트 ID
-  accessToken: string
-  refreshToken: string
-  isGuest: boolean
-} | null
+  providerId: string; // 게스트 ID
+  accessToken: string;
+  refreshToken: string;
+  isGuest: boolean;
+} | null;
 
 type State = {
-  user: User
-  login: (u: NonNullable<User>) => void
-  logout: (clearStorage?: boolean) => void
-}
+  user: User;
+  login: (u: NonNullable<User>) => void;
+  logout: (clearStorage?: boolean) => void;
+};
 
 export const useUser = create<State>()(
   persist(
@@ -20,12 +20,12 @@ export const useUser = create<State>()(
       user: null,
       login: (u) => set({ user: u }),
       logout: (clearStorage = true) => {
-        set({ user: null })
+        set({ user: null });
         if (clearStorage) {
-          localStorage.clear()
+          localStorage.clear();
         }
       },
     }),
-    { name: 'auth', partialize: (s) => ({ user: s.user }) }
-  )
-)
+    { name: 'auth', partialize: (s) => ({ user: s.user }) },
+  ),
+);

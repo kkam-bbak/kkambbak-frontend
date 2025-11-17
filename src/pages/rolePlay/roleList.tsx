@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock } from 'lucide-react'; // 시간 아이콘
-import Character1 from '../../assets/Character1.png'; // 캐릭터 이미지 경로 가정
 import './roleList.css';
+import Header from '@/components/layout/Header/Header';
+import Mascot from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // --- 데이터 구조 정의 ---
 interface RolePlayItem {
@@ -33,10 +35,6 @@ const RoleList: React.FC = () => {
   // 말풍선 텍스트
   const speechBubbleText = 'Choose a place to talk';
 
-  const handleLogout = () => {
-    navigate('/auth/login');
-  };
-
   const handleStart = (roleId: number) => {
     console.log(`Starting role play for ID: ${roleId}`);
     navigate(`/mainpage/rolePlay/${roleId}`);
@@ -52,25 +50,12 @@ const RoleList: React.FC = () => {
   };
 
   return (
-    <div className="role-list-container app-container">
-      <div className="header-section">
-        {/* 로그아웃 버튼 */}
-        <button className="logout" onClick={handleLogout}>
-          Logout
-        </button>
-
-        {/* 캐릭터 및 말풍선 섹션 */}
-        <div className="speech-bubble roleList-bubble">
-          {speechBubbleText}
-          <div className="speech-tail"></div>
-        </div>
-        <div className="character-placeholder">
-          <img src={Character1} alt="Character" className="character-icon" />
-        </div>
-      </div>
+    <div className="role-list-container">
+      <Header hasBackButton />
+      <Mascot image="basic" text={speechBubbleText} />
 
       {/* 하단 역할극 목록 섹션 */}
-      <div className="role-content-window">
+      <ContentSection color="blue">
         <div className="role-list-content-header">
           <h2 className="role-list-title">Role Play</h2>
           <button className="subscribe-button" onClick={handleSubscribe}>
@@ -116,7 +101,7 @@ const RoleList: React.FC = () => {
             );
           })}
         </div>
-      </div>
+      </ContentSection>
     </div>
   );
 };

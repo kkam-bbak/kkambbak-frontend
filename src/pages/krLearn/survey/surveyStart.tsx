@@ -2,8 +2,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { http } from '../../../apis/http';
-import Character1 from '../../../assets/Character1.png';
+//import Character1 from '../../../assets/Character1.png';
 import './surveyStart.css';
+import Header from '@/components/layout/Header/Header';
+import Mascot from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // --- 데이터 및 타입 정의 (유지) ---
 const surveyData = [
@@ -13,23 +16,12 @@ const INTRO_BUBBLE_TEXT =
   "Before we start, Answer a few simple questions and we'll tailor your learning to your needs.";
 
 // --- 컴포넌트 분리 (SpeechBubble, CharacterSection 유지) ---
-const SpeechBubble: React.FC<{ text: string }> = ({ text }) => (
-  <div className="speech-bubble survey-bubble">
-    {text}
-    <div className="speech-tail suvery-tail"></div>
-  </div>
-);
 
-const CharacterSection: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
+const CharacterSection = () => {
   return (
     <div className="header-section">
-      <button className="logout" onClick={onLogout}>
-        Logout
-      </button>
-      <SpeechBubble text={INTRO_BUBBLE_TEXT} />
-      <div className="character-placeholder">
-        <img src={Character1} alt="Character" className="character-icon" />
-      </div>
+      <Header hasBackButton />
+      <Mascot image="basic" text={INTRO_BUBBLE_TEXT} />
     </div>
   );
 };
@@ -91,17 +83,13 @@ const SurveyStart: React.FC = () => {
     navigate('../learnList');
   };
 
-  const handleLogout = () => {
-    navigate('/auth/login');
-  };
-
   return (
-    <div className="survey-start-container app-container">
+    <div className="survey-start-container">
       {/* 상단 섹션 */}
-      <CharacterSection onLogout={handleLogout} />
+      <CharacterSection />
 
       {/* 하단 Survey 내용 창 */}
-      <div className="content-window">
+      <ContentSection>
         <h1 className="survey-title">Survey</h1>
 
         {/* 1. Start 버튼 */}
@@ -117,7 +105,7 @@ const SurveyStart: React.FC = () => {
             Skip to learning
           </button>
         </div>
-      </div>
+      </ContentSection>
     </div>
   );
 };
