@@ -1,9 +1,8 @@
 import React, { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './rolePlayComplete.css';
-import CharacterSmile from '../../assets/Character-Smile.png'; 
+import CharacterShining from '../../assets/Character-Shining.png'; 
 
-// Mock Navigate Hook (실제 환경에서는 react-router-dom의 useNavigate 사용)
-const useNavigate = () => (path: string) => console.log(`Navigating to: ${path}`);
 
 // Mock 데이터 구조 (실제로는 props나 context를 통해 받아와야 합니다)
 const mockSessionData = {
@@ -34,21 +33,21 @@ const TurnDisplay: React.FC<{ data: TurnData, index: number }> = ({ data, index 
     
     return (
         <div className="turn-display-box">
-            <div className={`role-tag-container ${isCustomerTurn ? 'customer-tag' : 'staff-tag'}`}>
-                <span className="role-tag">{data.speaker}</span>
-            </div>
             
             <div className="content-box">
                 <div className="text-line korean-line">
-                    <span className="korean-text">{data.korean}</span>
+                    <span className="complete-korean-text">{data.korean}</span>
                     <button className="tts-button active">🔊</button>
                 </div>
                 <div className="text-line romanized-line">
-                    <span className={`romanized-text ${romanizedClass}`}>{data.romanized}</span>
+                    <span className={`complete-romanized-text ${romanizedClass}`}>{data.romanized}</span>
                     {/* Customer 턴에는 마이크 아이콘 표시 (녹음 완료 의미) */}
                     {isCustomerTurn && <span className="small-mic-icon active">🎤</span>}
                 </div>
                 <span className="english-text">{data.english}</span>
+            </div>
+            <div className={`role-tag-container ${isCustomerTurn ? 'customer-tag' : 'staff-tag'}`}>
+                <span className="role-tag">{data.speaker}</span>
             </div>
         </div>
     );
@@ -61,13 +60,13 @@ const RolePlayComplete: React.FC = () => {
     const handleTryAgain = useCallback(() => {
         // Try again 로직 (첫 턴으로 돌아가기 등)
         console.log("Attempting Try Again...");
-        navigate('/'); // 임시로 루트로 이동
+        navigate('/mainpage/rolePlay/${roleId}'); // 임시로 루트로 이동
     }, [navigate]);
 
     const handleNextLearning = useCallback(() => {
         // Next learning 로직
         console.log("Attempting Next Learning...");
-        navigate('/next-lesson'); // 임시 다음 레슨 페이지로 이동
+        navigate('/mainpage/roleList'); // 임시 다음 레슨 페이지로 이동
     }, [navigate]);
 
     return (
@@ -84,14 +83,14 @@ const RolePlayComplete: React.FC = () => {
 
             <div className="character-placeholder">
                 <img 
-                    src={CharacterSmile} 
+                    src={CharacterShining} 
                     alt="Character Complete" 
                     className="character-icon" 
                 />
             </div>
             </div>
 
-            <div className="role-content-window">
+            <div className="role-content-window roleComplete-content-window">
                 <h2 className="summary-title">Session Complete!</h2>
                 
                 <div className="summary-details">
@@ -113,11 +112,11 @@ const RolePlayComplete: React.FC = () => {
                     ))}
                 </div>
 
-                <div className="completion-actions">
-                    <button className="action-button try-again-button" onClick={handleTryAgain}>
+                <div className="buttons-container">
+                    <button className="action-button try-again" onClick={handleTryAgain}>
                         Try again
                     </button>
-                    <button className="action-button next-learning-button" onClick={handleNextLearning}>
+                    <button className="action-button next-learning" onClick={handleNextLearning}>
                         Next learning
                     </button>
                 </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import Character1 from '../../assets/Character1.png';
 
 import CharacterSmile from '../../assets/Character-Smile.png';
@@ -31,43 +31,43 @@ const SCENARIO_SEQUENCE = [
         ]
     },
     // Turn 3 (index 2): Staff Speaks (User Recording) - 03/06
-//     { 
-//         turnIndex: 3, id: '03/06', speaker: 'Staff', type: 'RECORDING', 
-//         korean: "다른 메뉴도 보시겠어요?", romanized: "Da-reun me-nyu-do bo-si-gess-eo-yo?", english: "Would you like to see other menus?"
-//     },
+    { 
+        turnIndex: 3, id: '03/06', speaker: 'Staff', type: 'RECORDING', 
+        korean: "다른 메뉴도 보시겠어요?", romanized: "Da-reun me-nyu-do bo-si-gess-eo-yo?", english: "Would you like to see other menus?"
+    },
 //     // Turn 4 (index 3): Customer Choices (User Selects) - 04/06
-//     { 
-//         turnIndex: 4, id: '04/06', speaker: 'Customer', type: 'CHOICE', 
-//         contextLine: { 
-//              korean: "다른 메뉴도 보시겠어요?", 
-//              romanized: "Da-reun me-nyu-do bo-si-gess-eo-yo?", 
-//              english: "Would you like to see other menus?", 
-//              role: "Staff" 
-//         },
-//         choices: [
-//              { id: 1, korean: "네, 다른메뉴도 보고싶어요", romanized: "a-ni-yo, a-jik-i-yeo-yo", english: "Not yet, thank you.", isCorrect: false },
-//              { id: 2, korean: "안녕하세요", romanized: "An-nyeong-ha-se-yo", english: "Hello.", isCorrect: true }
-//         ]
-//     },
+    { 
+        turnIndex: 4, id: '04/06', speaker: 'Customer', type: 'CHOICE', 
+        contextLine: { 
+             korean: "다른 메뉴도 보시겠어요?", 
+             romanized: "Da-reun me-nyu-do bo-si-gess-eo-yo?", 
+             english: "Would you like to see other menus?", 
+             role: "Staff" 
+        },
+        choices: [
+             { id: 1, korean: "네, 다른메뉴도 보고싶어요", romanized: "a-ni-yo, a-jik-i-yeo-yo", english: "Not yet, thank you.", isCorrect: false },
+             { id: 2, korean: "안녕하세요", romanized: "An-nyeong-ha-se-yo", english: "Hello.", isCorrect: true }
+        ]
+    },
 //      // Turn 5 (index 4): Staff Speaks (User Recording) - 05/06
-//     { 
-//         turnIndex: 5, id: '05/06', speaker: 'Staff', type: 'RECORDING', 
-//         korean: "메뉴 고르신 후 알려주세요?", romanized: "Me-nyu go-reu-sin hu al-lyeo-ju-se-yo?", english: "Please let me know after choosing the menu."
-//     },
+    { 
+        turnIndex: 5, id: '05/06', speaker: 'Staff', type: 'RECORDING', 
+        korean: "메뉴 고르신 후 알려주세요?", romanized: "Me-nyu go-reu-sin hu al-lyeo-ju-se-yo?", english: "Please let me know after choosing the menu."
+    },
 //     // Turn 6 (index 5): Customer Choices (User Selects) - 06/06
-//     { 
-//         turnIndex: 6, id: '06/06', speaker: 'Customer', type: 'CHOICE', 
-//         contextLine: { 
-//             korean: "메뉴 고르신 후 알려주세요", 
-//             romanized: "Me-nyu go-reu-sin hu al-lyeo-ju-se-yo?", 
-//             english: "Please let me know after choosing the menu.", 
-//             role: "Staff" 
-//         },
-//         choices: [
-//             { id: 1, korean: "감사합니다", romanized: "Gam-sa-ham-ni-da", english: "Thank you.", isCorrect: true },
-//             { id: 2, korean: "안녕하세요", romanized: "An-nyeong-ha-se-yo", english: "Hello.", isCorrect: false }
-//         ]
-//     },
+    { 
+        turnIndex: 6, id: '06/06', speaker: 'Customer', type: 'CHOICE', 
+        contextLine: { 
+            korean: "메뉴 고르신 후 알려주세요", 
+            romanized: "Me-nyu go-reu-sin hu al-lyeo-ju-se-yo?", 
+            english: "Please let me know after choosing the menu.", 
+            role: "Staff" 
+        },
+        choices: [
+            { id: 1, korean: "감사합니다", romanized: "Gam-sa-ham-ni-da", english: "Thank you.", isCorrect: true },
+            { id: 2, korean: "안녕하세요", romanized: "An-nyeong-ha-se-yo", english: "Hello.", isCorrect: false }
+        ]
+    },
 ];
 
 
@@ -109,7 +109,7 @@ const BUBBLE_TEXT = {
 };
 
 // Mock Navigate Hook (라우팅 시뮬레이션)
-const useNavigate = () => (path) => console.log(`Navigating to: ${path}`);
+// const useNavigate = () => (path) => console.log(`Navigating to: ${path}`);
 
 
 // 🧪 상태에 따른 캐릭터 이미지 결정 함수
@@ -173,18 +173,6 @@ const RolePlay = () => {
 
     const activeTurnData = SCENARIO_SEQUENCE[activeTurnIndex];
 
-// ⭐ 추가: activeTurnData가 없거나, DONE 상태일 경우 렌더링 중단
-    if (!activeTurnData && step !== STEPS.DONE) {
-        // 시나리오가 끝났는데 DONE 상태가 아니라면, DONE 상태로 강제 전환
-        // 이 경우 activeTurnIndex가 SCENARIO_SEQUENCE.length(6)이 됩니다.
-        setStep(STEPS.DONE);
-        return null; // 렌더링 중단
-    }
-    
-    // activeTurnData가 없지만 (index 6), 이미 DONE 상태라면,
-    if (!activeTurnData && step === STEPS.DONE) {
-        return <div className="loading-screen">Scenario complete. Redirecting...</div>;
-    }
 
     // ✅ 스크롤 자동 이동 로직
     useEffect(() => {
@@ -200,7 +188,7 @@ const RolePlay = () => {
         setTurnHistory(prev => [...prev, finalTurnData]);
         
         const nextIndex = activeTurnIndex + 1;
-        if (nextIndex <= SCENARIO_SEQUENCE.length) {
+        if (nextIndex === SCENARIO_SEQUENCE.length) {
             setActiveTurnIndex(nextIndex);
             const nextTurn = SCENARIO_SEQUENCE[nextIndex];
             const nextStep = nextTurn.type === 'CHOICE' ? STEPS.CHOICE_SETUP : STEPS.LISTEN;
@@ -466,10 +454,14 @@ const handleChoiceSelect = useCallback(() => {
             }, 1000);
         }
         // ⭐ 시나리오 완료 후 페이지 이동 로직 수정 (3초 딜레이 추가)
-    if (step === STEPS.DONE) {
-        console.log("Scenario Complete. Navigating to RolePlayComplete page in 3 seconds.");
-        navigate('/rolePlay/complete');
-    }
+    // ⭐ 시나리오 완료 후 페이지 이동 로직
+    if (step === STEPS.DONE) {
+        console.log("Scenario Complete. Navigating to RolePlayComplete page.");
+        // 짧은 딜레이 후 정확한 절대 경로로 이동
+        flowTimerRef.current = setTimeout(() => { 
+            navigate('../complete'); // ⭐ 정확한 절대 경로로 수정하세요.
+        }, 500); 
+    }
         
         // ⭐ PRACTICE_LISTEN_DONE 단계 -> PRACTICE_SPEAK으로 전환 (2초 대기)
         if (step === STEPS.PRACTICE_LISTEN_DONE) {
