@@ -1,13 +1,27 @@
 import Button from '@/components/Button/Button';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
-
 import styles from './PaymentCheckoutPage.module.css';
 import { useState } from 'react';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
+import { useQuery } from '@tanstack/react-query';
+import { getSubscriptionPlans } from '@/apis/subscriptions';
+import kakao from '@/assets/kakaopay.png';
+
+const PLAN = {
+  PREMIUM: 'Premium',
+};
 
 function PaymentCheckoutPage() {
   const [isJoin, setIsJoin] = useState(false);
+  const [selected, setSelected] = useState('');
+
+  const { data: plans } = useQuery({
+    queryKey: ['plans'],
+    queryFn: getSubscriptionPlans,
+  });
+
+  const { today, nextMonth } = getSubscriptionPeriod();
 
   return (
     <div
@@ -41,19 +55,49 @@ function PaymentCheckoutPage() {
           </div>
 
           <ContentSection color="blue">
-            <h1 className="h1">Payment</h1>
+            <div className={styles['content-container']}>
+              <div>
+                <h1 className="h1">Payment</h1>
 
-            <div>
-              <label htmlFor="plan">Plan *</label>
-              <select name="" id="plan">
-                <option value="">Premium</option>
-              </select>
+                <div className={styles.info}>
+                  <div>
+                    <label htmlFor="plan" className={styles.label}>
+                      Plan *
+                    </label>
+                    <select
+                      id="plan"
+                      className={styles.select}
+                      value={selected}
+                      onChange={(e) => setSelected(e.target.value)}
+                    >
+                      <option value="">Standard(₩ 0)</option>
+                      {plans.map(({ id, name, price }) => (
+                        <option key={id} value={name}>
+                          {`${PLAN[name]}(Per Month ₩ ${price})`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <span>Begins *</span>
-              <time>06 November, 2025</time>
+                  <div>
+                    <span className={styles.label}>Begins *</span>
+                    <time className={styles.time}>{today}</time>
+                  </div>
 
-              <span>Begins *</span>
-              <time>06 November, 2025</time>
+                  <div>
+                    <span className={styles.label}>Ends *</span>
+                    <time className={styles.time}>
+                      {selected ? nextMonth : ''}
+                    </time>
+                  </div>
+                </div>
+              </div>
+
+              {selected && (
+                <Button className={styles.pay} isFull>
+                  <img src={kakao} alt="카카오 페이" />
+                </Button>
+              )}
             </div>
           </ContentSection>
         </div>
@@ -63,3 +107,18 @@ function PaymentCheckoutPage() {
 }
 
 export default PaymentCheckoutPage;
+
+function getSubscriptionPeriod() {
+  const today = new Date();
+  const nextMonth = new Date(today);
+  nextMonth.setMonth(today.getMonth() + 1);
+
+  return { today: formatDate(today), nextMonth: formatDate(nextMonth) };
+}
+
+function formatDate(date: Date) {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = date.toLocaleString('en-US', { month: 'long' });
+  const year = date.getFullYear();
+  return `${day} ${month}, ${year}`;
+}

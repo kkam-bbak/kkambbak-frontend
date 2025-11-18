@@ -6,7 +6,12 @@ export async function getSubscriptionStatus() {
   return data;
 }
 
-export async function getSubscriptionPlans() {
+type ResponseSubscriptionPlans = Array<{
+  id: number;
+  name: string;
+  price: number;
+}>;
+export async function getSubscriptionPlans(): Promise<ResponseSubscriptionPlans> {
   const response = await http.get('/subscriptions/plans');
 
   return response.data.body;
