@@ -20,6 +20,9 @@ import RolePlay from '../pages/rolePlay/rolePlay';
 
 import { useUser } from '../stores/user';
 import BaseLayout from '@/components/layout/BaseLayout/BaseLayout';
+import PaymentGate from '@/pages/PaymentPage/PaymentGate';
+import PaymentCheckoutPage from '@/pages/PaymentPage/CheckoutPage/PaymentCheckoutPage';
+import PaymentReceiptPage from '@/pages/PaymentPage/ReceiptPage/PaymentReceiptPage';
 
 function Protected() {
   const user = useUser((s) => s.user);
@@ -76,6 +79,23 @@ export const router = createBrowserRouter([
 
               { path: 'learn/review', element: <LearnReview /> },
             ],
+          },
+        ],
+      },
+      {
+        path: 'payment',
+        children: [
+          {
+            index: true,
+            element: <PaymentGate />,
+          },
+          {
+            path: 'checkout',
+            element: <PaymentCheckoutPage />,
+          },
+          {
+            path: 'receipt',
+            element: <PaymentReceiptPage />,
           },
         ],
       },
