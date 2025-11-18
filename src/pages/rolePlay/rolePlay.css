@@ -59,35 +59,17 @@
 
 }
 
-
-
-/* 활성 입력 턴 영역 (하단에 고정) */
-.active-turn-input-area {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 10px;
-    background-color: #3b82f6; /* 부모 배경색과 동일 */
-    z-index: 25;
-}
-
-/* 활성 턴의 공간 확보 (스크롤이 Active Input Area를 침범하지 않도록) */
-.active-turn-placeholder {
-    height: 150px; 
-}
-
-
 /* 텍스트 표시 박스 (검은색) */
 .text-display-box {
     width: 100%;
     height: 120px;
-    top: 52px;
-    left: 15px;
     background-color: #101010;
     border-radius: 10px;
+    margin-bottom: 45px;
+    position: relative;
 
 }
+
 
 .history-box{
     margin-bottom: 35px;
@@ -103,17 +85,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 15px;
+    padding: 8px 15px 15px 15px;
+    
 }
 
 /* 한국어 원문 텍스트 (이미지 1번처럼 위에 위치) */
 .korean-text {
-    margin-left: 10px;
     font-size: 13px;
     color: white;
     font-weight: 500;
-    margin-top: 8px;
-    margin-bottom: 8px;
+    margin-bottom: -15px;
+    
+    
 }
 
 /* 🎧 듣기 버튼 */
@@ -135,11 +118,12 @@
 .romanized-text {
     font-size: 13px;
     font-weight: 500;
-    color: white;
+    color: #757575;
     transition: color 0.3s;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    margin-left: 10px;
+   
+}
+
+.text-line.romanized-line{
 }
 .romanized-text.correct {
     color: rgba(57, 255, 20, 1); /* Green-400 (초록색) */
@@ -160,33 +144,23 @@
     color: white; /* 녹음 중 흰색 */
 }
 
+
+
 /* 영어 번역 텍스트 (이미지 1번처럼 세 번째 줄에 위치) */
 .english-text {
     color: #007CFF; /* Gray-400 */
     font-size: 13px;
     font-weight: 500;
     display: block; 
-    margin-top: 8px;
-    margin-bottom: 8px;
-    margin-left: 10px;
+    margin-left: 15px;
+    
 
 }
 
-/*추후 변경*/
-.content-tail{
-    position: relative;
-    width: 12px;
-    height: 12px;
-    
-    /* 꼬리가 검은색 박스(text-display-box)의 왼쪽 상단 밖으로 나가도록 조정 */
-    top: 165px; /* 꼬리 높이만큼 위로 이동 */
-    left: 29px; /* 좌측 여백 설정 (이미지에서 보이는 위치) */
-    
-    transform: translateX(0) rotate(70deg); /* 이미지에 맞게 회전 없음 */
-    clip-path: polygon(0% 100%, 50% 0%, 100% 100%); 
-    background-color: black; /* 꼬리 색상 (검은색 박스와 동일) */
-    z-index: 15; /* 박스보다 위에 위치하도록 설정 */
-}
+
+/* .content-tail{
+
+} */
 
 .role-container{
     width: 44px;
@@ -199,11 +173,22 @@
     font-weight: 600;
     display: flex;
     justify-content: center;
-    margin-top: 5px;
+    margin-top: 20px;
+   
 }
 
-.role-container.costomer{
+.costomer{
     width: 68px;
+    height: 20px;
+    background-color: white;
+    color: black;
+    border-radius: 5px;
+    margin-left: 0px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
     
 }
 
@@ -242,32 +227,24 @@
 
 /* -------------------- 4. 메인 마이크 버튼 -------------------- */
 .mic-area {
-    /* ⭐ 수정: 화면 하단에 고정 */
     position: absolute; 
     bottom: 0;
     left: 0;
     right: 0;
-    
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 72px; /* 고정 영역 높이 */
-    background-color: transparent; /* 파란색 부모 창 배경 사용 */
+    height: 72px; 
+    background-color: transparent; 
     margin-left: 15px;
     margin-right: 15px;
    
 }
 
-/* .mic-button-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-} */
-
 .main-mic-button {
     
-    width: 300px;
-    height: 40px; /* ⭐ 수정: 크기 증가 */
+    width: 328px;
+    height: 40px; 
     border-radius: 10px;
 
     display: flex;
@@ -279,7 +256,7 @@
 }
 
 .main-mic-icon {
-    font-size: 20px; /* ⭐ 수정: 아이콘 크기 증가 */
+    font-size: 20px; 
     transition: color 0.3s;
 }
 
@@ -306,25 +283,84 @@
     background-color: #E3E3E3;
 }
 
-/* 10초 카운트다운 텍스트 */
-/* .countdown-text {
-    color: #d1d5db; Gray-300
-    font-size: 12px;
-    margin-bottom: 4px;
-} */
-
 /* 마이크 상태 텍스트 (ON/OFF) */
 .mic-status-text {
-
     font-size: 10px;
     font-weight: 700;
     margin-top: 4px;
 }
 
+
+/*choice 버튼 스타일*/
 .choice-options-area{
     position:absolute;
     top: 190px;
 }
 
+.mic-area.choice-button {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    
+    background-color: transparent; 
+}
 
 
+.choice-button .choice-button-action {
+    /* 크기 및 모양 */
+    width: 60px; /* 버튼 너비 */
+    height: 40px; /* 버튼 높이 */
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px; /* 둥근 모서리 */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: white; 
+    color: #1a1a1a; /* 검은색 텍스트 */
+    border: 2px solid #eeeeee;
+}
+
+.choice-button .choice-button-action.selected {
+    background-color: #1a1a1a; /* 검은색 계열 */
+    color: white; 
+    border: 2px solid #1a1a1a;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.mic-area .select-submit-button {
+    flex-grow: 1; 
+    max-width: 176px; 
+    height: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px; 
+    background-color: white;
+    color: black;
+    border: none;
+    cursor: pointer;
+}
+/* ⭐ 기본 상태 (1/2번 선택 전): 흰색 배경, 흐린 검은색 글자 */
+.mic-area .select-submit-button,
+.mic-area .select-submit-button.off.disabled { 
+    background-color: white;
+    color: #1a1a1a;
+    opacity: 0.5; /* 비활성 시 흐리게 */
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ⭐ 활성화 상태 (1/2번 선택 후): 흰색 배경, 선명한 검은색 글자 */
+.mic-area .select-submit-button.on {
+    background-color: white; /* ⭐ 흰색 배경 유지 */
+    color: #1a1a1a; /* ⭐ 검은색 글자 유지 */
+    opacity: 1; 
+    cursor: pointer;
+    pointer-events: auto; /* 클릭 가능 */
+}
+
+/* ⭐⭐⭐ 핵심 수정: 버튼이 실제로 눌리는 순간 (:active) ⭐⭐⭐ */
+.mic-area .select-submit-button.on:active {
+    background-color: #1a1a1a; /* 블랙 배경으로 반전 */
+    color: white; /* 흰색 글자로 반전 */
+
+}

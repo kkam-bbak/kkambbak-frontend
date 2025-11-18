@@ -510,7 +510,7 @@ const handleChoiceSelect = useCallback(() => {
         const mainRomanizedText = isChoiceTurn ? selectedData.romanized : data.romanized;
         const mainEnglishText = isChoiceTurn ? selectedData.english : data.english;
 
-        return (
+        return ( /*저장되는 내용*/ 
             <div className="text-display-box history-box">
                 
                 {/* 현재 턴의 주요 대화 내용 */}
@@ -524,7 +524,7 @@ const handleChoiceSelect = useCallback(() => {
                 </div>
                 <span className="english-text history-english">{mainEnglishText}</span>
                 
-                <div className="role-container"><span className="role-tag">{role}</span></div>
+                <div className="role-container costomer"><span className="role-tag">{role}</span></div>
             </div>
         );
     };
@@ -543,14 +543,21 @@ const handleChoiceSelect = useCallback(() => {
             const isTtsActionable = step === STEPS.LISTEN; 
             const isMicActionable = step === STEPS.SPEAK_SETUP || step === STEPS.RECORDING || step === STEPS.LISTEN_DONE;
             const mainMicButtonClass = isMicActionable ? (isRecording ? 'on' : 'off') : 'off disabled';
-            const getRomClass = () => (step === STEPS.GRADING && gradingResult !== 'CORRECT') ? ' incorrect-active' : '';
+            const getRomClass = () => {
+                if (step === STEPS.GRADING) {
+                    return gradingResult === 'CORRECT' ? ' correct-active' : (gradingResult === 'INCORRECT' || gradingResult === 'OOS' ? ' incorrect-active' : '');
+                }
+                return '';
+            };
+            const currentGradeClass = getRomClass(); // 현재 채점 결과 클래스
 
             return (
                 <div className="active-turn-recording-flow">
-                    <div className="text-display-box active-turn-box">
+                    <div className="text-display-box history-box">
                  
                         <div className="text-line korean-line">
-                            <span className="korean-text">{activeTurnData.korean}</span>
+                            {/* ⭐ Korean 텍스트에 클래스 적용 */}
+                            <span className={`korean-text ${currentGradeClass}`}>{activeTurnData.korean}</span>
                             <button 
                                 className={`tts-button ${isTtsActionable ? ' active' : ''}`}
                                 onClick={handleListenTtsClick}
@@ -559,11 +566,13 @@ const handleChoiceSelect = useCallback(() => {
                             </button>
                         </div>
                         <div className="text-line romanized-line">
-                            <span className={`romanized-text${getRomClass()}`}>{activeTurnData.romanized}</span>
+                            {/* ⭐ Romanized 텍스트에 클래스 적용 */}
+                            <span className={`romanized-text${currentGradeClass}`}>{activeTurnData.romanized}</span>
                             <span className={`small-mic-icon${isRecording || isMicActionable ? ' active' : ''}`}>🎤</span>
                         </div>
-                        <span className="english-text">{activeTurnData.english}</span>
-                            <div className="role-container"><span className="role-tag">{activeTurnData.speaker}</span></div>
+                        {/* ⭐ English 텍스트에 클래스 적용 */}
+                        <span className={`english-text${currentGradeClass}`}>{activeTurnData.english}</span>
+                            <div className="role-container costomer"><span className="role-tag">{activeTurnData.speaker}</span></div>
                         
                     </div>
                  
@@ -609,7 +618,7 @@ const handleChoiceSelect = useCallback(() => {
                 
                     {/* ⭐ 2. 선택지 내용 미리보기 (CHOICE_SETUP 단계에서만 렌더링) */}
                     {displayOption && step === STEPS.CHOICE_SETUP && (
-                        <div className="text-display-box active-turn-box choice-preview-box"> 
+                        <div className="text-display-box history-box"> 
                             <div className="text-line korean-line">
                                 <span className="korean-text">{displayOption.korean}</span>
                                 <button 
@@ -651,7 +660,7 @@ const handleChoiceSelect = useCallback(() => {
                             disabled={!isSubmitActive}
                         >
                             <span className="select-submit-text">
-                                {step === STEPS.CHOICE_FEEDBACK ? "Continue" : "Select"}
+                                Select
                             </span>
                         </button>
                     </div>
