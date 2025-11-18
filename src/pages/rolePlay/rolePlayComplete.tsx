@@ -44,7 +44,7 @@ const TurnDisplay: React.FC<{ data: TurnData, index: number }> = ({ data, index 
                     {/* Customer 턴에는 마이크 아이콘 표시 (녹음 완료 의미) */}
                     {isCustomerTurn && <span className="small-mic-icon active">🎤</span>}
                 </div>
-                <span className="english-text">{data.english}</span>
+                <span className="complete-english-text">{data.english}</span>
             </div>
             <div className={`role-tag-container ${isCustomerTurn ? 'customer-tag' : 'staff-tag'}`}>
                 <span className="role-tag">{data.speaker}</span>

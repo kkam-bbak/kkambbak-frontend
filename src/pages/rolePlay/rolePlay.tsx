@@ -260,7 +260,7 @@ const handlePracticeGrading = useCallback((mockResult) => {
         // ⭐ 2. 다음 단계 결정: 현재가 마지막 턴(index 5)인지 확인
         const nextIndex = activeTurnIndex + 1;
         
-        if (nextIndex > SCENARIO_SEQUENCE.length) {
+        if (nextIndex === SCENARIO_SEQUENCE.length) {
             // 마지막 턴 완료: DONE 단계로 전환하여 페이지 이동
             setStep(STEPS.DONE);
         } else {
@@ -459,7 +459,7 @@ const handleChoiceSelect = useCallback(() => {
         console.log("Scenario Complete. Navigating to RolePlayComplete page.");
         // 짧은 딜레이 후 정확한 절대 경로로 이동
         flowTimerRef.current = setTimeout(() => { 
-            navigate('../complete'); // ⭐ 정확한 절대 경로로 수정하세요.
+            navigate('/mainpage/rolePlay/complete'); // ⭐ 정확한 절대 경로로 수정하세요.
         }, 500); 
     }
         

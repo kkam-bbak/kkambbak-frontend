@@ -14,11 +14,12 @@
 
 /* -------------------- 3. 요약 카드 (Session Complete!) -------------------- */
 .summary-title {
+    
     font-size: 18px;
     font-weight: 500;
     margin-bottom: 15px;
     color: black;
-    margin-left: 16px;
+    margin-left: 20px;
 }
 
 .summary-details {
@@ -33,7 +34,7 @@
     margin-left: 15px;
     margin-right: 15px;
     background-color: black;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 .detail-item {
     font-size: 12px;
@@ -51,6 +52,7 @@
 
 .complete-history-area {
     /* 스크롤 영역 */
+    padding-top: 10px;
     max-height: 160px; /* 임시 높이 설정, 화면 크기에 따라 조정 필요 */
     overflow-y: auto;
     margin-left: 15px;
@@ -63,7 +65,7 @@
 
 .turn-display-box {
     width: 100%;
-    height: 110px;
+    height: 120px;
     background-color: #101010;
     border-radius: 10px;
     margin-bottom: 45px;
@@ -71,6 +73,9 @@
 }
 
 .turn-display-box .content-box {
+    padding-top: 5px; /* 10px 만큼 아래로 이동 (필요에 따라 값 조정) */
+
+  
 }
 
 /* 역할 태그 */
@@ -85,7 +90,7 @@
     background-color: white;
     color: black;
     font-weight: 600;
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
 
@@ -95,6 +100,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
 }
 .complete-korean-text {
     font-size: 13px;
@@ -113,10 +119,14 @@
 .romanized-text.incorrect {
     color: red;
 } */
-.english-text {
+.complete-english-text {
     color: #007CFF;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: 15px;
+    margin-top: 10px;
     display: block;
+    
 }
 .small-mic-icon.active {
     color: white;
@@ -133,6 +143,7 @@
     padding: 10px 0; 
     margin-left: 15px;
     margin-right: 15px;
+    
 }
 
 .action-button {

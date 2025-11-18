@@ -29,16 +29,17 @@
 .card-title-bar {
     display: flex;
     justify-content: space-between;
-    background-color: transparent; /* content-window의 파란색 배경을 사용 */
     align-items: center;
-    padding-top: 10px;
-    padding-left: 15px;
-    padding-right: 15px;
-    color: black;
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: transparent; /* content-window의 파란색 배경을 사용 */
 }
 .card-title-text {
     font-size: 18px;
     font-weight: 500;
+    margin: 0;
+    color: black; /* 파란색 배경 위 흰색 텍스트 */
 }
 .card-step-text {
     font-size: 18px;
