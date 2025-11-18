@@ -48,7 +48,7 @@ export default function ProfileCreation() {
         'https://pub-2fe42e6f80304939bbdef33f2525fe73.r2.dev/31826a56-4c25-41f1-8d28-651de3a2889c';
 
       try {
-        const response = await http.get('/api/v1/users/profile');
+        const response = await http.get('/users/profile');
         const profileData = response.data?.body;
 
         if (profileData) {
@@ -88,15 +88,11 @@ export default function ProfileCreation() {
           const formData = new FormData();
           formData.append('file', profileImageFile);
 
-          const uploadResponse = await http.post(
-            '/api/v1/upload/image',
-            formData,
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
+          const uploadResponse = await http.post('/upload/image', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
             },
-          );
+          });
 
           imageUrl = uploadResponse.data?.body?.url;
 
@@ -115,7 +111,7 @@ export default function ProfileCreation() {
           registrationData.profileImage = imageUrl;
         }
 
-        await http.patch('/api/v1/users/register', registrationData);
+        await http.patch('/users/register', registrationData);
 
         navigate('/mainpage');
       } catch (error) {

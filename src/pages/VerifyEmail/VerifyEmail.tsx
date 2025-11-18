@@ -62,7 +62,7 @@ export default function VerifyEmail() {
     try {
       setIsLoading(true);
 
-      const emailResponse = await http.get('/api/v1/auth/current-email', {
+      const emailResponse = await http.get('/auth/current-email', {
         params: { code },
       });
 
@@ -76,7 +76,7 @@ export default function VerifyEmail() {
       const currentEmail = emailResponse.data.body.email;
       setEmail(currentEmail);
 
-      const response = await http.post('/api/v1/auth/verify-email', {
+      const response = await http.post('/auth/verify-email', {
         email: currentEmail,
         otpCode: otp,
       });
@@ -128,7 +128,7 @@ export default function VerifyEmail() {
 
       let currentEmail = email;
       if (!currentEmail) {
-        const emailResponse = await http.get('/api/v1/auth/current-email', {
+        const emailResponse = await http.get('/auth/current-email', {
           params: { code },
         });
 
@@ -142,7 +142,7 @@ export default function VerifyEmail() {
         setEmail(currentEmail);
       }
 
-      await http.post('/api/v1/auth/resend-otp', { email: currentEmail });
+      await http.post('/auth/resend-otp', { email: currentEmail });
 
       setTimeLeft(180);
       setOtp('');
