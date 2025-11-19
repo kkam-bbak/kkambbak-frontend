@@ -69,10 +69,7 @@ function PaymentReceiptPage() {
 
       <div>
         <div className={styles['mascot-container']}>
-          <Mascot
-            image="shining"
-            text={`I'm excited to learn more with you!`}
-          />
+          <Mascot image="smile" text={`I'm excited to learn more with you!`} />
         </div>
 
         <ContentSection color="blue">

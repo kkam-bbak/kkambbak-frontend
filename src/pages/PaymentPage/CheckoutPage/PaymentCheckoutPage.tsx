@@ -62,7 +62,7 @@ function PaymentCheckoutPage() {
         <div>
           <div className={styles['mascot-container']}>
             <Mascot
-              image="shining"
+              image="smile"
               text={`I'm excited to learn more with you!`}
             />
           </div>
