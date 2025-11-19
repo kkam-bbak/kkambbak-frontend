@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { http } from '../../../apis/http';
 //import Character1 from '../../../assets/Character1.png';
-import './surveyStart.css';
+import './surveyStart.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
