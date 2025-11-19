@@ -16,3 +16,15 @@ export async function getSubscriptionPlans(): Promise<ResponseSubscriptionPlans>
 
   return response.data.body;
 }
+
+export async function getSubscriptionActive() {
+  const response = await http.get('/subscriptions/active');
+
+  return response;
+}
+
+export async function cancelSubscriptions(subscriptionId: string) {
+  const response = await http.post(`/subscriptions/${subscriptionId}/cancel`);
+
+  return response;
+}
