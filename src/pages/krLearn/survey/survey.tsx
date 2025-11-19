@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './survey.css';
+import { http } from '../../../apis/http';
+import './survey.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
@@ -182,9 +183,27 @@ const Survey: React.FC = () => {
     navigate('../learnList');
   };
 
-  const handleDoneMessageClick = () => {
-    navigate('../learnList');
+//설문저장 api - accesstoken발급안되서 안넘어가는 이슈 해결 안됨 
+const handleDoneMessageClick = async () => {
+    try {
+      const rawResponses: Record<string, string> = {};
+
+      selectedAnswers.forEach((answer, index) => {
+        if (answer) {
+          // surveyData의 질문 텍스트를 키로 사용하고, 사용자 입력값을 그대로 저장
+          rawResponses[surveyData[index].bubbleText] = answer;
+        }
+      });
+
+      // API 호출
+      await http.post('/api/v1/surveys', { rawResponses });
+
+      navigate('../learnList');
+    } catch (error) {
+      console.error('Failed to save survey:', error);
+    }
   };
+
 
   // --- Survey Content Window 내부 내용 렌더링 함수 ---
   const renderSurveyContent = () => {
