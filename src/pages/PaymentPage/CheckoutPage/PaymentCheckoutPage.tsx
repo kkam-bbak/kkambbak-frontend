@@ -31,7 +31,7 @@ function PaymentCheckoutPage() {
   const handlePayClick = () => {
     mutate(undefined, {
       onSuccess: (data) => {
-        window.location.href = data.data.body.approvalURl;
+        window.location.href = data.approvalUrl;
       },
     });
   };
