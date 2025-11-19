@@ -1,0 +1,167 @@
+/* -------------------- 외부 스타일 import (유지) -------------------- */
+/* 실제 프로젝트 경로에 맞게 수정해주세요 */
+@import '../../styles/page-base.css';
+@import '../../styles/Role-common.css';
+
+
+
+.roleComplete-bubble{
+    width: 100px;
+    height: 44px;
+    top: 60px;
+    left: 130px;
+}
+
+/* -------------------- 3. 요약 카드 (Session Complete!) -------------------- */
+.summary-title {
+    
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: black;
+    margin-left: 20px;
+}
+
+.summary-details {
+    top: 56px;
+    height: 131px;
+    border-radius: 10px;
+
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 15px;
+    margin-right: 15px;
+    background-color: black;
+    margin-bottom: 5px;
+}
+.detail-item {
+    font-size: 12px;
+    font-weight: 500;
+    padding-left: 10px;
+}
+.role-name {
+    padding-top: 5px;
+    font-weight: 500;
+    font-size: 18px;
+    padding-bottom: 5px;
+}
+
+/* -------------------- 4. 히스토리 영역 -------------------- */
+
+.complete-history-area {
+    /* 스크롤 영역 */
+    padding-top: 10px;
+    max-height: 160px; /* 임시 높이 설정, 화면 크기에 따라 조정 필요 */
+    overflow-y: auto;
+    margin-left: 15px;
+    margin-right: 15px;
+    -ms-overflow-style: none; /*edge, IE대상 스크롤바 제거*/
+    scrollbar-width: none; /*firefox 대상*/
+
+
+}
+
+.turn-display-box {
+    width: 100%;
+    height: 120px;
+    background-color: #101010;
+    border-radius: 10px;
+    margin-bottom: 45px;
+    position: relative;
+}
+
+.turn-display-box .content-box {
+    padding-top: 5px; /* 10px 만큼 아래로 이동 (필요에 따라 값 조정) */
+
+  
+}
+
+/* 역할 태그 */
+.role-tag-container {
+    width: 68px;
+    height: 20px;
+    border-radius: 5px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    color: black;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+
+
+/* 텍스트 줄 */
+.text-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+.complete-korean-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #757575;
+}
+.complete-romanized-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #757575;
+}
+
+/* .romanized-text.correct {
+    color: lime; 
+}
+.romanized-text.incorrect {
+    color: red;
+} */
+.complete-english-text {
+    color: #007CFF;
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: 15px;
+    margin-top: 10px;
+    display: block;
+    
+}
+.small-mic-icon.active {
+    color: white;
+    font-size: 14px;
+}
+
+/* -------------------- 5. 하단 액션 버튼 -------------------- */
+
+.buttons-container {
+    position: relative;
+    display: flex;
+    justify-content: center; 
+    gap: 15px;
+    padding: 10px 0; 
+    margin-left: 15px;
+    margin-right: 15px;
+    
+}
+
+.action-button {
+    height: 40px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+.try-again {
+    background-color: white;
+    color: black;
+    width: 159px;
+}
+.next-learning {
+    background-color: white;
+    color: black;
+    width: 153px;
+}
