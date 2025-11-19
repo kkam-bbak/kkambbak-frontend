@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Character1 from '../../assets/Character1.png';
-import CharacterSmile from '../../assets/Character-Smile.png';
-import CharacterJump from '../../assets/Character-Jump.png';
-import CharacterWrong from '../../assets/Character-Wrong.png';
-import CharacterGloomy from '../../assets/Character-Gloomy.png';
-import CharacterSullen from '../../assets/Character-Sullen.png';
 import './rolePlay.css';
+import Header from '@/components/layout/Header/Header';
+import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // --- 다중 턴 시나리오 데이터 구조 정의 ---
 const SCENARIO_SEQUENCE = [
@@ -128,7 +124,6 @@ const speakKoreanText = (text, onFinish = null) => {
 
     window.speechSynthesis.speak(utterance);
 };
-
 
 // --- 핵심 컴포넌트 ---
 

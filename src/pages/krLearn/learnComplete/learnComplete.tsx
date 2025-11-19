@@ -1,12 +1,9 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
-import CharacterShine from '../../../assets/Character-Shining.png';
-import CharacterSmile from '../../../assets/Character-Smile.png';
-import CharacterSoso from '../../../assets/Character-Soso.png';
-import CharacterGloomy from '../../../assets/Character-Gloomy.png';
-
 import './learnComplete.css'; // CSS 파일 임포트
+import Header from '@/components/layout/Header/Header';
+import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 
 // --- 유틸리티 함수: 시간 및 날짜 처리 ---
 
@@ -17,14 +14,14 @@ import './learnComplete.css'; // CSS 파일 임포트
  * @returns {string} 형식화된 시간 문자열 (예: "6m 30s")
  */
 const formatDuration = (durationMs: number): string => {
-    // 💡 실제 구현에서는 durationMs를 사용하여 분과 초를 계산합니다.
-    // 예시: const totalSeconds = Math.round(durationMs / 1000);
-    // const minutes = Math.floor(totalSeconds / 60);
-    // const seconds = totalSeconds % 60;
-    // return `${minutes}m ${seconds}s`;
-    
-    // 현재는 더미 데이터를 반영하여 "6m 30s"를 반환합니다.
-    return "6m 30s"; 
+  // 💡 실제 구현에서는 durationMs를 사용하여 분과 초를 계산합니다.
+  // 예시: const totalSeconds = Math.round(durationMs / 1000);
+  // const minutes = Math.floor(totalSeconds / 60);
+  // const seconds = totalSeconds % 60;
+  // return `${minutes}m ${seconds}s`;
+
+  // 현재는 더미 데이터를 반영하여 "6m 30s"를 반환합니다.
+  return '6m 30s';
 };
 
 /**
@@ -32,171 +29,142 @@ const formatDuration = (durationMs: number): string => {
  * @returns {string} 형식화된 날짜 문자열 (예: "Monday, November 10, 2025")
  */
 const getFormattedCompletionDate = (): string => {
-    const now = new Date();
-    const options: Intl.DateTimeFormatOptions = {
-        weekday: 'long', 
-        year: 'numeric',   
-        month: 'long',   
-        day: 'numeric',  
-    };
-    // 언어는 'en-US' (미국 영어)로 지정하여 이미지와 동일한 형식으로 출력합니다.
-    return now.toLocaleDateString('en-US', options); 
+  const now = new Date();
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
+  // 언어는 'en-US' (미국 영어)로 지정하여 이미지와 동일한 형식으로 출력합니다.
+  return now.toLocaleDateString('en-US', options);
 };
-
 
 // --- 더미 결과 데이터 ---
 const DUMMY_RESULTS = {
-    topicName: "Casual_Emotions", 
-    correctCount: 12, // <-- 이 값을 변경하여 테스트
-    totalCount: 26,
+  topicName: 'Casual_Emotions',
+  correctCount: 12, // <-- 이 값을 변경하여 테스트
+  totalCount: 26,
 };
 // --- END DUMMY DATA ---
 
 // 결과 항목을 렌더링하는 보조 컴포넌트
-const ResultRow = ({ icon: Icon, value }: { icon: React.ElementType, value: string }) => (
-    <div className="result-row">
-        <Icon className="result-icon" />
-        <span className="result-value">{value}</span>
-    </div>
+const ResultRow = ({
+  icon: Icon,
+  value,
+}: {
+  icon: React.ElementType;
+  value: string;
+}) => (
+  <div className="result-row">
+    <Icon className="result-icon" />
+    <span className="result-value">{value}</span>
+  </div>
 );
 
 const LearnComplete: React.FC = () => {
-    const navigate = useNavigate();
-    const { correctCount, totalCount, topicName } = DUMMY_RESULTS; // DUMMY_RESULTS에서 직접 비구조화 할당
+  const navigate = useNavigate();
+  const { correctCount, totalCount, topicName } = DUMMY_RESULTS; // DUMMY_RESULTS에서 직접 비구조화 할당
 
-    // 1. 학습 시간 (임시로 390000ms를 가정 = 6분 30초)
-    // 💡 실제 앱에서는 이 값이 학습 시작/종료 시점을 기반으로 상위 컴포넌트/상태에서 전달되어야 합니다.
-    const learningDurationMs = 390000; 
-    const learningTime = useMemo(() => formatDuration(learningDurationMs), [learningDurationMs]);
+  // 1. 학습 시간 (임시로 390000ms를 가정 = 6분 30초)
+  // 💡 실제 앱에서는 이 값이 학습 시작/종료 시점을 기반으로 상위 컴포넌트/상태에서 전달되어야 합니다.
+  const learningDurationMs = 390000;
+  const learningTime = useMemo(
+    () => formatDuration(learningDurationMs),
+    [learningDurationMs],
+  );
 
-    // 2. 완료 날짜 (실시간으로 가져와서 형식화)
-    const completionDate = useMemo(() => getFormattedCompletionDate(), []);
+  // 2. 완료 날짜 (실시간으로 가져와서 형식화)
+  const completionDate = useMemo(() => getFormattedCompletionDate(), []);
 
-    // 3. 말풍선 텍스트 및 캐릭터 이미지 결정 로직
-    const { speechBubbleText, characterImageSrc } = useMemo(() => {
-        let text = '';
-        let imgSrc = '';
+  // 3. 말풍선 텍스트 및 캐릭터 이미지 결정 로직
+  const { speechBubbleText, mascotImage: characterImageSrc } = useMemo(() => {
+    let text = '';
+    let mascot: MascotImage;
 
-        if (correctCount === totalCount) {
-            text = 'Perfect!!!';
-            // imgSrc = perfectImg; 
-            // 🚨 나중에 이미지 경로로 대체 (예: imgSrc = '/path/to/perfect_image.png')
-            imgSrc = CharacterShine; 
-        } else if (correctCount >= totalCount * (2 / 3)) { // 3분의 2 이상
-            text = "It's not bad~";
-            // imgSrc = goodImg;
-            imgSrc = CharacterSmile;
-        } else if (correctCount >= totalCount * (1 / 2)) { // 절반 이상
-            text = "So so~";
-            // imgSrc = sosoImg;
-            imgSrc = CharacterSoso;
-        } else { // 절반 이하
-            text = "I'm sorry ..";
-            // imgSrc = badImg;
-            imgSrc = CharacterGloomy;
-        }
-        return { speechBubbleText: text, characterImageSrc: imgSrc };
-    }, [correctCount, totalCount]); // correctCount 또는 totalCount가 변경될 때마다 재계산
+    if (correctCount === totalCount) {
+      text = 'Perfect!!!';
+      mascot = 'shining';
+    } else if (correctCount >= totalCount * (2 / 3)) {
+      // 3분의 2 이상
+      text = "It's not bad~";
+      // imgSrc = goodImg;
+      mascot = 'smile';
+    } else if (correctCount >= totalCount * (1 / 2)) {
+      // 절반 이상
+      text = 'So so~';
+      // imgSrc = sosoImg;
+      mascot = 'thinking';
+    } else {
+      // 절반 이하
+      text = "I'm sorry ..";
+      // imgSrc = badImg;
+      mascot = 'gloomy';
+    }
+    return { speechBubbleText: text, mascotImage: mascot };
+  }, [correctCount, totalCount]); // correctCount 또는 totalCount가 변경될 때마다 재계산
 
+  // 1. 로그아웃 핸들러
+  // const handleLogout = () => navigate('/auth/login');
 
-    // 1. 로그아웃 핸들러
-    const handleLogout = () => navigate('/auth/login');
+  // 2. Review 페이지 이동 핸들러
+  const handleReview = () => navigate('/mainpage/learn/review');
 
-    // 2. Review 페이지 이동 핸들러
-    const handleReview = () => navigate('/mainpage/learn/review'); 
-    
-    // 3. Try again (현재 학습 시작 화면으로 돌아감)
-    const handleTryAgain = () => {
-        navigate(`/mainPage/learn/${topicName}`); 
-    };
-    
-    // 4. Next learning (다음 학습) 핸들러
-    const handleNextLearning = () => {
-        navigate('/mainpage/learnList'); 
-    };
+  // 3. Try again (현재 학습 시작 화면으로 돌아감)
+  const handleTryAgain = () => {
+    navigate(`/mainPage/learn/${topicName}`);
+  };
 
-    return (
-        <div className="page-container app-container">
-            <div className="header-section">
-                <button 
-                    onClick={handleLogout} 
-                    className="logout"
-                >
-                    Logout
-                </button>
-        
-                {/* 말풍선: 조건에 따라 텍스트 변경 */}
-                <div className="speech-bubble complete-bubble">
-                    {speechBubbleText} 
-                    <div className="speech-tail"></div>
-                </div>
-            
-                <div className="character-placeholder">
-                    <img src={characterImageSrc} alt="Character" className="character-icon"></img>
-                </div>
-            </div>
+  // 4. Next learning (다음 학습) 핸들러
+  const handleNextLearning = () => {
+    navigate('/mainpage/learnList');
+  };
 
-            {/* 4. 세션 완료 결과 카드 (주황색 배경) */}
-            <div className="learning-card complete-card">
-                
-                <h1 className="session-complete-title">
-                    Session Complete!
-                </h1>
-                
-                {/* 결과 박스 (검은색 배경) */}
-                <div className="results-box">
-                    
-                    {/* 1. 학습 이름: Casual_Emotions Result */}
-                    <h2 className="comresults-topic-title">
-                        {topicName} Result
-                    </h2>
+  return (
+    <div className="learn-complete-container">
+      <Header hasBackButton />
 
-                    {/* 2. 정답 수: 18/25 Vocabularies correct */}
-                    <ResultRow 
-                        icon={CheckCircle} 
-                        value={`${correctCount}/${totalCount} Vocabularies correct`} 
-                    />
+      <Mascot image={characterImageSrc} text={speechBubbleText} />
 
-                    {/* 3. 학습 시간: **formatDuration 함수 사용** */}
-                    <ResultRow 
-                        icon={Clock} 
-                        value={learningTime} 
-                    />
+      {/* 4. 세션 완료 결과 카드 (주황색 배경) */}
+      <div className="learning-card complete-card">
+        <h1 className="session-complete-title">Session Complete!</h1>
 
-                    {/* 4. 날짜: **getFormattedCompletionDate 함수 사용** */}
-                    <ResultRow 
-                        icon={Calendar} 
-                        value={completionDate} 
-                    />
-                </div>
+        {/* 결과 박스 (검은색 배경) */}
+        <div className="results-box">
+          {/* 1. 학습 이름: Casual_Emotions Result */}
+          <h2 className="comresults-topic-title">{topicName} Result</h2>
 
-                {/* Review / Try Again 버튼 */}
-                <div className="action-buttons-row">
-                    <button 
-                        onClick={handleReview} 
-                        className="action-button white-bg"
-                    >
-                        Review
-                    </button>
-                    <button 
-                        onClick={handleTryAgain} 
-                        className="action-button white-bg"
-                    >
-                        Try again
-                    </button>
-                </div>
+          {/* 2. 정답 수: 18/25 Vocabularies correct */}
+          <ResultRow
+            icon={CheckCircle}
+            value={`${correctCount}/${totalCount} Vocabularies correct`}
+          />
 
-                {/* Next learning 버튼 */}
-                <button 
-                    onClick={handleNextLearning} 
-                    className="next-learning-button"
-                >
-                    Next learning
-                </button>
-            </div>
-            
+          {/* 3. 학습 시간: **formatDuration 함수 사용** */}
+          <ResultRow icon={Clock} value={learningTime} />
+
+          {/* 4. 날짜: **getFormattedCompletionDate 함수 사용** */}
+          <ResultRow icon={Calendar} value={completionDate} />
         </div>
-    );
+
+        {/* Review / Try Again 버튼 */}
+        <div className="action-buttons-row">
+          <button onClick={handleReview} className="action-button white-bg">
+            Review
+          </button>
+          <button onClick={handleTryAgain} className="action-button white-bg">
+            Try again
+          </button>
+        </div>
+
+        {/* Next learning 버튼 */}
+        <button onClick={handleNextLearning} className="next-learning-button">
+          Next learning
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default LearnComplete;

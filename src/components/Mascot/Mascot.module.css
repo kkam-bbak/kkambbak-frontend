@@ -1,0 +1,41 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+}
+
+.message {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-grayscale-7);
+  text-align: center;
+  background-color: var(--color-primary-orange);
+  border-radius: 10px;
+}
+
+.message::after {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  content: '';
+  background-color: var(--color-primary-orange);
+  clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+  transform: translateX(-50%) rotate(180deg);
+}
+
+.image {
+  width: 92px;
+}
+
+.text {
+  margin: 0;
+  white-space: pre-line;
+}

@@ -1,16 +1,18 @@
-@import '../../styles/page-base.css';
-
 .splash-container {
-  background-color: #ff5000;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-primary-orange);
 }
 
 .splash-content {
   display: flex;
   flex-direction: column;
+  gap: 20px;
   align-items: center;
   justify-content: center;
-  gap: 20px;
 }
 
 .splash-icon {
@@ -20,9 +22,11 @@
 }
 
 @keyframes splash-bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-15px);
   }

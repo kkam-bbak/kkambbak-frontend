@@ -1,7 +1,7 @@
-@import '../../styles/page-base.css';
-
-.pageContainer {
-  composes: page-container from '../../styles/page-base.css';
+.verifyEmailContainer {
+  width: 100%;
+  align-items: center;
+  position: relative;
 }
 
 /* 뒤로가기 버튼 */
@@ -25,12 +25,6 @@
   object-fit: contain;
 }
 
-.verifyEmailContainer {
-  background-color: #000000;
-  align-items: center;
-  position: relative;
-}
-
 .verifyEmailContent {
   display: flex;
   flex-direction: column;
@@ -48,7 +42,7 @@
 
 /* 안내 메시지 말풍선 */
 .infoBubble {
-  background-color: #FF5000;
+  background-color: #ff5000;
   color: #1b1b1b;
   padding: 20px 24px;
   border-radius: 10px;
@@ -73,7 +67,7 @@
   height: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-top: 12px solid #FF5000;
+  border-top: 12px solid #ff5000;
 }
 
 .infoTitle {
@@ -102,7 +96,7 @@
 
 /* 입력 박스 (주황색 배경 - 버튼 포함) */
 .inputBox {
-  background-color: #FF5000;
+  background-color: #ff5000;
   color: #1b1b1b;
   padding: 20px 20px 80px 20px;
   border-radius: 20px 20px 0 0;
@@ -119,11 +113,11 @@
 
 /* 만료 상태 - 배경 어둡게 */
 .inputBox.expired {
-  background-color: #A53818;
+  background-color: #a53818;
 }
 
 .expired {
-  background-color: #A53818;
+  background-color: #a53818;
 }
 
 /* 입력 라벨 */
@@ -164,11 +158,11 @@
 }
 
 .otpInput.error {
-  color: #FF0000 !important;
+  color: #ff0000 !important;
 }
 
 .error {
-  color: #FF0000 !important;
+  color: #ff0000 !important;
 }
 
 /* 타이머 */
@@ -181,13 +175,13 @@
 }
 
 .timerDisplay.expired {
-  color: #8B0000;
+  color: #8b0000;
   font-weight: 700;
 }
 
 /* 에러 메시지 */
 .errorMessage {
-  color: #8B0000;
+  color: #8b0000;
   font-size: 12px;
   font-weight: 600;
   text-align: center;
@@ -221,7 +215,7 @@
   top: 5%;
   left: 0;
   right: 0;
-  background-color: #FF5000;
+  background-color: #ff5000;
   border-radius: 20px;
   width: 100%;
   box-sizing: border-box;

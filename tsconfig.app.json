@@ -10,7 +10,13 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vite/client"]        // ← 중요 (CSS import, env 타입)
+    "types": ["vite/client"], // ← 중요 (CSS import, env 타입)
+
+    /* Path alias */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src"]
 }

@@ -1,47 +1,52 @@
-@import '../../styles/page-base.css';
-
-.pageContainer {
-  composes: page-container from '../../styles/page-base.css';
+.loginContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 16px;
 }
 
-.loginContainer {
-  background-color: #000000;
+.characterContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
   align-items: center;
 }
 
 .loginContent {
   display: flex;
   flex-direction: column;
+  gap: 45px;
   align-items: center;
   justify-content: center;
-  gap: 45px;
   height: 100%;
 }
 
 /* 인사말 말풍선 */
 .greetingBubble {
-  background-color: #ff5000;
-  color: #1b1b1b;
+  position: relative;
   padding: 12px 24px;
-  border-radius: 10px;
-  text-align: center;
   font-size: 16px;
   font-weight: 600;
-  position: relative;
+  color: #1b1b1b;
+  text-align: center;
+  background-color: #ff5000;
+  border-radius: 10px;
 }
 
 /* 말풍선 꼬리 */
 .greetingBubble::after {
-  content: '';
   position: absolute;
   bottom: -12px;
   left: 50%;
-  transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
+  content: '';
   border-top: 12px solid #ff5000;
+  border-right: 10px solid transparent;
+  border-left: 10px solid transparent;
+  transform: translateX(-50%);
 }
 
 /* 캐릭터 플레이스홀더 */
@@ -61,51 +66,48 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  max-width: 340px;
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 /* 로그인 버튼 */
 .loginButton {
-  width: 100%;
-  padding: 14px 16px;
-  border: none;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
+  gap: 8px;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background-color: #ffffff;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 600;
   color: #1b1b1b;
+  cursor: pointer;
+  background-color: #fff;
+  border: none;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
 }
 
 .loginButton:hover {
   background-color: #e3e3e3;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
 }
 
 .loginButton:active {
+  color: #fff;
   background-color: #757575;
-  color: #ffffff;
 }
 
 .loginButton:disabled {
-  background-color: #e3e3e3;
   color: #757575;
   cursor: not-allowed;
+  background-color: #e3e3e3;
   opacity: 0.6;
 }
 
 .googleIcon {
-  font-weight: 700;
   font-size: 16px;
+  font-weight: 700;
   color: #4285f4;
 }

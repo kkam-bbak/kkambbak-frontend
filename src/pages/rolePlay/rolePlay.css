@@ -1,6 +1,6 @@
-/* -------------------- 외부 스타일 import (유지) -------------------- */
-@import '../../styles/page-base.css';
-@import '../../styles/Role-common.css'; 
+.role-play-container {
+  width: 100%;
+}
 
 .rolePlay-bubble{
     width: 274px;
@@ -17,12 +17,15 @@
 } */
 
 /* START 단계에서 카드를 숨기기 위한 클래스 */
+
 /* .role-content-window.slide-out {
     transform: translateY(100%);
 } */
 
 /* ================================================= */
+
 /* 2. 카드 내부 컴포넌트 스타일             */
+
 /* ================================================= */
 
 /* 카드 타이틀 바 (상단 'Role Play_At a Cafe 01/02' 줄) */
@@ -35,15 +38,17 @@
     padding-right: 20px;
     background-color: transparent; /* content-window의 파란색 배경을 사용 */
 }
+
 .card-title-text {
     font-size: 18px;
     font-weight: 500;
     margin: 0;
     color: black; /* 파란색 배경 위 흰색 텍스트 */
 }
+
 .card-step-text {
-    font-size: 18px;
-    font-weight: 500;
+  font-size: 18px;
+  font-weight: 500;
 }
 
 
@@ -77,8 +82,8 @@
 
 
 .divider-line {
-    width: 328px;
-    border: 1px solid black;
+  width: 328px;
+  border: 1px solid black;
 }
 
 .text-line {
@@ -110,8 +115,9 @@
     color: #757575; /* Gray-500 (비활성화 기본 - 회색) */
     margin-right: 15px;
 }
+
 .tts-button.active {
-    color: white; /* 활성화 시 흰색 */
+  color: white; /* 활성화 시 흰색 */
 }
 
 /* 📝 로마자 발음 (이미지 1번처럼 두 번째 줄에 위치) */
@@ -125,11 +131,14 @@
 
 .text-line.romanized-line{
 }
+
 .romanized-text.correct {
-    color: rgba(57, 255, 20, 1); /* Green-400 (초록색) */
+  color: rgb(57 255 20 / 100%); /* Green-400 (초록색) */
 }
-.romanized-text.incorrect, .romanized-text.oos {
-    color: rgba(255, 0, 0, 1); /* Red-400 (빨간색) */
+
+.romanized-text.incorrect,
+.romanized-text.oos {
+  color: rgb(255 0 0 / 100%); /* Red-400 (빨간색) */
 }
 
 /* 🎙️ 작은 마이크 아이콘 (검은색 박스 내) */
@@ -140,8 +149,9 @@
     transition: color 0.2s;
     margin-right: 13px;
 }
+
 .small-mic-icon.active {
-    color: white; /* 녹음 중 흰색 */
+  color: white; /* 녹음 중 흰색 */
 }
 
 
@@ -224,7 +234,6 @@
     color: black;
 }
 
-
 /* -------------------- 4. 메인 마이크 버튼 -------------------- */
 .mic-area {
     position: absolute; 
@@ -262,25 +271,26 @@
 
 /* 마이크 버튼 상태 */
 .main-mic-button.off {
-    background-color: white;
-
+  background-color: white;
 }
+
 .main-mic-button.off .main-mic-icon {
-    color: black;
+  color: black;
 }
 
 .main-mic-button.on {
-    background-color: black;
-    color: white;
+  color: white;
+  background-color: black;
 }
+
 .main-mic-button.on .main-mic-icon {
-    color: white;
+  color: white;
 }
 
 .main-mic-button.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    background-color: #E3E3E3;
+  cursor: not-allowed;
+  background-color: #e3e3e3;
+  opacity: 0.3;
 }
 
 /* 마이크 상태 텍스트 (ON/OFF) */

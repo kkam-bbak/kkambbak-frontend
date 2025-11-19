@@ -1,17 +1,7 @@
-@import '../../styles/page-base.css';
-
-.pageContainer {
-  composes: page-container from '../../styles/page-base.css';
-}
-
 .profileCreationContainer {
-  background-color: #000000;
-  align-items: center;
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  height: 100%;
   padding: 0;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  background-color: #000;
 }
 
 /* logout or login */
@@ -26,81 +16,82 @@
   position: absolute;
   top: 10px;
   right: 10px;
+  z-index: 100;
+  padding: 5px 10px;
+  font-size: 14px;
+  color: #757575;
+  cursor: pointer;
   background: none;
   border: none;
-  color: #757575;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 5px 10px;
   transition: color 0.2s ease;
-  z-index: 100;
 }
 
 .logoutButton:hover {
-  color: #ffffff;
+  color: #fff;
 }
 
 .characterSection {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-  padding: 40px 20px 20px;
   flex-shrink: 0;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
   height: 280px;
+  padding: 40px 20px 20px;
   overflow: hidden;
 }
 
 .speechBubble {
-  background-color: #ff5000;
-  border-radius: 10px;
-  padding: 12px 24px;
-  text-align: center;
-  color: #1b1b1b;
-  font-size: 16px;
-  font-weight: 600;
   position: relative;
   top: 50px;
-  width: 170px;
-  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 170px;
+  height: 40px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1b1b1b;
+  text-align: center;
+  background-color: #ff5000;
+  border-radius: 10px;
 }
 
 .speechBubble::after {
-  content: '';
   position: absolute;
   bottom: -10px;
   left: 50%;
-  transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
+  content: '';
   border-top: 10px solid #ff5000;
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
+  transform: translateX(-50%);
 }
 
 .characterImage {
+  position: relative;
+  top: 45px;
   width: 80px;
   height: auto;
   object-fit: contain;
-  position: relative;
-  top: 45px;
 }
 
 .orangeBox {
-  width: 100%;
-  background-color: #ff5000;
-  border-radius: 20px 20px 0 0;
-  padding: 10px 12px 30px 12px;
+  position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  position: relative;
+  width: 100%;
+  padding: 10px 12px 30px;
   overflow: hidden;
-  margin-top: -40px;
+  background-color: #ff5000;
+  border-radius: 20px 20px 0 0;
+
+  /* margin-top: -40px; */
 }
 
 .formContainer {
@@ -126,42 +117,42 @@
 }
 
 .formLabel {
-  color: #000;
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
+  color: #000;
 }
 
 .formSection:has(.imageUploadArea) {
-  align-items: center;
   gap: 4px;
+  align-items: center;
 }
 
 .formSection:has(.imageUploadArea) .formLabel {
-  text-align: center;
   width: 100%;
+  text-align: center;
 }
 
 .imageUploadArea {
   position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
 .imageUploadLabel {
   display: flex;
-  justify-content: center;
+  flex-shrink: 0;
   align-items: center;
+  justify-content: center;
   width: 120px;
   height: 150px;
+  margin: 0 auto;
+  cursor: pointer;
+  background-color: #101010;
   border: none;
   border-radius: 10px;
-  background-color: #101010;
-  cursor: pointer;
   transition: background-color 0.2s ease;
-  flex-shrink: 0;
-  margin: 0 auto;
 }
 
 .imageUploadLabel:hover {
@@ -177,8 +168,8 @@
 
 .imagePlaceholder {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
 }
@@ -189,16 +180,16 @@
 }
 
 .formInput {
+  box-sizing: border-box;
   width: 100%;
   height: 40px;
   padding: 10px 12px;
-  border: 1.5px solid #000;
-  border-radius: 10px;
-  background-color: #101010;
-  color: #ffffff;
   font-size: 14px;
   font-weight: 500;
-  box-sizing: border-box;
+  color: #fff;
+  background-color: #101010;
+  border: 1.5px solid #000;
+  border-radius: 10px;
   transition: all 0.2s ease;
 }
 
@@ -208,108 +199,108 @@
 
 .formInput:focus {
   outline: none;
-  border-color: #ffffff;
   background-color: #1a1a1a;
-  box-shadow: 0 0 8px rgba(255, 80, 0, 0.3);
+  border-color: #fff;
+  box-shadow: 0 0 8px rgb(255 80 0 / 30%);
 }
 
 .formSelect {
+  box-sizing: border-box;
   width: 100%;
   height: 40px;
   padding: 10px 12px;
-  border: 1.5px solid #000;
-  border-radius: 10px;
-  background-color: #101010;
-  color: #ffffff;
+  padding-right: 36px;
   font-size: 14px;
   font-weight: 500;
-  box-sizing: border-box;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  color: #fff;
   appearance: none;
+  cursor: pointer;
+  background-color: #101010;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 20px;
-  padding-right: 36px;
+  border: 1.5px solid #000;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 .formSelect:focus {
   outline: none;
-  border-color: #ffffff;
   background-color: #1a1a1a;
-  box-shadow: 0 0 8px rgba(255, 80, 0, 0.3);
+  border-color: #fff;
+  box-shadow: 0 0 8px rgb(255 80 0 / 30%);
 }
 
 .formSelect option {
+  color: #fff;
   background-color: #101010;
-  color: #ffffff;
 }
 
 .nextButton {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 40px;
   padding: 0;
-  border: none;
-  border-radius: 10px;
+  margin-top: 12px;
   font-size: 16px;
   font-weight: 600;
   line-height: 40px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-  margin-top: 12px;
   white-space: nowrap;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  transition: all 0.3s ease;
 }
 
 .nextButton.active {
-  background-color: #ffffff;
   color: #1b1b1b;
+  background-color: #fff;
 }
 
 .nextButton.active:hover {
   background-color: #e3e3e3;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
 }
 
 .nextButton.active:active {
+  color: #fff;
   background-color: #757575;
-  color: #ffffff;
 }
 
 .nextButton.disabled {
-  background-color: #ffffff;
   color: #e3e3e3;
   cursor: not-allowed;
+  background-color: #fff;
 }
 
 /* Responsive */
 @media (max-width: 600px) {
   .profileCreationContainer {
-    overflow-y: auto;
     justify-content: flex-end;
+    overflow-y: auto;
   }
 
   .characterSection {
-    padding: 20px 20px 10px;
-    flex-shrink: 0;
     position: relative;
     z-index: 10;
+    flex-shrink: 0;
+    padding: 20px 20px 10px;
     margin-bottom: -30px;
   }
 
   .orangeBox {
-    min-height: 200px;
-    gap: 10px;
-    border-radius: 20px 20px 0 0;
-    padding-bottom: 30px;
-    padding-top: 20px;
-    justify-content: flex-end;
     flex-shrink: 0;
+    gap: 10px;
+    justify-content: flex-end;
+    min-height: 200px;
+    padding-top: 20px;
+    padding-bottom: 30px;
     margin-top: 0;
+    border-radius: 20px 20px 0 0;
   }
 
   .formContainer {
@@ -317,7 +308,7 @@
   }
 
   .nextButton {
-    margin-bottom: 10px;
     margin-top: 12px;
+    margin-bottom: 10px;
   }
 }

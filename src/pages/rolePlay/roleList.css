@@ -1,141 +1,139 @@
-@import '../../styles/page-base.css'; 
-@import '../../styles/Role-common.css';
+.role-list-container {
+  width: 100%;
+}
 
 /* -------------------- 1. 상단 말풍선 섹션 (Role-common.css 오버라이드) -------------------- */
-.roleList-bubble{
-    width: 206px;
-    height: 44px;
-    top: 60px;
-    left: 50%; /* 중앙 정렬을 위해 left: 50%와 transform: translateX(-50%) 사용 권장 */
-    transform: translateX(-50%);
+.roleList-bubble {
+  top: 60px;
+  left: 50%; /* 중앙 정렬을 위해 left: 50%와 transform: translateX(-50%) 사용 권장 */
+  width: 206px;
+  height: 44px;
+  transform: translateX(-50%);
 }
 
 /* -------------------- 2. 하단 목록 섹션 (Role-common.css의 .content-window 사용) -------------------- */
 
 /* 목록 헤더 (Role Play 타이틀 및 Subscribe 버튼) */
 .role-list-content-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background-color: transparent; /* content-window의 파란색 배경을 사용 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background-color: transparent; /* content-window의 파란색 배경을 사용 */
 }
 
 .role-list-title {
-    font-size: 18px;
-    font-weight: 500;
-    margin: 0;
-    color: black; /* 파란색 배경 위 흰색 텍스트 */
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: black; /* 파란색 배경 위 흰색 텍스트 */
 }
 
 .subscribe-button {
-    width: 81px;
-    height: 22px;
-    background-color: white; 
-    color: black;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: 600;
-    font-size: 10px;
-    cursor: pointer;
+  width: 81px;
+  height: 22px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: black;
+  cursor: pointer;
+  background-color: white;
+  border: none;
+  border-radius: 5px;
 }
 
 /* 역할극 목록 컨테이너 (스크롤 가능) */
 .role-list-items-container {
-    padding: 0px 15px 10px 15px;
-    /* content-window가 overflow: hidden을 가지므로, 스크롤바가 안 보이게 설정 */
-    overflow-y: scroll; 
-    
-    /* content-window의 height 430px 기준, 헤더(약 60px)를 제외한 나머지 공간 사용 */
-    height: calc(100% - 60px); 
+  /* content-window의 height 430px 기준, 헤더(약 60px)를 제외한 나머지 공간 사용 */
+  height: calc(100% - 60px);
+  padding: 0 15px 10px;
 
+  /* content-window가 overflow: hidden을 가지므로, 스크롤바가 안 보이게 설정 */
+  overflow-y: scroll;
 }
 
 /* 🔥 content-window 스크롤바 제거 (RoleList의 요구사항) */
 .content-window::-webkit-scrollbar,
 .role-list-items-container::-webkit-scrollbar {
-    display: none; 
+  display: none;
 }
+
 .content-window,
 .role-list-items-container {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* -------------------- 3. 단어 개별 항목 (선택/비선택 상태 처리) -------------------- */
 
 .role-item-row {
-    width: 100%; /* 부모(padding 15px이 적용된 영역)에 꽉 차도록 100% */
-    height: 82px;
-    
-    /* 🔥 정렬: 수직 정렬로 변경 */
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    
-    background-color: black; 
-    color: #484848; /* 🔥 기본 (선택 안 됨) 텍스트 색상을 회색으로 설정 */
-    border-radius: 10px;
-    padding: 10px 15px; 
-    margin-bottom: 8px;
-    box-sizing: border-box;
-    cursor: pointer;
-    transition: color 0.1s;
+  box-sizing: border-box;
+
+  /* 🔥 정렬: 수직 정렬로 변경 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%; /* 부모(padding 15px이 적용된 영역)에 꽉 차도록 100% */
+  height: 82px;
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  color: #484848; /* 🔥 기본 (선택 안 됨) 텍스트 색상을 회색으로 설정 */
+  cursor: pointer;
+  background-color: black;
+  border-radius: 10px;
+  transition: color 0.1s;
 }
 
 /* 🔥 선택된 항목의 스타일 */
 .role-item-row.selected {
-    color: white; /* 🔥 텍스트 색상 흰색으로 변경 */
+  color: white; /* 🔥 텍스트 색상 흰색으로 변경 */
 }
 
 /* 1. 제목 및 Start 버튼을 감싸는 헤더 (항목의 첫 줄) */
 .role-item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 13px;
 }
 
 .role-item-title {
-    font-size: 18px;
-    font-weight: 500;
-    color: inherit; /* 부모(.role-item-row)의 색상을 상속받음 (회색/흰색) */
+  font-size: 18px;
+  font-weight: 500;
+  color: inherit; /* 부모(.role-item-row)의 색상을 상속받음 (회색/흰색) */
 }
 
 /* 2. 시간 정보를 담는 영역 (항목의 두 번째 줄) */
 .role-item-info {
-
-    display: flex;
-    align-items: center;
-    justify-content: flex-end; /* 오른쪽 정렬 */
-    width: 100%;
-    gap: 11px;
-
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  width: 100%;
 }
 
 .role-start-button {
-    /* 이 버튼은 isSelected가 아닐 때 JSX에서 렌더링되지 않으므로, 스타일은 Selected 상태를 반영 */
-    width: 65px;
-    height: 20px;
-    background-color: white; 
-    color: black;
-    border: none;
-    padding: 0;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: auto; /* 제목과 Start 버튼이 양 끝에 붙도록 (role-item-header 내부) */
+  /* 이 버튼은 isSelected가 아닐 때 JSX에서 렌더링되지 않으므로, 스타일은 Selected 상태를 반영 */
+  width: 65px;
+  height: 20px;
+  padding: 0;
+  margin-left: auto; /* 제목과 Start 버튼이 양 끝에 붙도록 (role-item-header 내부) */
+  color: black;
+  cursor: pointer;
+  background-color: white;
+  border: none;
+  border-radius: 5px;
 }
 
 .role-time {
-    font-size: 12px;
-    font-weight: 500;
-    color: inherit; 
+  font-size: 12px;
+  font-weight: 500;
+  color: inherit;
 }
 
 .role-time-icon {
-    width: 10px;
-    height: 10px;
-    color: inherit; 
+  width: 10px;
+  height: 10px;
+  color: inherit;
 }
