@@ -1,8 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './rolePlay.css';
+import { http } from '../../apis/http';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
+
+import CharacterSmile from '@/assets/Character-Smile.png';
+import CharacterJump from '@/assets/Character-Jump.png';
+import CharacterGloomy from '@/assets/Character-Gloomy.png';
+import CharacterWrong from '@/assets/Character-Wrong.png';
+import CharacterBasic from '@/assets/Character-Basic.png';
+import CharacterSullen from '@/assets/Character-Sullen.png';
 
 // --- 다중 턴 시나리오 데이터 구조 정의 ---
 const SCENARIO_SEQUENCE = [
@@ -91,14 +100,20 @@ const BUBBLE_TEXT = {
     OOS: "That's out of our Learning Scope\ntry to focus on your Study", 
 };
 
+// STEPS는 이 코드 외부에 정의되어 있다고 가정합니다. (예: const STEPS = { START: 'START', GRADING: 'GRADING', ... })
 const getCharacterImage = (step, gradingResult) => {
-    if (step === STEPS.START) return CharacterSmile;
-    if (step === STEPS.GRADING || step === STEPS.CHOICE_FEEDBACK || step === STEPS.PRACTICE_GRADING) {
-        if (gradingResult === 'CORRECT') return CharacterJump;
-        if (gradingResult === 'INCORRECT') return CharacterGloomy; 
-        if (gradingResult === 'OOS') return CharacterSullen; 
-    }
-    return Character1; 
+    // 1. 시작 단계
+    if (step === STEPS.START) return 'smile'; // 'CharacterSmile' 대신 문자열 'smile' 반환
+
+    // 2. 채점 또는 피드백 단계
+    if (step === STEPS.GRADING || step === STEPS.CHOICE_FEEDBACK || step === STEPS.PRACTICE_GRADING) {
+        if (gradingResult === 'CORRECT') return CharacterJump; // 'CharacterJump' 대신 문자열 'jump' 반환
+        if (gradingResult === 'INCORRECT') return CharacterGloomy; // 'CharacterGloomy' 대신 문자열 'gloomy' 반환
+        if (gradingResult === 'OOS') return CharacterSullen; // 'CharacterSullen'이 없으므로, 유사한 'wrong' 사용 (다른 키로 변경 가능)
+    }
+
+    // 3. 기타/기본값
+    return CharacterBasic; // 'Character1' 대신 문자열 'basic' 반환
 };
 
 const speakKoreanText = (text, onFinish = null) => {
@@ -714,7 +729,7 @@ const handleChoiceSelect = useCallback(() => {
                             src={characterImage} 
                             alt="Role Play Character" 
                             className="character-icon" 
-                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = Character1; }}
+                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = CharacterBasic; }}
                         />
                     </div>
                </div>

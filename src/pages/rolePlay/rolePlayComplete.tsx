@@ -1,7 +1,9 @@
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './rolePlayComplete.css';
-import CharacterShining from '../../assets/Character-Shining.png'; 
+import { http } from '../../apis/http';
+import  './rolePlayComplete.css';
+import Header from '@/components/layout/Header/Header';
+import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 
 
 // Mock 데이터 구조 (실제로는 props나 context를 통해 받아와야 합니다)
@@ -57,6 +59,10 @@ const TurnDisplay: React.FC<{ data: TurnData, index: number }> = ({ data, index 
 const RolePlayComplete: React.FC = () => {
     const navigate = useNavigate();
 
+
+    // 완료 페이지이므로, 보통 'shining'이나 'cute' 같은 긍정적인 이미지를 사용합니다.
+    const mascotImageShining: MascotImage = 'shining'; // 또는 'cute', 'smile'
+
     const handleTryAgain = useCallback(() => {
         // Try again 로직 (첫 턴으로 돌아가기 등)
         console.log("Attempting Try Again...");
@@ -83,7 +89,7 @@ const RolePlayComplete: React.FC = () => {
 
             <div className="character-placeholder">
                 <img 
-                    src={CharacterShining} 
+                    src={mascotImageShining} 
                     alt="Character Complete" 
                     className="character-icon" 
                 />
