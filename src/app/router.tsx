@@ -87,10 +87,6 @@ export const router = createBrowserRouter([
         path: 'payment',
         children: [
           {
-            index: true,
-            element: <PaymentGate />,
-          },
-          {
             path: 'checkout',
             element: <PaymentCheckoutPage />,
           },
