@@ -6,8 +6,8 @@ import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   cancelSubscriptions,
-  getSubscriptionActive,
   getSubscriptionPlans,
+  getSubscriptionStatus,
 } from '@/apis/subscriptions';
 import { useUser } from '@/stores/user';
 import Button from '@/components/Button/Button';
@@ -29,7 +29,7 @@ function PaymentReceiptPage() {
   });
   const { data: active } = useQuery({
     queryKey: ['subscriptions', 'active', user.accessToken],
-    queryFn: getSubscriptionActive,
+    queryFn: getSubscriptionStatus,
   });
 
   const { mutate } = useMutation({
