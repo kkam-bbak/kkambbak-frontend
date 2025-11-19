@@ -1,101 +1,50 @@
 // learnList.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { http } from '../../../apis/http';
 import './learnList.css';
-import LearnInfo from '../learnInfo/learnInfo'; // 🔥 경로 수정
+import LearnInfo from '../learnInfo/learnInfo';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
-// Topic 인터페이스는 유지
+
+// API 응답의 sessions 항목에 맞는 인터페이스 정의
+interface Session {
+  id: number;
+  title: string;
+  categoryName: 'TOPIK' | 'CASUAL'; // categoryName 추가
+  vocabularyCount: number; // API의 vocabularyCount 사용
+  completed: boolean;
+  durationSeconds: number;
+}
+
+// 화면에 표시할 Topic 인터페이스 (Session 기반)
 interface Topic {
   id: number;
   title: string;
   vocabularies: number;
-  time: string;
+  time: string; // durationSeconds를 변환하여 사용
   completed: boolean;
 }
 
 // 🔥 localStorage 키 정의 (최초 이용 확인용)
 const HAS_SEEN_INFO_KEY = 'hasSeenLearnInfo';
 
-// 데이터는 유지
-const topikList: Topic[] = [
-  {
-    id: 1,
-    title: 'Topik 1',
-    vocabularies: 30,
-    time: '4m 17s',
-    completed: false,
-  },
-  {
-    id: 2,
-    title: 'Topik 2',
-    vocabularies: 30,
-    time: '6m 20s',
-    completed: false,
-  },
-  {
-    id: 3,
-    title: 'Topik 3',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  {
-    id: 4,
-    title: 'Topik 4',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  {
-    id: 9,
-    title: 'Topik 5',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  {
-    id: 10,
-    title: 'Topik 6',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-];
+// API의 durationSeconds를 'Xm Ys' 형식으로 변환하는 헬퍼 함수
+const formatDuration = (durationSeconds: number): string => {
+  const minutes = Math.floor(durationSeconds / 60);
+  const seconds = durationSeconds % 60;
+  return `${minutes}m ${seconds}s`;
+};
 
-const casualList: Topic[] = [
-  {
-    id: 5,
-    title: 'Emotions',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  {
-    id: 6,
-    title: 'Fruits',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  {
-    id: 7,
-    title: 'Places',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  { id: 8, title: 'Body', vocabularies: 30, time: '5m 15s', completed: false },
-  { id: 11, title: 'Food', vocabularies: 30, time: '5m 15s', completed: false },
-  {
-    id: 12,
-    title: 'Travel',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-];
+// Session 데이터를 Topic 데이터로 변환하는 함수
+const sessionToTopic = (session: Session): Topic => ({
+  id: session.id,
+  title: session.title,
+  vocabularies: session.vocabularyCount,
+  time: formatDuration(session.durationSeconds),
+  completed: session.completed,
+});
 
 // TopicCard 컴포넌트 정의는 유지
 interface TopicCardProps {
@@ -160,6 +109,111 @@ const LearnList: React.FC = () => {
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
 
+  // 🔥 API 상태 관리
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | number | null>(null);
+  const [hasNext, setHasNext] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // 스크롤 영역 참조
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // 학습 목록을 API에서 가져오는 함수
+  const fetchSessions = useCallback(
+    async (
+      category: 'topik' | 'casual',
+      cursor: string | number | null,
+      isInitial: boolean = false,
+    ) => {
+      if (isLoading || (!hasNext && !isInitial)) return;
+
+      setIsLoading(true);
+      const categoryParam = category.toUpperCase();
+      const limit = 4; // API 명세에 limit 기본값 4 참고
+
+      try {
+        const response = await http.get('/api/v1/learning/sessions', {
+          params: {
+            category: categoryParam,
+            cursor: cursor || undefined, // 첫 페이지 요청 시 cursor는 null/undefined
+            limit: limit,
+          },
+        });
+
+        const data = response.data.body;
+        const newSessions: Session[] = data.sessions || [];
+        
+        // 초기 로드인 경우 데이터를 덮어쓰고, 다음 페이지 로드인 경우 기존 데이터에 추가
+        setSessions((prevSessions) => 
+            isInitial ? newSessions : [...prevSessions, ...newSessions]
+        );
+        
+        setNextCursor(data.nextCursor);
+        setHasNext(data.hasNext);
+        
+        // 첫 페이지 로드 시 첫 번째 항목을 활성화
+        if (isInitial && newSessions.length > 0) {
+            setActiveTopicId(newSessions[0].id);
+        }
+
+      } catch (error) {
+        console.error('Failed to fetch learning sessions:', error);
+        // 에러 처리: 목록을 비우거나 에러 메시지를 표시할 수 있음
+        if (isInitial) {
+            setSessions([]);
+            setActiveTopicId(null);
+        }
+        setHasNext(false); // 에러 발생 시 추가 로드 방지
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isLoading, hasNext],
+  );
+
+  // 탭 변경 시 초기 목록 로드
+  useEffect(() => {
+    // 탭 변경 시 상태 초기화
+    setSessions([]);
+    setNextCursor(null);
+    setHasNext(true);
+    setActiveTopicId(null); 
+    
+    fetchSessions(activeTab, null, true);
+  }, [activeTab, fetchSessions]);
+
+  // 스크롤 이벤트 핸들러 (무한 스크롤)
+  const handleScroll = useCallback(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    // 스크롤이 끝에 도달했는지 확인
+    const isNearBottom =
+      scrollContainer.scrollTop + scrollContainer.clientHeight >=
+      scrollContainer.scrollHeight - 50; // 바닥에서 50px 이내
+
+    if (isNearBottom && hasNext && !isLoading) {
+      fetchSessions(activeTab, nextCursor);
+    }
+  }, [hasNext, isLoading, nextCursor, activeTab, fetchSessions]);
+  
+  // 스크롤 이벤트 리스너 등록/해제
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [handleScroll]); // handleScroll이 바뀔 때마다 리스너 갱신
+
+  // sessions 배열을 화면 표시용 Topic 배열로 변환
+  const topicsToDisplay: Topic[] = sessions.map(sessionToTopic);
+
+
   // 🔥 학습 시작 컨펌 후 최종 라우팅
   const handleConfirmStart = (topicId: number) => {
     handleCloseInfoModal();
@@ -195,25 +249,18 @@ const LearnList: React.FC = () => {
     setActiveTopicId(topicId);
   };
 
+  // 탭 변경 로직
+  const handleTabChange = (tab: 'topik' | 'casual') => {
+    if (tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  };
+  
   const activeBubbleText =
     activeTab === 'topik'
       ? 'Should I help you prepare\nfor the exam?'
       : 'Can I help you with daily conversation?';
 
-  const topicsToDisplay = activeTab === 'topik' ? topikList : casualList;
-
-  // 디폴트 활성화 로직
-  useEffect(() => {
-    if (topicsToDisplay.length > 0) {
-      setActiveTopicId(topicsToDisplay[0].id);
-    }
-  }, [topicsToDisplay]);
-
-  // 탭 변경 로직
-  const handleTabChange = (tab: 'topik' | 'casual') => {
-    setActiveTab(tab);
-    setActiveTopicId(null);
-  };
 
   return (
     <div className="content-lit-container">
@@ -239,17 +286,27 @@ const LearnList: React.FC = () => {
         </div>
 
         {/* 학습 목록 */}
-        <div className="scrollable-list">
-          {topicsToDisplay.map((topic) => (
-            <TopicCard
-              key={topic.id}
-              topic={topic}
-              onStart={handleStartLearning}
-              onCardClick={handleCardClick}
-              isActive={topic.id === activeTopicId}
-              isCompleted={topic.completed}
-            />
-          ))}
+        <div className="scrollable-list" ref={scrollRef}>
+          {topicsToDisplay.length === 0 && !isLoading ? (
+            <p className="no-sessions-message">No learning sessions available.</p>
+          ) : (
+            topicsToDisplay.map((topic) => (
+              <TopicCard
+                key={topic.id}
+                topic={topic}
+                onStart={handleStartLearning}
+                onCardClick={handleCardClick}
+                isActive={topic.id === activeTopicId}
+                isCompleted={topic.completed}
+              />
+            ))
+          )}
+          {/* 로딩 표시 */}
+          {isLoading && (
+            <div className="loading-indicator">
+              <p>Loading...</p>
+            </div>
+          )}
           <div style={{ height: '20px' }}></div>
         </div>
       </ContentSection>

@@ -1,6 +1,6 @@
 // LearnInfo.tsx
 import React, { useState, useEffect } from 'react';
-import './learnInfo.css';
+import styles from './learnInfo.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 
@@ -165,9 +165,9 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
       <Mascot image={getMascotImage()} text={currentSpeechText} />
       <div className="page-container ">
         {/* 학습 카드 영역 */}
-        <div className={`learning-card-info ${getCardClass()}`}>
+        <div className={`${styles.learningCardInfo} ${getCardClass()}`}>
           {/* 제목 및 페이지 */}
-          <div className="card-title-bar-info">
+          <div className={styles.cardTitleBarInfo}>
             <span className="topic-name-info">Casual_Emotions</span>
             <span className="word-count-info">{`01/${wordCount
               .toString()
@@ -175,22 +175,22 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
           </div>
 
           {/* 빈 영역 (이미지) */}
-          <div className={`word-display-area-info ${getInputClass('image')}`}>
+          <div className={`${styles.wordDisplayAreaInfo} ${getInputClass('image')}`}>
             {/* 🔥 내용은 완전히 비워둠 */}
           </div>
 
           {/* 단어 정보 입력 필드 */}
-          <div className="input-fields-container-info">
+          <div className={styles.inputFieldsContainerInfo}>
             {/* Romnized Row (스피커 포함) - First row */}
             <div
-              className={`input-row-info romnized-info ${getInputClass(
+              className={`${styles.inputRowInfo} ${getInputClass(
                 'romnized',
               )}`}
             >
               <label>Romnized</label>
               <input type="text" readOnly value={isFieldsActive ? '' : ''} />
               <button
-                className={`speaker-icon-info ${
+                className={`${styles.speakerIconInfo} ${
                   currentStep === 7 ? 'highlight-speaker' : ''
                 }`}
                 disabled={currentStep !== 7} // Step 7에서만 활성화

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
-import './learnComplete.css'; // CSS 파일 임포트
+import styles from './learnComplete.module.css'; // CSS 파일 임포트
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 
@@ -56,9 +56,9 @@ const ResultRow = ({
   icon: React.ElementType;
   value: string;
 }) => (
-  <div className="result-row">
-    <Icon className="result-icon" />
-    <span className="result-value">{value}</span>
+  <div className={styles.resultRow}>
+    <Icon className={styles.resultIcon}/>
+    <span className={styles.resultValue}>{value}</span>
   </div>
 );
 
@@ -121,19 +121,19 @@ const LearnComplete: React.FC = () => {
   };
 
   return (
-    <div className="learn-complete-container">
+    <div className={styles.learnCompleteContainer}>
       <Header hasBackButton />
 
       <Mascot image={characterImageSrc} text={speechBubbleText} />
 
       {/* 4. 세션 완료 결과 카드 (주황색 배경) */}
-      <div className="learning-card complete-card">
-        <h1 className="session-complete-title">Session Complete!</h1>
+      <div className={styles.completeCard}>
+        <h1 className={styles.sessionCompleteTitle}>Session Complete!</h1>
 
         {/* 결과 박스 (검은색 배경) */}
-        <div className="results-box">
+        <div className={styles.resultsBox}>
           {/* 1. 학습 이름: Casual_Emotions Result */}
-          <h2 className="comresults-topic-title">{topicName} Result</h2>
+          <h2 className={styles.comresultsTopicTitle}>{topicName} Result</h2>
 
           {/* 2. 정답 수: 18/25 Vocabularies correct */}
           <ResultRow
@@ -149,17 +149,17 @@ const LearnComplete: React.FC = () => {
         </div>
 
         {/* Review / Try Again 버튼 */}
-        <div className="action-buttons-row">
-          <button onClick={handleReview} className="action-button white-bg">
+        <div className={styles.actionButtonsRow}>
+          <button onClick={handleReview} className={styles.actionButton}>
             Review
           </button>
-          <button onClick={handleTryAgain} className="action-button white-bg">
+          <button onClick={handleTryAgain} className={styles.actionButton}>
             Try again
           </button>
         </div>
 
         {/* Next learning 버튼 */}
-        <button onClick={handleNextLearning} className="next-learning-button">
+        <button onClick={handleNextLearning} className={styles.nextLearningButton}>
           Next learning
         </button>
       </div>

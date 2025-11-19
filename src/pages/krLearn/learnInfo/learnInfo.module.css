@@ -42,7 +42,7 @@
 
 /* -------------------- 3. 학습 카드 영역 (슬라이드 애니메이션 적용) -------------------- */
 
-.learning-card-info {
+.learningCardInfo {
   position: absolute;
   width: 100%;
   height: 430px;
@@ -61,7 +61,7 @@
 }
 
 /* 🔥🔥 카드 전체의 흐림 효과 오버레이 🔥🔥 */
-.learning-card-info::before {
+.learningCardInfo::before {
   content: '';
   position: absolute;
   top: 0;
@@ -77,12 +77,12 @@
 }
 
 /* 🔥 Step 3, 4, 5, 6, 7, 8: 흐림 효과 적용 */
-.learning-card-info.card-fade::before {
+.learningCardInfo.card-fade::before {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
 /* 제목 및 페이지 */
-.card-title-bar-info {
+.cardTitleBarInfo {
   display: flex;
   justify-content: space-between;
   font-weight: 500;
@@ -93,7 +93,7 @@
 
 /* 빈 영역 */
 /* 빈 영역 (검은색 박스) */
-.word-display-area-info {
+.wordDisplayAreaInfo {
   width: 100%;
   height: 160px; /* 높이 고정 유지 */
 
@@ -110,14 +110,14 @@
 }
 
 /* 입력 필드 컨테이너 */
-.input-fields-container-info {
+.inputFieldsContainerInfo {
   display: flex;
   flex-direction: column;
   gap: 8px; /* 🔥 간격 8px */
   margin-bottom: 8px; /* 마이크 버튼과의 간격 8px */
 }
 
-.input-row-info {
+.inputRowInfo {
   display: 328px;
   align-items: center;
   height: 40px;
@@ -128,7 +128,7 @@
   border: 1px solid transparent;
 }
 
-.input-row-info label {
+.inputRowInfo label {
   width: 90px;
   font-weight: 500;
   padding: 0 10px;
@@ -136,7 +136,7 @@
   color: #757575;
 }
 
-.input-row-info input {
+.inputRowInfo input {
   flex-grow: 1;
   height: 100%;
   border: none;
@@ -145,8 +145,10 @@
   padding: 0 10px;
   font-size: 16px;
 }
+
+
 /* .speaker-icon-info 에 flex 속성을 추가하여 내부 아이콘을 중앙 정렬 */
-.speaker-icon-info {
+.speakerIconInfo {
   width: 44px;
   height: 100%;
   background-color: #000;
@@ -160,7 +162,7 @@
 }
 
 /* 🔥 새로운 클래스: 아이콘 심볼에 직접 크기와 색상 적용 */
-.speaker-icon-info .speaker-icon-symbol {
+.speakerIconInfo .speaker-icon-symbol {
   font-size: 20px;
   color: white; /* 항상 흰색 */
   z-index: 10;

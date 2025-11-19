@@ -1,12 +1,69 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './learnStart.css';
+import { http } from '../../../apis/http';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 
-// 학습 데이터 타입을 정의합니다.
+// API 응답의 공통 구조를 정의하는 제네릭 인터페이스
+interface ApiResponseBody<T> {
+  status: {
+    statusCode: string;
+    message: string;
+    description: string | null;
+  };
+  body: T; // 실제 비즈니스 데이터는 'body' 속성에 포함됨
+}
+
+// API 응답의 firstVocabulary에 맞는 인터페이스 정의
+interface FirstVocabulary {
+  vocabularyId: number;
+  korean: string;
+  romanization: string;
+  english: string;
+  imageId: string; // 이미지 ID 또는 URL (여기서는 URL로 처리)
+}
+
+// 학습 시작 API의 'body' 내부 데이터 인터페이스
+interface LearningStartData {
+  sessionId: string;
+  resultId: number;
+  baseResultId: number | null;
+  vocabularies: number[]; // 전체 단어 ID 목록 (사용하지 않음)
+  totalVocabularyCount: number; // 총 단어 수
+  firstVocabulary: FirstVocabulary | null; // 첫 번째 단어 정보
+  sessionTitle: string;
+}
+
+// 최종 학습 시작 API 응답 타입
+type LearningStartResponse = ApiResponseBody<LearningStartData>;
+
+
+// API 응답의 next 객체에 맞는 인터페이스 정의 (채점 API 응답의 next 필드)
+interface NextItem {
+  itemId: number;
+  korean: string;
+  romanization: string;
+  english: string;
+}
+
+// API 채점 API의 'body' 내부 데이터 인터페이스
+interface GradeData {
+  correct: boolean;
+  moved: boolean;
+  finished: boolean;
+  next: NextItem | null;
+  correctAnswer: string | null;
+}
+
+// 최종 채점 API 응답 타입
+type GradeResponse = ApiResponseBody<GradeData>;
+
+
+// 학습 데이터 타입을 정의합니다. (UI에서 사용할 구조)
 interface LearningContent {
-  topicTitle: string;
+  topicTitle: string; // 세션 제목 (API의 sessionTitle)
+  itemId: number; // API 호출을 위한 현재 단어의 ID
   korean: string;
   romanized: string;
   translation: string;
@@ -15,21 +72,51 @@ interface LearningContent {
 
 type LearningStatus = 'initial' | 'listen' | 'countdown' | 'speak';
 type ResultStatus = 'none' | 'processing' | 'correct' | 'incorrect';
-// 🔥 새로운 상태: 정답 후 말풍선 단계 제어
 type ResultDisplayStatus = 'none' | 'initial_feedback' | 'meaning_revealed';
 
-const dummyWord: LearningContent = {
-  topicTitle: 'Casual_Emotions',
-  // SpeechSynthesis는 띄어쓰기가 없어도 잘 작동하지만, 자연스러운 발음을 위해 띄어쓰기를 유지할 수 있습니다.
-  korean: '사과',
-  romanized: 'sa - gwa',
-  translation: 'Apple',
-  imageUrl: 'https://placehold.co/100x100/E64A19/FFFFFF?text=🍎',
+// 초기 로딩 상태에서 사용할 빈 콘텐츠
+const emptyContent: LearningContent = {
+  topicTitle: 'Loading...',
+  itemId: 0,
+  korean: '',
+  romanized: '',
+  translation: '',
+  imageUrl: 'https://placehold.co/100x100/CCCCCC/000000?text=Wait',
 };
 
+
+// API의 firstVocabulary 데이터를 LearningContent로 변환하는 헬퍼 함수
+const firstVocabToContent = (vocab: FirstVocabulary, title: string): LearningContent => ({
+  topicTitle: title,
+  itemId: vocab.vocabularyId,
+  korean: vocab.korean,
+  romanized: vocab.romanization,
+  translation: vocab.english,
+  // API 응답의 imageId를 이미지 URL로 직접 사용한다고 가정
+  imageUrl: vocab.imageId, 
+});
+
+// API의 next 데이터를 LearningContent로 변환하는 헬퍼 함수
+const nextItemToContent = (item: NextItem, topicTitle: string): LearningContent => ({
+  topicTitle,
+  itemId: item.itemId,
+  korean: item.korean,
+  romanized: item.romanization,
+  translation: item.english,
+  // 다음 단어는 이미지 정보가 없으므로 임시로 한글 텍스트를 사용
+  imageUrl: 'https://placehold.co/100x100/E64A19/FFFFFF?text=' + item.korean,
+});
+
 const LearnStart: React.FC = () => {
-  const { topicId } = useParams<{ topicId: string }>();
+  const { topicId: sessionId } = useParams<{ topicId: string }>();
   const navigate = useNavigate();
+
+  // API 호출 관련 상태
+  const [content, setContent] = useState<LearningContent>(emptyContent);
+  const [currentWordIndex, setCurrentWordIndex] = useState(1);
+  const [totalWords, setTotalWords] = useState(0); // 총 단어수 상태 추가
+  const [resultId, setResultId] = useState<number | null>(null); // 채점 API에 필요한 resultId
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
 
   // UI 상태 관리
   const [status, setStatus] = useState<LearningStatus>('initial');
@@ -38,24 +125,17 @@ const LearnStart: React.FC = () => {
     useState<ResultDisplayStatus>('none');
   const [micOn, setMicOn] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [content, setContent] = useState<LearningContent>(dummyWord);
-  const [currentWordIndex, setCurrentWordIndex] = useState(1);
-  const totalWords = 2; //총 단어수 예시
   const [countdownTime, setCountdownTime] = useState(0);
 
-  // 표시 상태
+  // ... (표시 상태 관련 변수들은 이전과 동일)
   const isWordVisible = status !== 'initial';
   const isSpeakerActive = status !== 'initial';
-
-  // 결과가 확정되지 않은 도전 중 (What was it? 말풍선 활성화 시점)
   const isInputTextHiddenDuringChallenge =
     (status === 'countdown' || status === 'speak') && resultStatus === 'none';
   const isInputTextVisible = !isInputTextHiddenDuringChallenge;
-
   const isRomnizedVisible = isInputTextVisible;
   const isKoreanVisible = isInputTextVisible;
   const isTranslationVisible = isInputTextVisible;
-
   const isIncorrectView = resultStatus === 'incorrect';
   const isMicActiveForRecording =
     (status === 'countdown' || status === 'speak') &&
@@ -65,55 +145,161 @@ const LearnStart: React.FC = () => {
   const countdownRef = useRef<number | null>(null);
 
   // 🔥🔥🔥 Web Speech Synthesis 함수 🔥🔥🔥
-  const speakKoreanText = (text: string) => {
+  const speakKoreanText = useCallback((text: string) => {
     if (!('speechSynthesis' in window)) {
       console.error('Web Speech API is not supported by this browser.');
-      alert('이 브라우저는 음성 합성 기능을 지원하지 않습니다.');
       return;
     }
-
     const utterance = new SpeechSynthesisUtterance(text);
-
-    // 한국어 음성 설정 시도
-    // (브라우저에 따라 'ko-KR' 음성이 없을 수 있음)
     utterance.lang = 'ko-KR';
-
-    // 현재 사용 가능한 음성 목록을 찾아서 한국어 음성을 명시적으로 지정할 수도 있습니다.
-    // const voices = window.speechSynthesis.getVoices();
-    // const koreanVoice = voices.find(voice => voice.lang === 'ko-KR');
-    // if (koreanVoice) {
-    //     utterance.voice = koreanVoice;
-    // }
-
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
-  };
-
-  // 🔥🔥🔥 자동 채점 로직 함수 🔥🔥🔥
-  const startGrading = () => {
-    setIsProcessing(true);
-    setMicOn(false);
-
-    setTimeout(() => {
-      setIsProcessing(false);
-
-      // 오답설정
-      const isCorrect = true;
-
-      setResultStatus(isCorrect ? 'correct' : 'incorrect');
-      setDisplayStatus('initial_feedback');
-    }, 1500); // 채점 처리 시간
-  };
+  }, []);
 
   // --------------------------------------------------
-  // 🔥 1. 학습 흐름 제어 useEffect (자동 재생 TTS 로직 수정) 🔥
+  // 🔥 API 호출: 학습 시작 데이터 로드 함수 (수정 적용) 🔥
+  // --------------------------------------------------
+  const fetchLearningData = useCallback(async () => {
+    if (!sessionId) {
+      console.error('Session ID is missing.');
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
+
+    try {
+      // 1. ApiResponseBody<LearningStartData> 타입으로 HTTP 호출
+      const response = await http.post<LearningStartResponse>(
+        `/api/v1/learning/sessions/${sessionId}/start`,
+        { mode: 'ALL' }, 
+      );
+      
+      // 2. response.data.body에서 실제 데이터 추출
+      const data = response.data.body;
+
+      if (data.firstVocabulary) {
+        // 첫 단어 정보 및 세션 정보로 상태 업데이트
+        setContent(firstVocabToContent(data.firstVocabulary, data.sessionTitle));
+        setTotalWords(data.totalVocabularyCount);
+        setResultId(data.resultId);
+        setCurrentWordIndex(1);
+        setStatus('initial'); // 로드 완료 후 initial 상태로 진입
+      } else {
+         // 단어 목록이 비어있는 경우
+        console.warn('No vocabulary found for this session.');
+        navigate('/mainpage/learn/complete', { state: { message: 'No words to learn.' } });
+      }
+
+    } catch (error) {
+      console.error('Failed to start learning session:', error);
+      // 에러 발생 시 완료 페이지 또는 이전 페이지로 이동
+      navigate('/mainpage/learn/complete', { state: { message: 'Failed to load session data.' } });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [sessionId, navigate]);
+
+  // --------------------------------------------------
+  // 🔥 API 호출: 채점 로직 함수 (수정: GradeResponse 타입 적용) 🔥
+  // --------------------------------------------------
+  const startGrading = useCallback(
+    async (
+      action: 'GRADE' | 'NEXT_AFTER_WRONG',
+      audioFile: File | null = null,
+    ) => {
+      if (!sessionId || resultId === null) {
+        console.error('Session ID or Result ID is missing for grading.');
+        return;
+      }
+      setIsProcessing(true);
+      setMicOn(false);
+
+      const formData = new FormData();
+      formData.append('action', action);
+      formData.append('itemId', String(content.itemId));
+      if (audioFile) {
+        formData.append('audioFile', audioFile);
+      }
+
+      try {
+        // 1. ApiResponseBody<GradeData> 타입으로 HTTP 호출
+        const response = await http.post<GradeResponse>(`/api/v1/learning/${sessionId}/grade`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        // 2. response.data.body에서 실제 데이터 추출
+        const data = response.data.body;
+
+        // 1. 결과 상태 업데이트
+        setResultStatus(data.correct ? 'correct' : 'incorrect');
+
+        if (data.correct) {
+          setDisplayStatus('initial_feedback');
+        } else {
+          setDisplayStatus('none');
+        }
+        
+        // 2. 다음 단어 정보 처리 (핵심 로직)
+        if (data.finished) {
+            // 세션 완료 처리
+             setTimeout(() => {
+                navigate('/mainpage/learn/complete');
+             }, data.correct ? 2000 : 0); // 정답 시 잠깐 딜레이
+             return;
+        }
+
+        if (data.next) {
+            // 다음 단어로 이동
+            const nextContent = nextItemToContent(data.next, content.topicTitle);
+            
+            // 정답 후 자동 이동 (useEffect에서 처리)
+            if(data.correct){
+                setTimeout(() => {
+                    setContent(nextContent);
+                    setCurrentWordIndex((prev) => prev + 1);
+                    setStatus('initial');
+                }, 2000); 
+            } else {
+                // 오답 후 'Next' 액션을 눌렀다면 바로 업데이트
+                if(action === 'NEXT_AFTER_WRONG'){
+                    setContent(nextContent);
+                    setCurrentWordIndex((prev) => prev + 1);
+                    setStatus('initial');
+                    setResultStatus('none'); 
+                }
+            }
+        }
+
+      } catch (error) {
+        console.error('Grading failed:', error);
+        setResultStatus('incorrect');
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [sessionId, resultId, content, navigate],
+  );
+
+  // --------------------------------------------------
+  // 🔥 0. 초기 데이터 로드 (컴포넌트 마운트 시) 🔥
+  // --------------------------------------------------
+  useEffect(() => {
+    fetchLearningData();
+  }, [fetchLearningData]);
+
+
+  // --------------------------------------------------
+  // 1. 학습 흐름 제어 useEffect 
   // --------------------------------------------------
   useEffect(() => {
     let timer: number | undefined;
-    // 이전의 Gemini TTS 호출을 취소합니다. (SpeechSynthesis는 취소할 필요가 적습니다.)
+
+    // 로딩 중이거나 단어 수가 0이면 흐름 정지
+    if (isLoading || totalWords === 0) return; 
 
     if (status === 'initial') {
       setResultStatus('none');
-      setDisplayStatus('none'); // 상태 초기화
+      setDisplayStatus('none');
 
       const initialTimer = setTimeout(() => {
         setStatus('listen');
@@ -122,8 +308,7 @@ const LearnStart: React.FC = () => {
     }
 
     if (status === 'listen') {
-      // 듣기 상태 진입 시, 단어를 자동으로 한 번 재생 (SpeechSynthesis)
-      speakKoreanText(content.korean); // 🔥 Web Speech API 사용
+      speakKoreanText(content.korean);
 
       timer = setTimeout(() => {
         setStatus('countdown');
@@ -142,7 +327,8 @@ const LearnStart: React.FC = () => {
             if (countdownRef.current !== null)
               clearInterval(countdownRef.current);
             setStatus('speak');
-            startGrading();
+            // 자동 채점 시작
+            startGrading('GRADE', null); 
             return 10;
           }
           return newTime;
@@ -150,23 +336,11 @@ const LearnStart: React.FC = () => {
       }, 100) as unknown as number;
     }
 
-    // A. 정답 로직 유지
+    // A. 정답 로직 
     if (resultStatus === 'correct' && displayStatus === 'initial_feedback') {
       timer = setTimeout(() => {
         setDisplayStatus('meaning_revealed');
       }, 1000);
-    }
-
-    if (resultStatus === 'correct' && displayStatus === 'meaning_revealed') {
-      const isLastWord = currentWordIndex === totalWords;
-      timer = setTimeout(() => {
-        if (isLastWord) {
-          navigate('/mainpage/learn/complete');
-        } else {
-          setCurrentWordIndex((prev) => prev + 1);
-          setStatus('initial');
-        }
-      }, 2000);
     }
 
     // B. 오답 로직 유지
@@ -174,68 +348,51 @@ const LearnStart: React.FC = () => {
     return () => {
       if (countdownRef.current !== null) clearInterval(countdownRef.current);
       if (timer) clearTimeout(timer);
-      // 언마운트 시 SpeechSynthesis 중지 (선택 사항)
       window.speechSynthesis.cancel();
     };
   }, [
     status,
     resultStatus,
     displayStatus,
-    currentWordIndex,
-    totalWords,
-    navigate,
     content.korean,
+    isLoading,
+    totalWords,
+    startGrading,
   ]);
-
+  
   // --------------------------------------------------
-  // 🔥 2. 이벤트 핸들러 (handleSpeakerClick 수정) 🔥
+  // 2. 이벤트 핸들러
   // --------------------------------------------------
-
-  const handleAction = (action: 'tryAgain' | 'next') => {
+  const handleAction = async (action: 'tryAgain' | 'next') => {
     if (action === 'next') {
-      const isLastWord = currentWordIndex === totalWords;
-      if (isLastWord) {
-        navigate('/mainpage/learn/complete');
-        return;
-      }
-      setCurrentWordIndex((prev) => prev + 1);
+      // 오답 후 'Next' 버튼 클릭 시, ACTION: NEXT_AFTER_WRONG으로 API 호출
+      await startGrading('NEXT_AFTER_WRONG', null);
+    } else if (action === 'tryAgain') {
+      // 재시도 시 상태만 초기화
+      setStatus('initial');
+      setResultStatus('none');
+      setDisplayStatus('none');
     }
-    setStatus('initial');
-    setResultStatus('none');
-    setDisplayStatus('none');
   };
 
   const handleMicDown = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
-    if (isMicActiveForRecording) {
-      setMicOn(true);
-    }
+    if (isMicActiveForRecording) { setMicOn(true); }
   };
-
   const handleMicUp = () => {
-    if (isMicActiveForRecording && micOn) {
-      setMicOn(false);
-    }
+    if (isMicActiveForRecording && micOn) { setMicOn(false); }
   };
-
-  const handleLogout = () => navigate('/auth/login');
-
-  // 🔥🔥🔥 Speaker 클릭 핸들러 수정: Web Speech API 호출 🔥🔥🔥
   const handleSpeakerClick = () => {
-    if (isSpeakerActive) {
-      // 현재 재생 중인 음성이 있다면 취소하고 다시 시작
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
-      }
-      speakKoreanText(content.korean);
-    }
+    if (isSpeakerActive) { speakKoreanText(content.korean); }
   };
 
-  // --------------------------------------------------
-  // 🔥 3. UI 렌더링 값 (로딩 상태 제거) 🔥
-  // --------------------------------------------------
 
+  // --------------------------------------------------
+  // 3. UI 렌더링 값 (로딩 상태 처리) 
+  // --------------------------------------------------
   const bubbleText = (() => {
+    if (isLoading) return 'Loading session data...';
+    if (isProcessing) return 'Grading...';
     if (resultStatus === 'correct') {
       if (displayStatus === 'initial_feedback') return 'good job!';
       if (displayStatus === 'meaning_revealed')
@@ -245,7 +402,6 @@ const LearnStart: React.FC = () => {
       return 'good job!';
     }
     if (resultStatus === 'incorrect') return 'Should we try again?';
-
     if (status === 'initial') return 'Start!';
     if (status === 'countdown' || status === 'speak')
       return 'What was it? Tell me';
@@ -253,6 +409,7 @@ const LearnStart: React.FC = () => {
   })();
 
   const getMascotImage = (): MascotImage => {
+    if (isLoading || isProcessing) return 'basic';
     if (resultStatus === 'none') {
       return 'smile';
     }
@@ -264,15 +421,9 @@ const LearnStart: React.FC = () => {
     }
     return 'basic';
   };
-
-  const characterImageClass =
-    resultStatus === 'incorrect'
-      ? 'character-image incorrect-char'
-      : 'character-image default-char';
-
+  
   const renderWordImage = () => {
     if (!isWordVisible) return null;
-
     return (
       <div className="word-image-placeholder">
         <img src={content.imageUrl} alt="Word visual" className="word-image" />
@@ -285,6 +436,16 @@ const LearnStart: React.FC = () => {
       </div>
     );
   };
+
+
+  if (isLoading) {
+    return (
+      <div className="learn-start-container loading-screen">
+        <Header hasBackButton />
+        <Mascot image="basic" text={bubbleText} />
+      </div>
+    );
+  }
 
   return (
     <div className="learn-start-container">
@@ -360,7 +521,8 @@ const LearnStart: React.FC = () => {
             </button>
             <button
               className="action-button next"
-              onClick={() => handleAction('next')}
+              onClick={() => handleAction('next')} 
+              // 총 단어 수와 현재 인덱스를 비교하여 마지막 단어일 경우 비활성화할 수도 있습니다.
             >
               Next
             </button>
@@ -368,18 +530,18 @@ const LearnStart: React.FC = () => {
         ) : (
           <button
             className={`mic-button ${micOn ? 'on' : 'off'} ${
-              !isMicActiveForRecording ? 'disabled' : ''
+              !isMicActiveForRecording || isProcessing ? 'disabled' : ''
             }`}
             onMouseDown={handleMicDown}
             onMouseUp={handleMicUp}
             onTouchStart={handleMicDown}
             onTouchEnd={handleMicUp}
             disabled={
-              resultStatus === 'correct' ? true : !isMicActiveForRecording
+              resultStatus === 'correct' || !isMicActiveForRecording || isProcessing
             }
           >
             <span className="mic-icon">🎤</span>
-            {micOn ? 'ON' : 'OFF'}
+            {isProcessing ? 'PROCESSING' : micOn ? 'ON' : 'OFF'}
           </button>
         )}
       </div>
