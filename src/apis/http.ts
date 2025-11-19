@@ -5,6 +5,14 @@ const API_ERROR_CODES = {
   TOKEN_EXPIRED: 'J001',
 } as const;
 
+const API_ENDPOINTS = {
+  REFRESH: '/users/refresh',
+} as const;
+
+const API_HEADERS = {
+  REFRESH_TOKEN: 'RefreshToken',
+} as const;
+
 export const http = axios.create({
   baseURL: 'https://kkambbak.duckdns.org/api/v1',
   withCredentials: true,
@@ -35,61 +43,53 @@ http.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
-      if (refreshPromise) {
-        try {
-          const newAccessToken = await refreshPromise;
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          return http(originalRequest);
-        } catch (refreshErr) {
-          return Promise.reject(refreshErr);
-        }
-      }
+      if (!refreshPromise) {
+        refreshPromise = (async () => {
+          try {
+            const { user } = useUser.getState();
 
-      refreshPromise = (async () => {
-        try {
-          const { user } = useUser.getState();
+            if (!user?.refreshToken) {
+              throw new Error('No refresh token available');
+            }
 
-          if (!user?.refreshToken) {
-            throw new Error('No refresh token available');
-          }
-
-          const response = await axios.post(
-            `${http.defaults.baseURL}/users/refresh`,
-            {},
-            {
-              headers: {
-                RefreshToken: user.refreshToken,
+            const response = await axios.post(
+              `${http.defaults.baseURL}${API_ENDPOINTS.REFRESH}`,
+              {},
+              {
+                headers: {
+                  [API_HEADERS.REFRESH_TOKEN]: user.refreshToken,
+                },
               },
-            },
-          );
+            );
 
-          const { accessToken, refreshToken } = response.data?.body;
+            const { accessToken, refreshToken } = response.data?.body;
 
-          if (!accessToken || !refreshToken) {
-            throw new Error('Failed to get new tokens');
+            if (!accessToken || !refreshToken) {
+              throw new Error('Failed to get new tokens');
+            }
+
+            useUser.setState({
+              user: {
+                ...user,
+                accessToken,
+                refreshToken,
+              },
+            });
+
+            return accessToken;
+          } catch (refreshErr) {
+            console.error('Token refresh failed:', refreshErr);
+            const { user, logout } = useUser.getState();
+            if (!user?.isGuest) {
+              logout();
+            }
+            window.location.href = '/login';
+            throw refreshErr;
+          } finally {
+            refreshPromise = null;
           }
-
-          useUser.setState({
-            user: {
-              ...user,
-              accessToken,
-              refreshToken,
-            },
-          });
-
-          return accessToken;
-        } catch (refreshErr) {
-          console.error('Token refresh failed:', refreshErr);
-          const { user } = useUser.getState();
-          if (!user?.isGuest) {
-            useUser.getState().logout();
-          }
-          window.location.href = '/login';
-          throw refreshErr;
-        } finally {
-          refreshPromise = null;
-        }
-      })();
+        })();
+      }
 
       try {
         const newAccessToken = await refreshPromise;

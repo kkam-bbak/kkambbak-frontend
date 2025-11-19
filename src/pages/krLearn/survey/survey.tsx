@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './survey.css';
+import { http } from '../../../apis/http';
+import styles from './survey.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
@@ -112,17 +113,19 @@ const CharacterSection: React.FC<{
   );
 };
 
+// 🌟 PaginationDots 컴포넌트: CSS 모듈 클래스 적용 수정 완료
 const PaginationDots: React.FC<{
   currentPage: number;
   totalPages: number;
   onDotClick: (index: number) => void;
 }> = ({ currentPage, totalPages, onDotClick }) => {
   return (
-    <div className="pagination-dots">
+    <div className={styles.paginationDotsList}>
       {Array.from({ length: totalPages }, (_, index) => (
         <div
           key={index}
-          className={`dot ${index === currentPage ? 'active' : ''}`}
+          // ✅ styles.dot과 styles.active를 조건부로 적용
+          className={`${styles.dot} ${index === currentPage ? styles.active : ''}`}
           onClick={() => {
             if (index < currentPage) onDotClick(index);
           }}
@@ -182,17 +185,35 @@ const Survey: React.FC = () => {
     navigate('../learnList');
   };
 
-  const handleDoneMessageClick = () => {
-    navigate('../learnList');
+//설문저장 api - accesstoken발급안되서 안넘어가는 이슈 해결 안됨 
+const handleDoneMessageClick = async () => {
+    try {
+      const rawResponses: Record<string, string> = {};
+
+      selectedAnswers.forEach((answer, index) => {
+        if (answer) {
+          // surveyData의 질문 텍스트를 키로 사용하고, 사용자 입력값을 그대로 저장
+          rawResponses[surveyData[index].bubbleText] = answer;
+        }
+      });
+
+      // API 호출
+      await http.post('/api/v1/surveys', { rawResponses });
+
+      navigate('../learnList');
+    } catch (error) {
+      console.error('Failed to save survey:', error);
+    }
   };
+
 
   // --- Survey Content Window 내부 내용 렌더링 함수 ---
   const renderSurveyContent = () => {
     // 설문 완료 뷰
     if (currentPage === DONE_PAGE_INDEX) {
       return (
-        <div className="survey-done-view">
-          <div className="survey-done-message" onClick={handleDoneMessageClick}>
+        <div className={styles.surveyDoneView}>
+          <div className={styles.surveyDoneMessage} onClick={handleDoneMessageClick}>
             Well Done!
           </div>
         </div>
@@ -202,13 +223,13 @@ const Survey: React.FC = () => {
     // 일반 설문 페이지 뷰 (질문 옵션 렌더링)
     const currentQuestion = surveyData[currentPage];
     return (
-      <div className="survey-question-view">
-        <div className="survey-options-list">
+      <div className={styles.surveyQuestionView}>
+        <div className={styles.surveyOptionsList}>
           {currentQuestion.options.map((option, index) => (
-            <div className="survey-option-container" key={index}>
-              <span className="bullet-point">●</span>
+            <div className={styles.surveyOptionContainer}key={index}>
+              <span className={styles.bulletPoint}>●</span>
               <button
-                className={`survey-option-button ${
+                className={`${styles.surveyOptionButton} ${
                   selectedOptionIndex === index ? 'selected' : ''
                 }`}
                 onClick={() => handleOptionClick(option, index)}
@@ -233,21 +254,21 @@ const Survey: React.FC = () => {
 
       {/* 하단 Survey 내용 창 */}
       <ContentSection>
-        <h1 className="h1 survey-title">Survey</h1>
+        <h1 className={styles.surveyTitle}>Survey</h1>
 
-        <div className="survey-form-area">{renderSurveyContent()}</div>
+        <div className={styles.surveyFormArea}>{renderSurveyContent()}</div>
 
         {currentPage !== DONE_PAGE_INDEX && (
           <>
             {/* 페이지네이션 도트 (설문 진행 중일 때) */}
-
-            <PaginationDots
-              currentPage={currentPage}
-              totalPages={DONE_PAGE_INDEX}
-              onDotClick={handleDotClick}
-            />
-
-            <Button isFull onClick={handleSkip}>
+            <div className={styles.paginationArea}>
+              <PaginationDots
+                currentPage={currentPage}
+                totalPages={DONE_PAGE_INDEX}
+                onDotClick={handleDotClick}
+              />
+            </div>
+            <Button className={styles.skipButtonContainer} isFull onClick={handleSkip}>
               Skip to learning
             </Button>
           </>

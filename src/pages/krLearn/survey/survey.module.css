@@ -1,0 +1,127 @@
+/* Survey Title Text */
+.survey-title {
+  padding: 0;
+}
+
+/* 설문 폼 영역 */
+.surveyFormArea {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.surveyTitle {
+  padding: 16px 16px 0;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500 !important;
+  color: black;
+}
+
+/* -------------------- 3. 옵션/질문 뷰 -------------------- */
+.surveyQuestionView {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.surveyOptionsList {
+  margin-top: 10px;
+}
+
+.surveyOptionContainer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.bulletPoint {
+  font-size: 10px;
+  color: black;
+}
+
+/* 설문 옵션 버튼 스타일 (이미지 기반) */
+.surveyOptionButton {
+  width: 304px;
+  height: 40px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #757575;
+  text-align: left;
+  cursor: pointer;
+  background-color: #000;
+  border: none;
+  border-radius: 10px;
+  transition: background-color 0.1s;
+}
+
+.surveyOptionButton.selected {
+  color: white;
+}
+
+/* -------------------- 4. 시작/완료/스킵 버튼 (크기 일치 및 위치 조정) -------------------- */
+
+.skipButtonContainer {
+  box-sizing: border-box;
+  margin-top: 120px;
+}
+
+
+
+/* -------------------- 5. 페이지네이션 및 완료 화면 -------------------- */
+
+/* ⭐️ 페이지네이션 영역 (Skip 버튼 위에 위치) */
+.paginationArea {
+  position: absolute; 
+  left: 50%; 
+  transform: translateX(-50%);
+  bottom: 84px; 
+  z-index: 10;
+  width: auto; /* ✅ 이 부분이 중요합니다. 내용물 너비에 맞게 조정 */
+}
+
+/* 페이지네이션 도트 컨테이너 */
+.paginationDotsList { /* PaginationDots 컴포넌트의 최상위 div에 적용됨 */
+  display: flex;
+  flex-direction: row; /* ✅ 도트를 가로로 정렬 */
+  justify-content: center; /* 도트들을 중앙 정렬 */
+  gap: 10px; /* 도트 간 간격 */
+  /* 필요에 따라 width를 명시적으로 설정할 수도 있지만, auto가 더 유연합니다. */
+  /* width: max-content; */ 
+}
+
+/* 개별 도트 스타일 (비활성 상태) */
+.dot {
+  width: 8px;
+  height: 8px;
+  cursor: pointer;
+  background-color: #F8D3B7; 
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+/* 활성화된 도트 스타일 */
+.active { 
+  background-color: white; 
+}
+
+/* 설문 완료 메시지 "Done!" */
+.surveyDoneView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  padding-top: 100px;
+}
+
+.surveyDoneMessage {
+  margin-bottom: 100px;
+  font-size: 18px;
+  font-weight: 500;
+  color: black;
+  cursor: pointer;
+}
