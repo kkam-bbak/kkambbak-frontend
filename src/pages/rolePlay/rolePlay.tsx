@@ -6,12 +6,7 @@ import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
-import CharacterSmile from '@/assets/Character-Smile.png';
-import CharacterJump from '@/assets/Character-Jump.png';
-import CharacterGloomy from '@/assets/Character-Gloomy.png';
-import CharacterWrong from '@/assets/Character-Wrong.png';
-import CharacterBasic from '@/assets/Character-Basic.png';
-import CharacterSullen from '@/assets/Character-Sullen.png';
+
 
 // --- 다중 턴 시나리오 데이터 구조 정의 ---
 const SCENARIO_SEQUENCE = [
@@ -100,22 +95,22 @@ const BUBBLE_TEXT = {
     OOS: "That's out of our Learning Scope\ntry to focus on your Study", 
 };
 
-// STEPS는 이 코드 외부에 정의되어 있다고 가정합니다. (예: const STEPS = { START: 'START', GRADING: 'GRADING', ... })
-const getCharacterImage = (step, gradingResult) => {
+const getCharacterImage = (step, gradingResult): MascotImage => {
     // 1. 시작 단계
-    if (step === STEPS.START) return 'smile'; // 'CharacterSmile' 대신 문자열 'smile' 반환
+    if (step === STEPS.START) return 'smile'; 
 
     // 2. 채점 또는 피드백 단계
     if (step === STEPS.GRADING || step === STEPS.CHOICE_FEEDBACK || step === STEPS.PRACTICE_GRADING) {
-        if (gradingResult === 'CORRECT') return CharacterJump; // 'CharacterJump' 대신 문자열 'jump' 반환
-        if (gradingResult === 'INCORRECT') return CharacterGloomy; // 'CharacterGloomy' 대신 문자열 'gloomy' 반환
-        if (gradingResult === 'OOS') return CharacterSullen; // 'CharacterSullen'이 없으므로, 유사한 'wrong' 사용 (다른 키로 변경 가능)
+        // ⭐ 이미지 변수 대신 문자열 키를 반환하도록 수정
+        if (gradingResult === 'CORRECT') return 'jump'; 
+        if (gradingResult === 'INCORRECT') return 'gloomy'; 
+        if (gradingResult === 'OOS') return 'wrong'; // 'wrong' 키 사용 (sullen과 유사)
     }
 
     // 3. 기타/기본값
-    return CharacterBasic; // 'Character1' 대신 문자열 'basic' 반환
+    // ⭐ 이미지 변수 대신 문자열 키를 반환하도록 수정
+    return 'basic'; 
 };
-
 const speakKoreanText = (text, onFinish = null) => {
     if (!('speechSynthesis' in window)) {
         console.error("Web Speech API is not supported by this browser.");
@@ -510,252 +505,223 @@ const handleChoiceSelect = useCallback(() => {
         
         // ⭐ turnHistory에 기록된 내용은 항상 CORRECT(정답)이므로 항상 초록색을 표시합니다.
         const resultForColor = isChoiceTurn ? data.userResponseData?.finalResult : data.result;
-        // turnHistory에는 항상 'CORRECT'이므로 항상 초록색 클래스를 사용합니다.
-        const romanizedClass = ' correct-rom'; 
-        const role = data.speaker;
-        
-        const selectedData = isChoiceTurn ? data.userResponseData : {};
+        // ⭐ romanizedClass 변수를 styles 객체를 사용하도록 수정해야 함
+        const romanizedClass = styles.correctRom; 
+        const role = data.speaker;
         
-        const mainKoreanText = isChoiceTurn ? selectedData.text : data.korean; 
-        const mainRomanizedText = isChoiceTurn ? selectedData.romanized : data.romanized;
-        const mainEnglishText = isChoiceTurn ? selectedData.english : data.english;
+        const selectedData = isChoiceTurn ? data.userResponseData : {};
+        
+        const mainKoreanText = isChoiceTurn ? selectedData.text : data.korean; 
+        const mainRomanizedText = isChoiceTurn ? selectedData.romanized : data.romanized;
+        const mainEnglishText = isChoiceTurn ? selectedData.english : data.english;
 
-        return ( /*저장되는 내용*/ 
-            <div className="text-display-box history-box">
-                
-                {/* 현재 턴의 주요 대화 내용 */}
-                <div className="text-line korean-line">
-                    <span className="korean-text history-korean">{mainKoreanText}</span>
-                    {isRecordingTurn && <button className="tts-button active" onClick={() => startTtsAndListen(data.korean)} disabled={isTtsPlaying}>🔊</button>}
-                </div>
-                <div className="text-line romanized-line">
-                    <span className={`romanized-text history-romanized ${romanizedClass}`}>{mainRomanizedText}</span>
-                    {isRecordingTurn && <span className="small-mic-icon active">🎤</span>}
-                </div>
-                <span className="english-text history-english">{mainEnglishText}</span>
-                
-                <div className="role-container costomer"><span className="role-tag">{role}</span></div>
-            </div>
-        );
-    };
+        return (
+            <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
+                <div className={`${styles.textLine} ${styles.koreanLine}`}>
+                    <span className={`${styles.koreanText} ${styles.historyKorean}`}>{mainKoreanText}</span>
+                    {isRecordingTurn && <button className={`${styles.ttsButton} ${styles.active}`} onClick={() => startTtsAndListen(data.korean)} disabled={isTtsPlaying}>🔊</button>}
+                </div>
+                <div className={`${styles.textLine} ${styles.romanizedLine}`}>
+                    <span className={`${styles.romanizedText} ${styles.historyRomanized} ${romanizedClass}`}>{mainRomanizedText}</span>
+                    {isRecordingTurn && <span className={`${styles.smallMicIcon} ${styles.active}`}>🎤</span>}
+                </div>
+                <span className={`${styles.englishText} ${styles.historyEnglish}`}>{mainEnglishText}</span>
+                
+                <div className={`${styles.roleContainer} ${styles.customer}`}><span className={styles.roleTag}>{role}</span></div>
+            </div>
+        );
+    };
 
 
-    // ⬇️ 현재 활성 입력 턴 렌더링
-    const renderActiveInput = () => {
-        const isCurrentlySpeaking = window.speechSynthesis.speaking; 
+    // ⬇️ 현재 활성 입력 턴 렌더링
+    const renderActiveInput = () => {
+        const isCurrentlySpeaking = window.speechSynthesis.speaking; 
         
         if (activeTurnIndex >= SCENARIO_SEQUENCE.length) return null;
-        
-        const isPracticeFlow = step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK || step === STEPS.PRACTICE_GRADING || step === STEPS.PRACTICE_LISTEN_DONE;
-        
-        // 1. 일반 녹음 입력 턴 (T1, T3, T5)
-        if (activeTurnData.type === 'RECORDING' && !isPracticeFlow) {
+        
+        const isPracticeFlow = step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK || step === STEPS.PRACTICE_GRADING || step === STEPS.PRACTICE_LISTEN_DONE;
+        
+        // 1. 일반 녹음 입력 턴 (T1, T3, T5)
+        if (activeTurnData.type === 'RECORDING' && !isPracticeFlow) {
             const isTtsActionable = step === STEPS.LISTEN; 
-            const isMicActionable = step === STEPS.SPEAK_SETUP || step === STEPS.RECORDING || step === STEPS.LISTEN_DONE;
-            const mainMicButtonClass = isMicActionable ? (isRecording ? 'on' : 'off') : 'off disabled';
-            const getRomClass = () => {
+            const isMicActionable = step === STEPS.SPEAK_SETUP || step === STEPS.RECORDING || step === STEPS.LISTEN_DONE;
+            // ⭐ styles 객체 사용을 위해 문자열 클래스 제거 및 모듈 클래스로 변경 필요
+            const mainMicButtonClass = isMicActionable ? (isRecording ? styles.on : styles.off) : `${styles.off} ${styles.disabled}`;
+            const getRomClass = () => {
+                 // ⭐ styles 객체를 사용하도록 변경 필요
                 if (step === STEPS.GRADING) {
-                    return gradingResult === 'CORRECT' ? ' correct-active' : (gradingResult === 'INCORRECT' || gradingResult === 'OOS' ? ' incorrect-active' : '');
+                    return gradingResult === 'CORRECT' ? styles.correctActive : (gradingResult === 'INCORRECT' || gradingResult === 'OOS' ? styles.incorrectActive : '');
                 }
                 return '';
             };
-            const currentGradeClass = getRomClass(); // 현재 채점 결과 클래스
+            const currentGradeClass = getRomClass(); 
 
-            return (
-                <div className="active-turn-recording-flow">
-                    <div className="text-display-box history-box">
-                 
-                        <div className="text-line korean-line">
-                            {/* ⭐ Korean 텍스트에 클래스 적용 */}
-                            <span className={`korean-text ${currentGradeClass}`}>{activeTurnData.korean}</span>
-                            <button 
-                                className={`tts-button ${isTtsActionable ? ' active' : ''}`}
-                                onClick={handleListenTtsClick}
-                                disabled={!isTtsActionable || isCurrentlySpeaking}>
-                                🔊
-                            </button>
-                        </div>
-                        <div className="text-line romanized-line">
-                            {/* ⭐ Romanized 텍스트에 클래스 적용 */}
-                            <span className={`romanized-text${currentGradeClass}`}>{activeTurnData.romanized}</span>
-                            <span className={`small-mic-icon${isRecording || isMicActionable ? ' active' : ''}`}>🎤</span>
-                        </div>
-                        {/* ⭐ English 텍스트에 클래스 적용 */}
-                        <span className={`english-text${currentGradeClass}`}>{activeTurnData.english}</span>
-                            <div className="role-container costomer"><span className="role-tag">{activeTurnData.speaker}</span></div>
-                        
-                    </div>
-                 
-                    <div className="mic-area full-width-mic">
-                        <div className="mic-button-wrapper">
-                           
-                            <button 
-                                className={`main-mic-button ${mainMicButtonClass}`}
-                                onMouseDown={handleMicPress} onMouseUp={handleMicRelease}
-                                onTouchStart={handleMicPress} onTouchEnd={handleMicRelease}
-                                disabled={!isMicActionable || isCurrentlySpeaking}>
-                                <span className="main-mic-icon">🎤
-                                    <span className="mic-status-text">{isRecording ? "ON" : "OFF"}</span>
-                                </span>
-                            </button>
-                            
-                        </div>
-                    </div>
-                </div>
-            );
-        } 
-        
-        // 2. 선택지 입력 턴 (T2, T4, T6) - CHOICE_SETUP 또는 CHOICE_FEEDBACK 단계
-        else if (activeTurnData.type === 'CHOICE' && !isPracticeFlow) {
-            const customerData = activeTurnData.choices;
-            
-            const isDisabled = step === STEPS.CHOICE_FEEDBACK || isCurrentlySpeaking;
-            
-            const isSubmitActive = selectedChoiceId !== null;
-            const submitButtonClass = isSubmitActive ? 'on' : 'off disabled';
+            return (
+                <div className={styles.activeTurnRecordingFlow}>
+                    <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
+                    
+                        <div className={`${styles.textLine} ${styles.koreanLine}`}>
+                            <span className={`${styles.koreanText} ${currentGradeClass}`}>{activeTurnData.korean}</span>
+                            <button 
+                                className={`${styles.ttsButton} ${isTtsActionable ? styles.active : ''}`}
+                                onClick={handleListenTtsClick}
+                                disabled={!isTtsActionable || isCurrentlySpeaking}>
+                                🔊
+                            </button>
+                        </div>
+                        <div className={`${styles.textLine} ${styles.romanizedLine}`}>
+                            <span className={`${styles.romanizedText} ${currentGradeClass}`}>{activeTurnData.romanized}</span>
+                            <span className={`${styles.smallMicIcon}${isRecording || isMicActionable ? styles.active : ''}`}>🎤</span>
+                        </div>
+                        <span className={`${styles.englishText} ${currentGradeClass}`}>{activeTurnData.english}</span>
+                        <div className={`${styles.roleContainer} ${styles.costomer}`}><span className={styles.roleTag}>{activeTurnData.speaker}</span></div>
+                        
+                    </div>
+                
+                    <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
+                        <div className={styles.micButtonWrapper}>
+                            
+                            <button 
+                                className={`${styles.mainMicButton} ${mainMicButtonClass}`}
+                                onMouseDown={handleMicPress} onMouseUp={handleMicRelease}
+                                onTouchStart={handleMicPress} onTouchEnd={handleMicRelease}
+                                disabled={!isMicActionable || isCurrentlySpeaking}>
+                                <span className={styles.mainMicIcon}>🎤
+                                    <span className={styles.micStatusText}>{isRecording ? "ON" : "OFF"}</span>
+                                </span>
+                            </button>
+                            
+                        </div>
+                    </div>
+                </div>
+            );
+        } 
+        
+        // 2. 선택지 입력 턴 (T2, T4, T6) - CHOICE_SETUP 또는 CHOICE_FEEDBACK 단계
+        else if (activeTurnData.type === 'CHOICE' && !isPracticeFlow) {
+            const customerData = activeTurnData.choices;
+            
+            const isDisabled = step === STEPS.CHOICE_FEEDBACK || isCurrentlySpeaking;
+            const isSubmitActive = selectedChoiceId !== null;
+            // ⭐ styles 객체 사용을 위해 문자열 클래스 제거 및 모듈 클래스로 변경 필요
+            const submitButtonClass = isSubmitActive ? styles.on : `${styles.off} ${styles.disabled}`;
 
-            // 중앙에 표시할 옵션: 선택된 옵션이 없으면 첫 번째 옵션을 기본으로 표시
-            let displayOption = customerData.find(c => c.id === selectedChoiceId);
+            let displayOption = customerData.find(c => c.id === selectedChoiceId);
             if (!displayOption && step === STEPS.CHOICE_SETUP) {
                 displayOption = customerData[0];
             } else if (step === STEPS.CHOICE_FEEDBACK) {
-                // 피드백 단계에서는 선택지 미리보기 표시 안함
                 displayOption = null;
             }
 
-            return (
-                <>
-                
-                    {/* ⭐ 2. 선택지 내용 미리보기 (CHOICE_SETUP 단계에서만 렌더링) */}
+            return (
+                <>
                     {displayOption && step === STEPS.CHOICE_SETUP && (
-                        <div className="text-display-box history-box"> 
-                            <div className="text-line korean-line">
-                                <span className="korean-text">{displayOption.korean}</span>
+                        <div className={`${styles.textDisplayBox} ${styles.historyBox}`}> 
+                            <div className={`${styles.textLine} ${styles.koreanLine}`}>
+                                <span className={styles.koreanText}>{displayOption.korean}</span>
                                 <button 
-                                    className={`tts-button ${isCurrentlySpeaking && ttsOptionId === displayOption.id ? 'active' : 'choice-tts-inactive'}`}
+                                    className={`${styles.ttsButton} ${isCurrentlySpeaking && ttsOptionId === displayOption.id ? styles.active : styles.choiceTtsInactive}`}
                                     onClick={() => handleChoiceOptionClick(displayOption.id, displayOption.korean)}
                                     disabled={isDisabled}
                                 >
                                     🔊
                                 </button>
                             </div>
-                            <div className="text-line romanized-line">
-                                <span className={`romanized-text`}>{displayOption.romanized}</span>
+                            <div className={`${styles.textLine} ${styles.romanizedLine}`}>
+                                <span className={styles.romanizedText}>{displayOption.romanized}</span>
                             </div>
-                            <span className="english-text">{displayOption.english}</span>
-                            <div className="role-container costomer"><span className="role-tag">{activeTurnData.speaker}</span></div>
+                            <span className={styles.englishText}>{displayOption.english}</span>
+                            <div className={`${styles.roleContainer} ${styles.costomer}`}><span className={styles.roleTag}>{activeTurnData.speaker}</span></div>
                         </div>
                     )}
-               
-                    {/* 3. 선택 버튼 영역 (하단 고정) */}
-                    <div className="mic-area choice-button">
+                
+                    {/* 3. 선택 버튼 영역 (하단 고정) */}
+                    <div className={`${styles.micArea} ${styles.choiceButton}`}>
                         {/* 1, 2 버튼 */}
-                        {customerData.map(option => (
-                            <button 
-                                key={option.id}
-                                className={`choice-button-action ${option.id === selectedChoiceId ? 'selected' : ''}`}
-                                onClick={() => handleChoiceOptionClick(option.id, option.korean)}
-                                disabled={isDisabled}
-                            >
-                                {option.id}
-                            </button>
-                        ))}
-                        
-                        <button 
-                            className={`main-mic-button select-submit-button 
-                                ${step === STEPS.CHOICE_FEEDBACK ? (gradingResult === 'CORRECT' ? 'correct-submit' : 'incorrect-submit') : ''}
-                                ${isSubmitActive ? 'on' : 'off disabled'}`}
-                            // CHOICE_FEEDBACK 단계에서는 Continue 로직 수행
-                            onClick={handleChoiceSelect} 
-                            disabled={!isSubmitActive}
-                        >
-                            <span className="select-submit-text">
-                                Select
-                            </span>
-                        </button>
-                    </div>
-                </>
-            );
-        }
-        
-        // 3. ⭐ 연습 단계 렌더링
-        else if (isPracticeFlow && practiceLineData) {
-            const practiceText = practiceLineData; 
-            
-             const isTtsActionable = step === STEPS.PRACTICE_LISTEN; 
-             const practiceButtonActive = step === STEPS.PRACTICE_SPEAK || step === STEPS.PRACTICE_LISTEN_DONE;
-             const practiceMainMicClass = practiceButtonActive ? (isRecording ? 'on' : 'off') : 'off disabled';
-             const practiceRomClass = (step === STEPS.PRACTICE_GRADING && gradingResult !== 'CORRECT') ? ' incorrect-active' : '';
+                        {customerData.map(option => (
+                            <button 
+                                key={option.id}
+                                className={`${styles.choiceButtonAction} ${option.id === selectedChoiceId ? styles.selected : ''}`}
+                                onClick={() => handleChoiceOptionClick(option.id, option.korean)}
+                                disabled={isDisabled}
+                            >
+                                {option.id}
+                            </button>
+                        ))}
+                        
+                        <button 
+                            // ⭐ styles 객체와 조건부 클래스 사용
+                            className={`${styles.mainMicButton} ${styles.selectSubmitButton} ${
+                                step === STEPS.CHOICE_FEEDBACK 
+                                    ? (gradingResult === 'CORRECT' ? styles.correctSubmit : styles.incorrectSubmit) 
+                                    : ''
+                            } ${submitButtonClass}`}
+                            onClick={handleChoiceSelect} 
+                            disabled={!isSubmitActive}
+                        >
+                            <span className={styles.selectSubmitText}>
+                                Select
+                            </span>
+                        </button>
+                    </div>
+                </>
+            );
+        }
+        
+        // 3. ⭐ 연습 단계 렌더링
+        else if (isPracticeFlow && practiceLineData) {
+            // ⭐ styles 객체 사용을 위해 문자열 클래스 제거 및 모듈 클래스로 변경 필요
+            const practiceButtonActive = step === STEPS.PRACTICE_SPEAK || step === STEPS.PRACTICE_LISTEN_DONE;
+            const practiceMainMicClass = practiceButtonActive ? (isRecording ? styles.on : styles.off) : `${styles.off} ${styles.disabled}`;
+            // const practiceRomClass = (step === STEPS.PRACTICE_GRADING && gradingResult !== 'CORRECT') ? styles.incorrectActive : '';
 
-             return (
-                     <div className="mic-area full-width-mic">
-                        <div className="mic-button-wrapper">
-                  
-                            <button 
-                                className={`main-mic-button ${practiceMainMicClass}`}
-                                onMouseDown={handleMicPress} onMouseUp={handleMicRelease}
-                                onTouchStart={handleMicPress} onTouchEnd={handleMicRelease}
-                                disabled={!practiceButtonActive || isCurrentlySpeaking}>
-                                <span className="main-mic-icon">🎤
-                                    <span className="mic-status-text">{isRecording ? "ON" : "OFF"}</span>
-                                </span>
-                            </button>
-                          
-                        </div>
-                    </div>
-             );
-        }
+            return (
+                <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
+                    <div className={styles.micButtonWrapper}>
+                        <button 
+                            className={`${styles.mainMicButton} ${practiceMainMicClass}`}
+                            onMouseDown={handleMicPress} onMouseUp={handleMicRelease}
+                            onTouchStart={handleMicPress} onTouchEnd={handleMicRelease}
+                            disabled={!practiceButtonActive || isCurrentlySpeaking}>
+                            <span className={styles.mainMicIcon}>🎤
+                                <span className={styles.micStatusText}>{isRecording ? "ON" : "OFF"}</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            );
+        }
 
-        return <></>;
-    };
+        return <></>;
+    };
 
 
-    return (
-        <div className="page-container app-container">
-            
-            <div className="header-section">
-                <button className="logout" onClick={() => navigate('/logout')}>Logout</button>
-                
-                <div className="speech-bubble rolePlay-bubble">
-                    <div className={bubbleClass}>
-                        {currentBubbleText}
-                  
-                    </div>
-                        <div className="speech-tail" /> 
-                    </div>
+    return (
+        <div className={`${styles.pageContainer} ${styles.appContainer}`}>
+            
+            {/* ⭐ 1. Header 컴포넌트 추가 */}
+            <Header hasBackButton />
+                
+                {/* ⭐ 2. Mascot 컴포넌트로 대체 */}
+                <Mascot image={characterImage} text={currentBubbleText} /> 
 
-                    <div className="character-placeholder">
-                        <img 
-                            src={characterImage} 
-                            alt="Role Play Character" 
-                            className="character-icon" 
-                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = CharacterBasic; }}
-                        />
-                    </div>
-               </div>
+            <ContentSection color="blue">
+                <div className={styles.cardTitleBar}>
+                    <span className={styles.cardTitleText}>Role Play_At a Cafe</span>
+                    <span className={styles.cardStepText}>{activeTurnData.id}</span>
+                </div>
 
-                <div className="role-content-window rolePlay-content-window">
-                    <div className="card-title-bar">
-                        <span className="card-title-text">Role Play_At a Cafe</span>
-                        <span className="card-step-text">{activeTurnData.id}</span>
-                    </div>
-
-                    {/* 스크롤 가능한 대화 기록 영역 */}
-                    {/* ⭐ isScrollLocked 변수 사용 */}
-                    <div className={`turn-history-area ${isScrollLocked ? 'scroll-locked' : ''}`} ref={scrollRef}>
-    
-                        {turnHistory.map((turn, index) => (
-                            <TurnContentBox key={index} data={turn} />
-                        ))}
-                       {renderActiveInput()}    
-       
-                    </div>
-
-                
-                </div>
-        
-</div>
-    );
+                {/* 스크롤 가능한 대화 기록 영역 */}
+                <div className={`${styles.turnHistoryArea} ${isScrollLocked ? styles.scrollLocked : ''}`} ref={scrollRef}>
+                    {turnHistory.map((turn, index) => (
+                        <TurnContentBox key={index} data={turn} />
+                    ))}
+                    {renderActiveInput()}    
+                </div>
+            
+        </ContentSection>
+        </div>
+    );
 };
 
 export default RolePlay;

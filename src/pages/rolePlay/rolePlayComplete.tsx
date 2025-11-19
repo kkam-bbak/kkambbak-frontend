@@ -4,6 +4,7 @@ import { http } from '../../apis/http';
 import styles from './rolePlayComplete.module.css'; 
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // Mock 데이터 구조 (유지)
 const mockSessionData = {
@@ -78,7 +79,7 @@ const RolePlayComplete: React.FC = () => {
                 
                 <Mascot image="shining" text={speechBubbleText} />
 
-            <div className={`${styles.roleContentWindow} ${styles.roleCompleteContentWindow}`}>
+            <ContentSection color="blue">
                 <h2 className={styles.summaryTitle}>Session Complete!</h2>
 
                 <div className={styles.summaryDetails}>
@@ -108,8 +109,8 @@ const RolePlayComplete: React.FC = () => {
                         Next learning
                     </button>
                 </div>
+                </ContentSection>
             </div>
-        </div>
     );
 };
 
