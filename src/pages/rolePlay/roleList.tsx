@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock } from 'lucide-react'; // 시간 아이콘
-import './roleList.css';
+import styles from './roleList.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
@@ -50,21 +50,21 @@ const RoleList: React.FC = () => {
   };
 
   return (
-    <div className="role-list-container">
+    <div className={styles.roleListContainer}>
       <Header hasBackButton />
       <Mascot image="basic" text={speechBubbleText} />
 
       {/* 하단 역할극 목록 섹션 */}
       <ContentSection color="blue">
-        <div className="role-list-content-header">
-          <h2 className="role-list-title">Role Play</h2>
-          <button className="subscribe-button" onClick={handleSubscribe}>
+        <div className={styles.roleListContentHeader}>
+          <h2 className={styles.roleListTitle}>Role Play</h2>
+          <button className={styles.subscribeButton} onClick={handleSubscribe}>
             Subscribe
           </button>
         </div>
 
         {/* 역할극 항목 리스트 */}
-        <div className="role-list-items-container">
+        <div className={styles.roleListItemsContainer}>
           {DUMMY_ROLES.map((role) => {
             const isSelected = role.id === selectedRole;
             const isStartVisible = isSelected && role.isSubscribed; // 구독 여부도 고려
@@ -72,16 +72,16 @@ const RoleList: React.FC = () => {
             return (
               <div
                 key={role.id}
-                className={`role-item-row ${isSelected ? 'selected' : ''}`}
+                className={`${styles.roleItemRow} ${isSelected ? styles.selected : ''}`}
                 onClick={() => handleRoleSelect(role.id)} // 🔥 클릭 핸들러 추가
               >
                 {/* 첫 번째 줄: 제목 및 Start 버튼 */}
-                <div className="role-item-header">
-                  <span className="role-item-title">{role.title}</span>
+                <div className={styles.roleItemHeader}>
+                  <span className={styles.roleItemTitle}>{role.title}</span>
 
                   {isStartVisible && (
                     <button
-                      className="role-start-button"
+                      className={styles.roleStartButton}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleStart(role.id);
@@ -93,9 +93,9 @@ const RoleList: React.FC = () => {
                 </div>
 
                 {/* 두 번째 줄: 시간 정보 */}
-                <div className="role-item-info">
-                  <span className="role-time">{role.time}</span>
-                  <Clock className="role-time-icon" />
+                <div className={styles.roleItemInfo}>
+                  <span className={styles.roleTime}>{role.time}</span>
+                  <Clock className={styles.roleTimeIcon} />
                 </div>
               </div>
             );
