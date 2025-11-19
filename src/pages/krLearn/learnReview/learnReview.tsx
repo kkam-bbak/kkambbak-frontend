@@ -1,10 +1,8 @@
 import React from 'react';
-
 import { useNavigate } from 'react-router-dom';
-
+import { http } from '../../../apis/http';
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
-
-import './learnReview.css';
+import styles from './learnReview.module.css';
 
 // --- 학습 데이터 구조 정의 ---
 
@@ -102,10 +100,10 @@ const ResultRow = ({
   icon: React.ElementType;
   value: string;
 }) => (
-  <div className="result-row">
-    <Icon className="result-icon" />
+  <div className={styles.resultRow}>
+    <Icon className={styles.resultIcon} />
 
-    <span className="result-value">{value}</span>
+    <span className={styles.resultValue}>{value}</span>
   </div>
 );
 
@@ -117,13 +115,13 @@ const WordResultRow: React.FC<{
   isResult?: boolean;
   isCorrect?: boolean;
 }> = ({ label, value, isResult = false, isCorrect }) => (
-  <div className="word-result-row">
-    <span className="word-label">{label}</span>
+  <div className={styles.WordResultRow}>
+    <span className={styles.wordLabel}>{label}</span>
 
-    <span className="word-value">{value}</span>
+    <span className={styles.wordValue}>{value}</span>
 
     {isResult && (
-      <span className={`result-tag ${isCorrect ? 'correct' : 'wrong'}`}>
+      <span className={`${styles.resultTag} ${isCorrect ? styles.correct : styles.wrong}`}>
         {isCorrect ? 'Correct' : 'Wrong'}
       </span>
     )}
@@ -159,16 +157,16 @@ const LearnReview: React.FC = () => {
   };
 
   return (
-    <div className="Review-page-container">
+    <div className={styles.ReviewPageContainer}>
       {/* 1. 상단 타이틀 및 요약 (스크롤 시 고정) */}
 
-      <div className="review-header">
-        <h1 className="review-title">Session Result Review</h1>
+      <div className={styles.reviewHeader}>
+        <h1 className={styles.reviewTitle}>Session Result Review</h1>
 
         {/* 결과 요약 박스 (검은색 배경) */}
 
-        <div className="review-results-box">
-          <h2 className="results-topic-title">{summary.topicName}_Result</h2>
+        <div className={styles.reviewResultsBox}>
+          <h2 className={styles.resultsTopicTitle}>{summary.topicName}_Result</h2>
 
           <ResultRow
             icon={CheckCircle}
@@ -183,9 +181,9 @@ const LearnReview: React.FC = () => {
 
       {/* 2. 단어별 결과 목록 (스크롤 되는 본문 내용) */}
 
-      <div className="word-results-list">
+      <div className={styles.wordResultList}>
         {wordResults.map((word, index) => (
-          <div key={index} className="rv-word-result-container">
+          <div key={index} className={styles.rvWordResultContainer}>
             <WordResultRow
               label="Romnized"
               value={word.romnized}
@@ -202,16 +200,16 @@ const LearnReview: React.FC = () => {
 
       {/* 3. 하단 고정 버튼 */}
 
-      <div className="review-action-container">
+      <div className={styles.reviewActionContainer}>
         <button
-          className="review-action-button wrong-only"
+          className={styles.reviewActionButton}
           onClick={handleWrongOnlyTryAgain}
         >
           Only wrong try Again
         </button>
 
         <button
-          className="review-action-button try-all"
+          className={styles.reviewActionButton}
           onClick={handleTryAgain}
         >
           Try again

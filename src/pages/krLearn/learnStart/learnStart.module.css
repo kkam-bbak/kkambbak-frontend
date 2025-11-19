@@ -1,6 +1,6 @@
 /* learnStart.css */
 
-.learn-start-container {
+.learnStartContainer {
   width: 100%;
 }
 
@@ -16,7 +16,7 @@
 }
 
 /* -------------------- 3. 학습 카드 영역 -------------------- */
-.learning-card {
+.learningCard {
   position: absolute;
   bottom: 0;
   box-sizing: border-box;
@@ -30,7 +30,7 @@
 }
 
 /* 카운트다운 바 컨테이너 */
-.countdown-bar-container {
+.countdownBarContainer {
   position: absolute;
   top: 0;
   left: 0;
@@ -41,7 +41,7 @@
   background-color: black;
 }
 
-.countdown-bar-fill {
+.countdownBarFill {
   position: absolute;
   top: 3px;
   left: 0;
@@ -52,7 +52,7 @@
 }
 
 /* 제목 바 */
-.card-title-bar {
+.cardTitleBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -63,7 +63,7 @@
 }
 
 /* 단어 표시 영역 (이미지) */
-.word-display-area {
+.wordDisplayArea {
   /* 🔥🔥 수정: 자식인 countdown-bar-container의 위치 기준점 */
   position: relative;
   display: flex;
@@ -80,20 +80,20 @@
 /* 이미지 Placeholder (사과 이미지 구현) */
 
 /* -------------------- 4. 입력 필드 -------------------- */
-.input-fields-container {
+.inputFieldsContainer {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.topic-name {
+.topicName {
   top: 16px;
   left: 16px;
   font-size: 18px;
   font-weight: 500;
 }
 
-.input-row {
+.inputRow {
   display: flex;
   align-items: center;
   height: 40px;
@@ -103,7 +103,7 @@
   border-radius: 10px;
 }
 
-.input-row label {
+.inputRow label {
   width: 90px;
   padding: 0 10px;
   font-size: 14px;
@@ -112,7 +112,7 @@
   text-align: left;
 }
 
-.input-row input {
+.inputRow input {
   flex-grow: 1;
   height: 100%;
   font-size: 16px;
@@ -124,11 +124,11 @@
 }
 
 /* Translation 행 (주황색 배경) */
-.input-row.translation {
+.inputRow.translation {
   background-color: #ff5000;
 }
 
-.input-row.translation label {
+.inputRow.translation label {
   width: 90px;
   height: 100%;
   line-height: 44px;
@@ -136,13 +136,13 @@
   background-color: black;
 }
 
-.input-row.translation input {
+.inputRow.translation input {
   color: white;
   background-color: black;
 }
 
 /* 스피커 아이콘 */
-.speaker-icon {
+.speakerIcon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,13 +154,15 @@
   border: none;
 }
 
-.speaker-icon:disabled {
+
+/*.speakerIcon:global(:disabled)*/
+.speakerIcon:disabled {
   color: #333; /* 비활성화 시 색상 */
   cursor: not-allowed;
 }
 
 /* -------------------- 5. 마이크 버튼 -------------------- */
-.mic-button {
+.micButton {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -176,33 +178,33 @@
   transition: background-color 0.1s, color 0.1s;
 }
 
-.action-buttons-container {
+.actionButtonsContainer {
   display: flex;
   gap: 10px;
   margin-top: 10px;
 }
 
-.action-button {
+.actionButton {
   width: 156px;
   height: 40px;
 }
 
-.mic-button.off {
+.micButton.off {
   color: black;
   background-color: white;
 }
 
-.mic-button.on {
+.micButton.on {
   color: white;
   background-color: black;
 }
 
-.mic-button.on .mic-icon {
+.micButton.on .micIcon {
   color: white;
 }
 
 /* 비활성화 상태 */
-.mic-button.disabled {
+.micButton.disabled {
   color: #e3e3e3;
   cursor: not-allowed;
   background-color: white;

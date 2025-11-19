@@ -1,5 +1,5 @@
 /* learnComplete.css와 동일한 기본 컨테이너 재활용 */
-.Review-page-container {
+.ReviewPageContainer {
   background-color: #ff5000;
   border-radius: 20px;
   font-family: 'Inter', sans-serif;
@@ -19,13 +19,13 @@
 }
 
 /* Chrome, Safari, Opera 브라우저의 스크롤바 숨김 */
-.Review-page-container::-webkit-scrollbar {
+.ReviewPageContainer::-webkit-scrollbar {
   display: none;
 }
 
 /* -------------------- 1. 상단 타이틀 및 요약 카드 -------------------- */
 
-.review-header {
+.reviewHeader {
   padding: 5px 15px 15px 15px;
   /* 🔥 수정: 스크롤 시 상단에 고정 */
   position: sticky;
@@ -35,7 +35,7 @@
   height: 199px;
 }
 
-.review-title {
+.reviewTitle {
   font-size: 18px;
   font-weight: 500;
   color: black;
@@ -44,15 +44,15 @@
 }
 
 /* 결과 요약 박스 (검은색 배경) */
-.review-results-box {
-  background-color: #000;
+.reviewResultsBox {
+  background-color: black;
   color: white;
   border-radius: 10px;
   padding: 0px 15px 15px 15px;
   height: 131px;
 }
 
-.results-topic-title {
+.resultsTopicTitle {
   font-size: 18px;
   font-weight: 500;
   width: 172px;
@@ -63,19 +63,19 @@
 }
 
 /* ... (결과 항목 스타일 유지) ... */
-.result-row {
+.resultRow {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
 }
-.result-icon {
+.resultIcon {
   width: 20px;
   height: 20px;
   color: white;
   margin-right: 5px;
 }
-.result-value {
+.resultValue {
   font-size: 12px;
   font-weight: 500;
   color: white;
@@ -83,15 +83,17 @@
 
 /* -------------------- 2. 단어별 결과 목록 -------------------- */
 
-.word-results-list {
+.wordResultsList {
+
   position: relative;
   /* 🔥 수정: 좌우 패딩만 설정. 스크롤은 부모가 담당. */
   padding: 0 15px;
 }
 
 /* 단어 컨테이너 (단어 한 쌍) */
-.rv-word-result-container {
-  background-color: #ff5000;
+.rvWordResultContainer {
+  margin-left: 15px;
+  background-color: black;
   border-radius: 10px;
   margin-bottom: 8px;
   padding-bottom: 2px;
@@ -101,7 +103,7 @@
 }
 
 /* 단어 정보 행 */
-.word-result-row {
+.wordResultRow {
   display: flex;
   align-items: center;
   height: 32px;
@@ -112,18 +114,18 @@
   border-bottom: 1px solid #1a1a1a;
 }
 
-.word-result-row:last-child {
+.wordResultRow:last-child {
   border-bottom: none;
 }
 
-.word-label {
+.wordLabel {
   width: 90px;
   font-size: 12px;
   font-weight: 500;
   color: white;
 }
 
-.word-value {
+.wordValue {
   flex-grow: 1;
   font-size: 12px;
   font-weight: 500;
@@ -131,7 +133,7 @@
 }
 
 /* Correct/Wrong 태그 스타일 */
-.result-tag {
+.resultTag {
   font-size: 10px;
   font-weight: 600;
 
@@ -141,19 +143,19 @@
   text-align: center;
 }
 
-.result-tag.correct {
+.resultTag.correct {
   background-color: #39ff14;
   color: black;
 }
 
-.result-tag.wrong {
+.resultTag.wrong {
   background-color: #ff0000;
   color: black;
 }
 
 /* -------------------- 3. 하단 고정 버튼 -------------------- */
 
-.review-action-container {
+.reviewActionContainer {
   /* 🔥 수정: Fixed 속성을 다시 적용 */
   position: sticky;
   bottom: 0px;
@@ -174,7 +176,7 @@
   z-index: 20;
 }
 
-.review-action-button {
+.reviewActionButton {
   flex-grow: 1;
   height: 40px;
   border: none;
@@ -182,15 +184,8 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-}
-
-/* 버튼 색상 */
-.review-action-button.wrong-only {
   background-color: white;
   color: black;
 }
 
-.review-action-button.try-all {
-  background-color: white;
-  color: black;
-}
+

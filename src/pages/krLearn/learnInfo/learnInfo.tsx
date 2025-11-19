@@ -202,7 +202,7 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
 
             {/* Korean Row - Second row */}
             <div
-              className={`input-row-info korean-info ${getInputClass(
+              className={`${styles.inputRowInfo} ${getInputClass(
                 'korean',
               )}`}
             >
@@ -212,7 +212,7 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
 
             {/* Translation Row - Third row */}
             <div
-              className={`input-row-info translation-info ${getInputClass(
+              className={`${styles.inputRowInfo}${styles.translationInfo} ${getInputClass(
                 'translation',
               )}`}
             >
@@ -223,7 +223,7 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
 
           {/* 마이크 버튼 */}
           <button
-            className={`mic-button-info ${getMicButtonState()}`}
+            className={`${styles.micButtonInfo} ${getMicButtonState()}`}
             onMouseDown={handleMicDown}
             onMouseUp={handleMicUp}
             onTouchStart={handleMicDown}

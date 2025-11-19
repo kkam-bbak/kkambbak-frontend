@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import './learnStart.css';
+import styles from './learnStart.module.css';
 import { http } from '../../../apis/http';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
@@ -440,7 +440,7 @@ const LearnStart: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="learn-start-container loading-screen">
+      <div className={styles.learnStartContainer}>
         <Header hasBackButton />
         <Mascot image="basic" text={bubbleText} />
       </div>
@@ -448,14 +448,14 @@ const LearnStart: React.FC = () => {
   }
 
   return (
-    <div className="learn-start-container">
+    <div className={styles.learnStartContainer}>
       <Header hasBackButton />
 
       <Mascot image={getMascotImage()} text={bubbleText} />
 
-      <div className="learning-card">
-        <div className="card-title-bar">
-          <span className="topic-name">{content.topicTitle}</span>
+      <div className={styles.learningCard}>
+        <div className={styles.cardTitleBar}>
+          <span className={styles.topicName}>{content.topicTitle}</span>
           <span className="word-count">{`${currentWordIndex
             .toString()
             .padStart(2, '0')}/${totalWords
@@ -463,11 +463,11 @@ const LearnStart: React.FC = () => {
             .padStart(2, '0')}`}</span>
         </div>
 
-        <div className="word-display-area">
+        <div className={styles.wordDisplayArea}>
           {status === 'countdown' && !isIncorrectView && (
-            <div className="countdown-bar-container">
+            <div className={styles.countdownBarContainer}>
               <div
-                className="countdown-bar-fill"
+                className={styles.countdownBarFill}
                 style={{ width: `${100 - (countdownTime / 10) * 100}%` }}
               ></div>
             </div>
@@ -475,8 +475,8 @@ const LearnStart: React.FC = () => {
           {renderWordImage()}
         </div>
 
-        <div className="input-fields-container">
-          <div className="input-row">
+        <div className={styles.inputFieldsContainer}>
+          <div className={styles.inputRow}>
             <label>Romnized</label>
             <input
               type="text"
@@ -484,7 +484,7 @@ const LearnStart: React.FC = () => {
               readOnly
             />
             <button
-              className={`speaker-icon`}
+              className={`${styles.speakerIcon}`}
               onClick={handleSpeakerClick}
               disabled={!isSpeakerActive}
             >
@@ -492,7 +492,7 @@ const LearnStart: React.FC = () => {
             </button>
           </div>
 
-          <div className="input-row">
+          <div className={styles.inputRow}>
             <label>Korean</label>
             <input
               type="text"
@@ -501,7 +501,7 @@ const LearnStart: React.FC = () => {
             />
           </div>
 
-          <div className="input-row translation">
+          <div className={`${styles.inputRow} ${styles.translation}`}>
             <label>Translation</label>
             <input
               type="text"
@@ -512,15 +512,15 @@ const LearnStart: React.FC = () => {
         </div>
 
         {isIncorrectView ? (
-          <div className="action-buttons-container">
+          <div className={styles.actionButtonsContainer}>
             <button
-              className="action-button try-again"
+              className={styles.actionButton}
               onClick={() => handleAction('tryAgain')}
             >
               Try Again
             </button>
             <button
-              className="action-button next"
+              className={styles.actionButton}
               onClick={() => handleAction('next')} 
               // 총 단어 수와 현재 인덱스를 비교하여 마지막 단어일 경우 비활성화할 수도 있습니다.
             >
@@ -529,8 +529,8 @@ const LearnStart: React.FC = () => {
           </div>
         ) : (
           <button
-            className={`mic-button ${micOn ? 'on' : 'off'} ${
-              !isMicActiveForRecording || isProcessing ? 'disabled' : ''
+            className={`${styles.micButton} ${micOn ? styles.on : styles.off} ${
+              !isMicActiveForRecording || isProcessing ? styles.disabled: ''
             }`}
             onMouseDown={handleMicDown}
             onMouseUp={handleMicUp}
@@ -540,7 +540,7 @@ const LearnStart: React.FC = () => {
               resultStatus === 'correct' || !isMicActiveForRecording || isProcessing
             }
           >
-            <span className="mic-icon">🎤</span>
+            <span className={styles.micIcon}>🎤</span>
             {isProcessing ? 'PROCESSING' : micOn ? 'ON' : 'OFF'}
           </button>
         )}

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { http } from '../../../apis/http';
-import './learnList.css';
+import styles from './learnList.module.css';
 import LearnInfo from '../learnInfo/learnInfo';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
@@ -68,14 +68,14 @@ const TopicCard: React.FC<TopicCardProps> = ({
 
   return (
     <div
-      className={`topic-card ${isCompleted ? 'completed' : ''}`}
+      className={`${styles.topicCard} ${isCompleted ? 'completed' : ''}`}
       onClick={() => onCardClick(topic.id)}
     >
-      <div className="card-header">
+      <div className={styles.cardHeader}>
         <h3 className={statusClass}>{topic.title}</h3>
         {showButton && (
           <button
-            className={`topic-start-button ${isCompleted ? 'learn-again' : ''}`}
+            className={`${styles.topicStartButton} ${isCompleted ? styles.learnAgain : ''}`}
             onClick={(e) => {
               e.stopPropagation();
               onStart(topic.id);
@@ -85,14 +85,14 @@ const TopicCard: React.FC<TopicCardProps> = ({
           </button>
         )}
       </div>
-      <div className="card-divider"></div>
-      <div className="card-footer">
-        <span className={`vocab-count ${statusClass}`}>
+      <div className={styles.cardDivider}></div>
+      <div className={styles.cardFooter}>
+        <span className={`${styles.vocabCount}${statusClass}`}>
           {topic.vocabularies} Vocabularies
         </span>
-        <span className={`time-info ${statusClass}`}>
+        <span className={`${styles.timeInfo} ${statusClass}`}>
           {topic.time}
-          <div className="time-icon">🕒</div>
+          <div className={styles.timeIcon}>🕒</div>
         </span>
       </div>
     </div>
@@ -263,22 +263,22 @@ const LearnList: React.FC = () => {
 
 
   return (
-    <div className="content-lit-container">
+    <div className={styles.contentLitContainer}>
       <Header hasBackButton />
 
       <Mascot image="basic" text={activeBubbleText} />
 
       <ContentSection>
         {/* 탭 버튼 */}
-        <div className="tab-buttons-container">
+        <div className={styles.tabButtonsContainer}>
           <button
-            className={`tab-button ${activeTab === 'topik' ? 'active' : ''}`}
+            className={`${styles.tabButton} ${activeTab === 'topik' ? styles.activeTabButton : ''}`}
             onClick={() => handleTabChange('topik')}
           >
             Topik
           </button>
           <button
-            className={`tab-button ${activeTab === 'casual' ? 'active' : ''}`}
+            className={`${styles.tabButton} ${activeTab === 'casual' ? styles.activeTabButton : ''}`}
             onClick={() => handleTabChange('casual')}
           >
             Casual
@@ -286,7 +286,7 @@ const LearnList: React.FC = () => {
         </div>
 
         {/* 학습 목록 */}
-        <div className="scrollable-list" ref={scrollRef}>
+        <div className={`${styles.scrollableList}`} ref={scrollRef}>
           {topicsToDisplay.length === 0 && !isLoading ? (
             <p className="no-sessions-message">No learning sessions available.</p>
           ) : (

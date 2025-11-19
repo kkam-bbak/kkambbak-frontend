@@ -171,37 +171,37 @@
 
 /* -------------------- 4. 입력 필드 (Translation 색상 수정) -------------------- */
 
-/* Translation 행 */
-.input-row-info.translation-info {
+/*  Translation 행 */
+.inputRowInfo.translationInfo {
   background-color: black;
 }
-.input-row-info.translation-info label {
+.input-row-info.translationInfo label {
   background-color: black; /* 🔥 레이블 배경 투명 */
   color: #757575; /* 🔥 레이블 텍스트는 검은색 */
 }
-.input-row-info.translation-info input {
+.input-row-info.translationInfo input {
   background-color: black; /* 🔥 입력 필드 배경 주황색 */
   color: #ff5000; /* 🔥 입력 필드 텍스트 검은색 */
   /* padding 유지 */
 }
 
 /* 🔥 흐림 효과가 적용된 상태에서 원색을 표시하고 싶을 때 사용 (Step 2, 7) */
-.word-display-area-info.highlight-no-fade,
-.input-row-info.highlight-no-fade {
+.wordDisplayAreaInfo.highlight-no-fade,
+.inputRowInfo.highlight-no-fade {
   /* 카드 전체의 흐림 효과를 뚫고 불투명하게 보이도록 z-index를 높이고 opacity를 1로 설정 */
   z-index: 10;
   position: relative;
   opacity: 1 !important;
 }
 /* 🔥 주황색 테두리 적용 */
-.word-display-area-info.border-highlight-orange {
+.wordDisplayAreaInfo.border-highlight-orange {
   border: 2px solid #ff5000;
 }
-.input-row-info.border-highlight-orange {
+.inputRowInfo.border-highlight-orange {
   border: 2px solid #ff5000;
 }
 
-.mic-button-info {
+.micButtonInfo {
   /* 🔥 info-card-container를 기준으로 절대 위치 설정 */
   position: absolute;
   bottom: 16px;
@@ -226,12 +226,12 @@
   z-index: 20;
 }
 
-.mic-button-info .mic-icon {
+.micButtonInfo .mic-icon {
   transition: color 0.2s;
 }
 
 /* 🔥 ON (Step 4) */
-.mic-button-info.on {
+.micButtonInfo.on {
   background-color: #000;
   color: white;
   border: 2px solid #ff5000;
@@ -241,20 +241,20 @@
 }
 
 /* 🔥 OFF (Step 3, 5, 8) */
-.mic-button-info.off {
+.micButtonInfo.off {
   background-color: white;
   color: black;
 }
-.mic-button-info.off .mic-icon {
+.micButtonInfo.off .mic-icon {
   color: #ff5000;
 }
 
 /* 🔥 Disabled (Step 0, 1, 2, 6, 7) */
-.mic-button-info.disabled-info {
+.micButtonInfo.disabled-info {
   background-color: rgba(255, 255, 255, 0.5);
   color: rgba(0, 0, 0, 0.4);
   cursor: not-allowed;
 }
-.mic-button-info.disabled-info .mic-icon {
+.micButtonInfo.disabled-info .mic-icon {
   color: rgba(0, 0, 0, 0.4);
 }
