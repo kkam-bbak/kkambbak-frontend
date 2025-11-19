@@ -1,8 +1,8 @@
 /* surveyStart.css */
 
-.survey-start-container {
+.surveyStartContainer {
   width: 100%;
-  background-color: aqua;
+  background-color: black;
 }
 
 .survey-bubble {
@@ -12,7 +12,7 @@
   height: 86px !important;
 }
 
-.survey-title {
+.surveyTitle {
   padding: 16px 16px 0;
   margin: 0;
   font-size: 18px;
@@ -31,8 +31,8 @@
 /* -------------------- 4. 시작/스킵 버튼 (절대 위치 고정 및 크기 일치) -------------------- */
 
 /* 버튼 컨테이너 (너비 328px 고정) */
-.skip-button-container,
-.start-button-container {
+.skipButtonContainer,
+.startButtonContainer {
   position: absolute;
   left: 16px;
   z-index: 25;
@@ -42,20 +42,20 @@
 }
 
 /* Skip to learning 버튼 (가장 하단 고정) */
-.skip-button-container {
+.skipButtonContainer {
   bottom: 20px;
   height: 40px;
 }
 
 /* ⭐️ Start 버튼 컨테이너 (Skip 버튼 위에 위치) */
-.start-button-container {
+.startButtonContainer {
   /* Skip 버튼 bottom 20px + Skip 버튼 height 40px + 10px 간격 = 70px */
   bottom: 70px;
 }
 
 /* Skip/Start learning 버튼 크기 일치 */
-.skip-button,
-.start-button {
+.skipButton,
+.startButton {
   display: block;
   width: 100%;
   height: 40px;
