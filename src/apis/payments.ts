@@ -18,6 +18,5 @@ export async function createPayments(
 export async function getPaymentsResult() {
   const response = await http.get('/payments/result');
 
-  console.log(response);
   return response;
 }
