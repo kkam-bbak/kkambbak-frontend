@@ -1,5 +1,5 @@
 .textarea {
-  height: 80px;
+  min-height: 80px;
   padding: 8px;
   font-size: 13px;
   line-height: 22px;
