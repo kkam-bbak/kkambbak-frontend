@@ -171,7 +171,7 @@ export default function ProfileCreation() {
         <PersonalityContent updateMascot={updateMascot} />
       )}
 
-      {step === 'korean' && <KoreanContent />}
+      {step === 'korean' && <KoreanContent updateMascot={updateMascot} />}
     </div>
   );
 }

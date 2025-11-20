@@ -8,8 +8,13 @@ import { useMutation } from '@tanstack/react-query';
 import { generateName, createName, SelectedName } from '@/apis/users';
 import { useNavigate } from 'react-router-dom';
 import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
+import { MascotInfo } from '../../ProfileCreation';
 
-function KoreanContent() {
+type KoreanContentProps = {
+  updateMascot: (info: MascotInfo) => void;
+};
+
+function KoreanContent({ updateMascot }: KoreanContentProps) {
   const [selected, setSelected] = useState({ name: '', meaning: '' });
   const navigate = useNavigate();
 
@@ -30,8 +35,20 @@ function KoreanContent() {
     setSelected({ name, meaning });
   };
 
+  const triggerNameGeneration = () => {
+    updateMascot({ image: 'thinking', text: 'I think your name is...' });
+    generateNameMutate(undefined, {
+      onSuccess: () => {
+        updateMascot({
+          image: 'shining',
+          text: `What do you think?\nWhich one do you like?`,
+        });
+      },
+    });
+  };
+
   const handleRetryClick = () => {
-    generateNameMutate();
+    triggerNameGeneration();
   };
 
   const handleCreateClick = () => {
@@ -45,8 +62,9 @@ function KoreanContent() {
       },
     });
   };
+
   useEffect(() => {
-    generateNameMutate();
+    triggerNameGeneration();
   }, []);
 
   return (
@@ -111,7 +129,9 @@ function KoreanContent() {
             </Button>
             {data && (
               <span className={styles.remain}>
-                {data.remainingAttempts} credits left
+                {data.remainingAttempts > 0
+                  ? `${data.remainingAttempts} credits left`
+                  : 'No rounds left'}
               </span>
             )}
           </div>
