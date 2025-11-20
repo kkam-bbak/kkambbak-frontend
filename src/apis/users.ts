@@ -90,29 +90,9 @@ type ResponseGenerateName = {
 };
 
 export async function generateName(): Promise<ResponseGenerateName> {
-  // const response = await http.post('/name/generate');
+  const response = await http.post('/name/generate');
 
-  // return response.data.body;
-  return {
-    historyId: 1,
-    remainingAttempts: 2,
-    generationOutput: {
-      names: [
-        {
-          koreanName: '이빛찬',
-          romanization: 'Lee Bit Chan',
-          poeticMeaning:
-            'A bright light that radiates warmth and kindness, illuminating the hearts of those nearby ☀️',
-        },
-        {
-          koreanName: '김상휘',
-          romanization: 'Kim Sang Hwi',
-          poeticMeaning:
-            'A gentle flame that brings comfort and serenity, guiding others through the darkness 🔥',
-        },
-      ],
-    },
-  };
+  return response.data.body;
 }
 
 export type SelectedName = {
