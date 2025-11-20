@@ -18,12 +18,17 @@
   color: var(--color-grayscale-4);
 }
 
+.li textarea {
+  cursor: pointer;
+}
+
 .label {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-bottom: 16px;
   color: var(--color-primary-green);
+  cursor: pointer;
 }
 
 .header {
@@ -92,4 +97,18 @@
 .buttons {
   display: flex;
   gap: 16px;
+}
+
+.try-again {
+  position: relative;
+  width: 100%;
+}
+
+.remain {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  font-size: 10px;
+  line-height: 20px;
+  transform: translateX(-50%);
 }
