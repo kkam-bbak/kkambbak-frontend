@@ -12,15 +12,21 @@ import {
   PERSONALITY,
   PERSONALITY_IMAGE_MAP,
 } from '@/constants/users';
+import { MascotInfo } from '../../ProfileCreation';
 
 const DIRECT = 'direct';
 
-function PersonalityContent() {
+type PersonalityContentProps = {
+  updateMascot: (info: MascotInfo) => void;
+};
+
+function PersonalityContent({ updateMascot }: PersonalityContentProps) {
   const [personality, setPersonality] = useState('');
   const [image, setImage] = useState('');
   const [meaning, setMeaning] = useState('');
   const [topText, setTopText] = useState('');
   const [bottomText, setBottomText] = useState('');
+  const isCompleted = topText.trim() && bottomText.trim();
 
   const handlePersonalityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -67,6 +73,14 @@ function PersonalityContent() {
       setBottomText(result);
     }
   }, [meaning]);
+
+  useEffect(() => {
+    if (isCompleted) {
+      updateMascot({ image: 'jump', text: 'Perfect!' });
+    } else {
+      updateMascot({ image: 'basic', text: 'Okay, tell me more.' });
+    }
+  }, [isCompleted]);
 
   return (
     <ContentSection className={styles.section} color="blue">
@@ -143,7 +157,7 @@ function PersonalityContent() {
           </div>
         </div>
 
-        <Button>Next</Button>
+        <Button disabled={!isCompleted}>Next</Button>
       </div>
     </ContentSection>
   );

@@ -3,7 +3,7 @@ import { useUser } from '../../stores/user';
 import styles from './ProfileCreation.module.css';
 import Header from '@/components/layout/Header/Header';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
-import Mascot from '@/components/Mascot/Mascot';
+import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import Input from '@/components/Input/Input';
 import Select from '@/components/Select/Select';
 import Button from '@/components/Button/Button';
@@ -27,6 +27,8 @@ const COUNTRIES = [
   'Indonesia',
 ];
 
+export type MascotInfo = { image: MascotImage; text: string };
+
 export default function ProfileCreation() {
   const user = useUser((s) => s.user);
 
@@ -35,6 +37,10 @@ export default function ProfileCreation() {
   const [name, setName] = useState(user?.name || '');
   const [gender, setGender] = useState('');
   const [country, setCountry] = useState('');
+  const [mascot, setMascot] = useState<MascotInfo>({
+    image: 'basic',
+    text: 'First, Tell me about you',
+  });
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -66,6 +72,16 @@ export default function ProfileCreation() {
     );
   };
 
+  const updateMascot = (info: MascotInfo) => {
+    setMascot(info);
+  };
+
+  useEffect(() => {
+    if (isProfileInfoValid) {
+      updateMascot({ image: 'jump', text: 'Good job!' });
+    }
+  }, [isProfileInfoValid]);
+
   useEffect(() => {
     return () => {
       if (profileImage) URL.revokeObjectURL(profileImage);
@@ -76,10 +92,7 @@ export default function ProfileCreation() {
     <div className={`${styles['page-container']}`}>
       <Header />
 
-      <Mascot
-        image={isProfileInfoValid ? 'jump' : 'basic'}
-        text={isProfileInfoValid ? 'Good job!' : 'First, Tell me about you'}
-      />
+      <Mascot image={mascot.image} text={mascot.text} />
 
       <ContentSection>
         <div className={styles['content-container']}>
@@ -154,7 +167,9 @@ export default function ProfileCreation() {
         </div>
       </ContentSection>
 
-      {step === 'personality' && <PersonalityContent />}
+      {step === 'personality' && (
+        <PersonalityContent updateMascot={updateMascot} />
+      )}
     </div>
   );
 }
