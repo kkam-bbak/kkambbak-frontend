@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './learnInfo.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // Topic 인터페이스는 유지
 interface Topic {

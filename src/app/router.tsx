@@ -17,6 +17,7 @@ import LearnComplete from '../pages/krLearn/learnComplete/learnComplete';
 import LearnReview from '../pages/krLearn/learnReview/learnReview';
 import RoleList from '../pages/rolePlay/roleList';
 import RolePlay from '../pages/rolePlay/rolePlay';
+import LearnWrong from '../pages/krLearn/learnWrong/learnWrong';
 
 import { useUser } from '../stores/user';
 import BaseLayout from '@/components/layout/BaseLayout/BaseLayout';
@@ -75,6 +76,9 @@ export const router = createBrowserRouter([
               { path: 'learn/complete', element: <LearnComplete /> },
 
               { path: 'learn/review', element: <LearnReview /> },
+
+              { path: 'learn/:topicId/retry-wrong', element: <LearnWrong /> },
+              
             ],
           },
         ],

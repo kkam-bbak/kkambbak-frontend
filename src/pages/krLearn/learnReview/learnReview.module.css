@@ -83,16 +83,25 @@
 
 /* -------------------- 2. 단어별 결과 목록 -------------------- */
 
-.wordResultsList {
-
+.wordResultList {
   position: relative;
-  /* 🔥 수정: 좌우 패딩만 설정. 스크롤은 부모가 담당. */
   padding: 0 15px;
+  max-height: 450px;
+  overflow-y: scroll; /* 스크롤 기능은 유지 */
+
+  /* IE 및 구형 Edge */
+  -ms-overflow-style: none;
+  /* Firefox */
+  scrollbar-width: none;
 }
 
+/* Chrome, Safari, Edge 최신 버전 */
+.wordResultList::-webkit-scrollbar {
+  display: none;
+}
 /* 단어 컨테이너 (단어 한 쌍) */
 .rvWordResultContainer {
-  margin-left: 15px;
+
   background-color: black;
   border-radius: 10px;
   margin-bottom: 8px;
@@ -103,7 +112,7 @@
 }
 
 /* 단어 정보 행 */
-.wordResultRow {
+.WordResultRow {
   display: flex;
   align-items: center;
   height: 32px;
@@ -114,7 +123,7 @@
   border-bottom: 1px solid #1a1a1a;
 }
 
-.wordResultRow:last-child {
+.WordResultRow:last-child {
   border-bottom: none;
 }
 
@@ -136,11 +145,13 @@
 .resultTag {
   font-size: 10px;
   font-weight: 600;
-
   border-radius: 6px;
   min-width: 65px;
   height: 20px;
-  text-align: center;
+  display: flex; /* Flexbox 활성화 */
+  justify-content: center; /* 수평 중앙 정렬 (기존 text-align: center 대체) */
+  align-items: center; /* 수직 중앙 정렬 */
+
 }
 
 .resultTag.correct {

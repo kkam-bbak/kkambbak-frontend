@@ -1,9 +1,9 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate } from 'react-router-dom';
 import { http } from '../../../apis/http';
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
 import styles from './learnReview.module.css';
-
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 // --- 학습 데이터 구조 정의 ---
 
 interface WordResult {
@@ -129,11 +129,12 @@ const WordResultRow: React.FC<{
 );
 
 const LearnReview: React.FC = () => {
+  const location = useLocation();
   const navigate = useNavigate();
 
   const summary = DUMMY_SUMMARY;
-
-  const wordResults = DUMMY_WORD_RESULTS;
+  const state = location.state as { updatedWordResults?: WordResult[] };
+  const wordResults = state?.updatedWordResults || DUMMY_WORD_RESULTS;
 
   // 'Only wrong try Again' 클릭 핸들러 (틀린 단어만 재학습 시작)
 

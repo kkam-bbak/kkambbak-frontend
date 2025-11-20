@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import styles from './learnStart.module.css';
 import { http } from '../../../apis/http';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // API 응답의 공통 구조를 정의하는 제네릭 인터페이스
 interface ApiResponseBody<T> {
@@ -70,6 +71,16 @@ interface LearningContent {
   imageUrl: string;
 }
 
+// src/types.ts (새 파일 생성 예시)
+
+interface WordResult {
+  romnized: string;
+  korean: string;
+  translation: string;
+  isCorrect: boolean;
+  // learnStart에서 필요한 다른 속성이 있다면 여기에 추가
+}
+
 type LearningStatus = 'initial' | 'listen' | 'countdown' | 'speak';
 type ResultStatus = 'none' | 'processing' | 'correct' | 'incorrect';
 type ResultDisplayStatus = 'none' | 'initial_feedback' | 'meaning_revealed';
@@ -109,7 +120,20 @@ const nextItemToContent = (item: NextItem, topicTitle: string): LearningContent 
 
 const LearnStart: React.FC = () => {
   const { topicId: sessionId } = useParams<{ topicId: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
+  const { topicName } = useParams<{ topicName: string }>();
+
+  
+
+  // 1. 라우터 state에서 전달받은 단어 목록을 확인
+  const state = location.state as { wordsToRetry?: WordResult[], isRetryWrong?: boolean };
+  const wordsToRetry = state?.wordsToRetry;
+  const isRetryWrong = state?.isRetryWrong || false;
+
+  // 2. 학습할 단어 목록 결정
+  // 만약 wordsToRetry가 있으면 그 목록을 사용하고, 없으면 기존 로직(전체 단어 API 호출 등)을 따릅니다.
+  // const wordsToLearn = wordsToRetry ? wordsToRetry : fetchedAllWords;
 
   // API 호출 관련 상태
   const [content, setContent] = useState<LearningContent>(emptyContent);
@@ -363,6 +387,19 @@ const LearnStart: React.FC = () => {
   // --------------------------------------------------
   // 2. 이벤트 핸들러
   // --------------------------------------------------
+
+  // 학습 완료 처리 핸들러 (예: 모든 단어 학습 후)
+const handleLearningComplete = (finalResults: WordResult[]) => {
+  // 3. 재학습이 맞다면, 최종 결과를 Review 페이지로 전달
+  if (isRetryWrong) {
+    navigate(`/mainPage/review/${topicName}`, {
+      state: { updatedWordResults: finalResults }, // 최종 결과 목록을 state로 전달
+    });
+  } else {
+    // 전체 학습 완료 시의 기존 로직 (API 전송 등)
+    // navigate(`/mainPage/review/${summary.topicName}`);
+  }
+};
   const handleAction = async (action: 'tryAgain' | 'next') => {
     if (action === 'next') {
       // 오답 후 'Next' 버튼 클릭 시, ACTION: NEXT_AFTER_WRONG으로 API 호출
