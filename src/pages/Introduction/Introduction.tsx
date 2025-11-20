@@ -83,7 +83,7 @@ function Introduction() {
   const handleLogout = async () => {
     if (!user?.isGuest) {
       try {
-        await http.post('/api/v1/users/logout');
+        await http.post('/users/logout');
         logout();
       } catch (error) {
         console.error('Logout failed:', error);
