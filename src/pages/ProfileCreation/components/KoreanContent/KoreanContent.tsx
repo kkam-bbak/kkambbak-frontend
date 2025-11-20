@@ -31,7 +31,7 @@ function KoreanContent({ updateMascot }: KoreanContentProps) {
     mutationFn: (info: SelectedName) => createName(info),
   });
 
-  const handleSelected = (name: string, meaning: string) => {
+  const handleNameItemClick = (name: string, meaning: string) => {
     setSelected({ name, meaning });
   };
 
@@ -86,7 +86,9 @@ function KoreanContent({ updateMascot }: KoreanContentProps) {
                     key={koreanName}
                     className={styles.li}
                     data-checked={selected.name === koreanName}
-                    onClick={() => handleSelected(koreanName, poeticMeaning)}
+                    onClick={() =>
+                      handleNameItemClick(koreanName, poeticMeaning)
+                    }
                   >
                     <label
                       htmlFor={`checkbox-${index}`}
