@@ -3,6 +3,7 @@ import { useUser } from '../stores/user'
 
 const API_ERROR_CODES = {
   TOKEN_EXPIRED: 'J001',
+  UNAUTHORIZED: 'C401',
 } as const
 
 const API_ENDPOINTS = {
@@ -36,7 +37,18 @@ http.interceptors.response.use(
   async (err) => {
     const originalRequest = err.config
     const errorCode = err.response?.data?.status?.statusCode
+    const statusCode = err.response?.status
 
+    // C401 (Unauthorized) - 토큰이 없거나 인증 실패 → 바로 로그인
+    if (errorCode === API_ERROR_CODES.UNAUTHORIZED || statusCode === 401) {
+      console.log('Unauthorized access. Redirecting to login...')
+      const { logout } = useUser.getState()
+      logout()
+      window.location.href = '/login'
+      return Promise.reject(err)
+    }
+
+    // J001 (Token Expired) - 토큰 만료 → refresh 시도
     if (errorCode === API_ERROR_CODES.TOKEN_EXPIRED && !originalRequest._retry) {
       originalRequest._retry = true
 

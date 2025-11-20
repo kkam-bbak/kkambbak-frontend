@@ -1,21 +1,35 @@
-import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { http } from '../../apis/http';
-import styles from './rolePlayComplete.module.css'; 
+import styles from './rolePlayComplete.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
-// Mock 데이터 구조 (유지)
-const mockSessionData = {
-    sentenceCorrect: "02/02",
-    timeTaken: "2m 30s",
-    date: "Tuesday, November 3, 2023",
-    rolePlayName: "Role Play_At a Cafe",
-    turns: [
-        { speaker: 'Staff', korean: '주문 하시겠어요?', romanized: 'Ju-mun ha-si-gess-eo-yo?', english: 'Would you like to order?', result: 'CORRECT' },
-        { speaker: 'Customer', korean: '네, 주문 할게요', romanized: 'Nae, ju-mun hal-ge-yo', english: 'Yes, I\'d like to order.', result: 'CORRECT' },
-    ]
+// --- API 응답 타입 정의 ---
+interface SessionSummary {
+  sessionId: number;
+  totalSentence: number;
+  correctSentence: number;
+  completedAt: string;
+}
+
+// 화면 표시용 데이터 구조
+interface DisplaySessionData {
+  sentenceCorrect: string;
+  timeTaken: string;
+  date: string;
+  rolePlayName: string;
+  turns: TurnData[];
+}
+
+// 초기 빈 데이터 상태
+const emptySessionData: DisplaySessionData = {
+    sentenceCorrect: "0/0",
+    timeTaken: "-",
+    date: "-",
+    rolePlayName: "-",
+    turns: []
 };
 
 interface TurnData {
@@ -28,7 +42,8 @@ interface TurnData {
 
 // TurnDisplay 컴포넌트 수정 (CSS Modules 적용)
 const TurnDisplay: React.FC<{ data: TurnData, index: number }> = ({ data, index }) => {
-    const isCustomerTurn = data.speaker === 'Customer';
+    // ✅ USER speaker (사용자가 선택/연습한 턴) 또는 Customer로 식별
+    const isUserTurn = data.speaker === 'USER' || data.speaker === 'Customer';
 
     // 로마자 색상 결정
     const romanizedClass = data.result === 'CORRECT' ? styles.correct : data.result === 'INCORRECT' ? styles.incorrect : '';
@@ -43,12 +58,12 @@ const TurnDisplay: React.FC<{ data: TurnData, index: number }> = ({ data, index 
                 <div className={styles.romanizedLine}>
                     {/* styles 객체를 통해 클래스 적용 */}
                     <span className={`${styles.completeRomanizedText} ${romanizedClass}`}>{data.romanized}</span>
-                    {isCustomerTurn && <span className={`${styles.smallMicIcon} ${styles.active}`}>🎤</span>}
+                    {isUserTurn && <span className={`${styles.smallMicIcon} ${styles.active}`}>🎤</span>}
                 </div>
                 <span className={styles.completeEnglishText}>{data.english}</span>
             </div>
             {/* styles 객체를 통해 클래스 적용 */}
-            <div className={`${styles.roleTagContainer} ${isCustomerTurn ? styles.customerTag : styles.staffTag}`}>
+            <div className={`${styles.roleTagContainer} ${isUserTurn ? styles.customerTag : styles.staffTag}`}>
                 <span className={styles.roleTag}>{data.speaker}</span>
             </div>
         </div>
@@ -58,12 +73,39 @@ const TurnDisplay: React.FC<{ data: TurnData, index: number }> = ({ data, index 
 
 const RolePlayComplete: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [sessionData, setSessionData] = useState<DisplaySessionData>(emptySessionData);
+
     const speechBubbleText = 'Perfect!';
 
+    // rolePlay에서 넘어온 state 데이터 처리
+    useEffect(() => {
+        const state = location.state as any;
+        if (state?.sessionSummary) {
+            // API에서 받은 세션 요약 데이터
+            const summary: SessionSummary = state.sessionSummary;
+
+            // 화면 표시용 데이터로 변환
+            const displayData: DisplaySessionData = {
+                sentenceCorrect: `${summary.correctSentence}/${summary.totalSentence}`,
+                timeTaken: state.timeTaken || '-', // rolePlay에서 계산한 시간 사용
+                date: new Date(summary.completedAt).toLocaleDateString(),
+                rolePlayName: state.rolePlayName || 'Role Play',
+                turns: state.turns || [],
+            };
+            setSessionData(displayData);
+        }
+    }, [location.state]);
+
     const handleTryAgain = useCallback(() => {
-        // 실제 roleId를 사용하도록 수정 필요
-        navigate(`/mainpage/rolePlay/defaultRoleId`); 
-    }, [navigate]);
+        const state = location.state as any;
+        const scenarioId = state?.scenarioId;
+        if (scenarioId) {
+            navigate(`/mainpage/rolePlay/${scenarioId}`);
+        } else {
+            navigate('/mainpage/roleList');
+        }
+    }, [navigate, location.state]);
 
     const handleNextLearning = useCallback(() => {
         navigate('/mainpage/roleList');
@@ -83,20 +125,20 @@ const RolePlayComplete: React.FC = () => {
                 <h2 className={styles.summaryTitle}>Session Complete!</h2>
 
                 <div className={styles.summaryDetails}>
-                    <span className={`${styles.detailItem} ${styles.roleName}`}>{mockSessionData.rolePlayName}</span>
+                    <span className={`${styles.detailItem} ${styles.roleName}`}>{sessionData.rolePlayName}</span>
                     <div className={`${styles.detailItem} ${styles.stat}`}>
-                        <span className={styles.statLabel}>✅ {mockSessionData.sentenceCorrect} sentence correct</span>
+                        <span className={styles.statLabel}>✅ {sessionData.sentenceCorrect} sentence correct</span>
                     </div>
                     <div className={`${styles.detailItem} ${styles.stat}`}>
-                        <span className={styles.statLabel}>⏱️ {mockSessionData.timeTaken}</span>
+                        <span className={styles.statLabel}>⏱️ {sessionData.timeTaken}</span>
                     </div>
                     <div className={`${styles.detailItem} ${styles.stat}`}>
-                        <span className={styles.statLabel}>📅 {mockSessionData.date}</span>
+                        <span className={styles.statLabel}>📅 {sessionData.date}</span>
                     </div>
                 </div>
 
                 <div className={styles.completeHistoryArea}>
-                    {mockSessionData.turns.map((turn, index) => (
+                    {sessionData.turns.map((turn, index) => (
                         <TurnDisplay key={index} data={turn} index={index} />
                     ))}
                 </div>
