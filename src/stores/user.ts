@@ -16,12 +16,12 @@ export type Auth = {
   accessToken: string;
   refreshToken: string;
   isGuest?: boolean;
-} | null;
+};
 
-type User = (Partial<Auth> & Partial<Profile>) | null;
+type User = Partial<Auth> & Partial<Profile>;
 
 type State = {
-  user: User;
+  user: null | User;
   login: (u: Auth) => void;
   logout: (clearStorage?: boolean) => void;
   updateProfile: (profile: Profile) => void;
