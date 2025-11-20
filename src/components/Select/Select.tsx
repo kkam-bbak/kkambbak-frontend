@@ -3,18 +3,19 @@ import styles from './Select.module.css';
 import { ChevronDown } from 'lucide-react';
 
 type SelectProps = {
-  id: string;
   label: string;
+  isFull?: boolean;
 } & React.ComponentProps<'select'>;
 
 function Select({
-  label,
   id,
+  label,
+  isFull = false,
   children,
   ...props
 }: PropsWithChildren<SelectProps>) {
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${isFull ? styles['is-full'] : ''}`}>
       <label htmlFor={id}>{label}</label>
       <div className={styles['select-container']}>
         <select id={id} className={styles.select} {...props}>

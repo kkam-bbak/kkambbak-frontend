@@ -4,6 +4,10 @@
   gap: 8px;
 }
 
+.container.is-full {
+  width: 100%;
+}
+
 .select-container {
   position: relative;
   display: flex;
