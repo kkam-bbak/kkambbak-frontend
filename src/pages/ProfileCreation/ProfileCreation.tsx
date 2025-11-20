@@ -9,6 +9,8 @@ import Select from '@/components/Select/Select';
 import Button from '@/components/Button/Button';
 import { useMutation } from '@tanstack/react-query';
 import { registerProfile, RegisterProfileInfo } from '@/apis/users';
+import { useSearchParams } from 'react-router-dom';
+import PersonalityContent from './components/PersonalityContent/PersonalityContent';
 
 const COUNTRIES = [
   'Direct input',
@@ -34,10 +36,13 @@ export default function ProfileCreation() {
   const [gender, setGender] = useState('');
   const [country, setCountry] = useState('');
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const { mutate, isPending } = useMutation({
     mutationFn: (info: RegisterProfileInfo) => registerProfile(info),
   });
 
+  const step = searchParams.get('step');
   const isProfileInfoValid = name.trim() && gender && country;
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +59,7 @@ export default function ProfileCreation() {
       { name, gender, country, profileImageFile },
       {
         onSuccess: () => {
+          setSearchParams({ step: 'personality' });
           console.log('성공함');
         },
       },
@@ -147,6 +153,8 @@ export default function ProfileCreation() {
           </Button>
         </div>
       </ContentSection>
+
+      {step === 'personality' && <PersonalityContent />}
     </div>
   );
 }
