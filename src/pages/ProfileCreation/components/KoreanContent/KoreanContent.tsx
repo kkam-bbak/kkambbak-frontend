@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { generateName, createName, SelectedName } from '@/apis/users';
 import { useNavigate } from 'react-router-dom';
+import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
 
 function KoreanContent() {
   const [selected, setSelected] = useState({ name: '', meaning: '' });
@@ -51,7 +52,11 @@ function KoreanContent() {
   return (
     <ContentSection color="green">
       <div className={styles.container}>
-        {isPending && <span>로딩중</span>}
+        {isPending && (
+          <div className={styles.spinner}>
+            <SpinnerIcon />
+          </div>
+        )}
 
         {data && (
           <div>
