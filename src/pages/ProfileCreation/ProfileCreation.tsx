@@ -11,6 +11,7 @@ import { useMutation } from '@tanstack/react-query';
 import { registerProfile, RegisterProfileInfo } from '@/apis/users';
 import { useSearchParams } from 'react-router-dom';
 import PersonalityContent from './components/PersonalityContent/PersonalityContent';
+import KoreanContent from './components/KoreanContent/KoreanContent';
 
 const COUNTRIES = [
   'Direct input',
@@ -169,6 +170,8 @@ export default function ProfileCreation() {
       {step === 'personality' && (
         <PersonalityContent updateMascot={updateMascot} />
       )}
+
+      {step === 'korean' && <KoreanContent />}
     </div>
   );
 }

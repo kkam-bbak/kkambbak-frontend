@@ -1,0 +1,95 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 24px;
+}
+
+.li[data-checked='false'] .name,
+.li[data-checked='false'] textarea {
+  color: var(--color-grayscale-4);
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: var(--color-primary-green);
+}
+
+.header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding-left: 24px;
+}
+
+.header::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  content: '';
+  background-color: var(--color-grayscale-7);
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.name {
+  min-width: 180px;
+  padding: 8px 24px 8px 8px;
+  font-size: 13px;
+  line-height: 24px;
+  color: var(--color-grayscale-1);
+  background-color: var(--color-grayscale-6);
+  border: 1.5px solid var(--color-grayscale-7);
+  border-radius: 10px;
+}
+
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-grayscale-1);
+  border: 1px solid var(--color-grayscale-2);
+  border-radius: 5px;
+}
+
+.checkbox svg {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.input:checked + .checkbox svg {
+  visibility: visible;
+  opacity: 1;
+}
+
+.buttons {
+  display: flex;
+  gap: 16px;
+}
