@@ -114,3 +114,17 @@ export async function generateName(): Promise<ResponseGenerateName> {
     },
   };
 }
+
+export type SelectedName = {
+  historyId: number;
+  name: string;
+  meaning: string;
+};
+export async function createName(selected: SelectedName) {
+  const { historyId, name, meaning } = selected;
+  const data = { historyId, koreanName: name, meaningOfName: meaning };
+
+  const response = await http.post('/name/select', data);
+
+  return response;
+}

@@ -5,10 +5,13 @@ import styles from './KoreanContent.module.css';
 import CheckIcon from '@/components/icons/CheckIcon/CheckIcon';
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { generateName } from '@/apis/users';
+import { generateName, createName, SelectedName } from '@/apis/users';
+import { useNavigate } from 'react-router-dom';
 
 function KoreanContent() {
-  const [selected, setSelected] = useState('');
+  const [selected, setSelected] = useState({ name: '', meaning: '' });
+  const navigate = useNavigate();
+
   const {
     mutate: generateNameMutate,
     isPending,
@@ -18,10 +21,29 @@ function KoreanContent() {
     mutationFn: generateName,
   });
 
+  const { mutate: createNameMutate, isPending: isCreatePending } = useMutation({
+    mutationFn: (info: SelectedName) => createName(info),
+  });
+
+  const handleSelected = (name: string, meaning: string) => {
+    setSelected({ name, meaning });
+  };
+
   const handleRetryClick = () => {
     generateNameMutate();
   };
 
+  const handleCreateClick = () => {
+    if (!data || !selected.name) return;
+
+    const info = { historyId: data.historyId, ...selected };
+    createNameMutate(info, {
+      onSuccess: () => {
+        // TODO: 프로필 페이지로 이동해야 함
+        navigate('/mainpage');
+      },
+    });
+  };
   useEffect(() => {
     generateNameMutate();
   }, []);
@@ -40,8 +62,8 @@ function KoreanContent() {
                   <li
                     key={koreanName}
                     className={styles.li}
-                    data-checked={selected === koreanName}
-                    onClick={() => setSelected(koreanName)}
+                    data-checked={selected.name === koreanName}
+                    onClick={() => handleSelected(koreanName, poeticMeaning)}
                   >
                     <label
                       htmlFor={`checkbox-${index}`}
@@ -55,7 +77,7 @@ function KoreanContent() {
                           id={`checkbox-${index}`}
                           type="checkbox"
                           className={styles.input}
-                          checked={selected === koreanName}
+                          checked={selected.name === koreanName}
                           readOnly
                         />
 
@@ -88,7 +110,11 @@ function KoreanContent() {
               </span>
             )}
           </div>
-          <Button isFull disabled={!selected}>
+          <Button
+            isFull
+            disabled={!selected || isCreatePending || !data}
+            onClick={handleCreateClick}
+          >
             Create profile
           </Button>
         </div>
