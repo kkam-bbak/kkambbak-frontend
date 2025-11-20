@@ -1,17 +1,30 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type User = {
+export type Profile = {
+  name: string;
+  koreanName: string | null;
+  nameMeaning: string | null;
+  gender: string | null;
+  countryOfOrigin: string | null;
+  personalityOrImage: string | null;
+  profileImage: string;
+};
+
+export type Auth = {
   providerId: string; // 게스트 ID
   accessToken: string;
   refreshToken: string;
-  isGuest: boolean;
+  isGuest?: boolean;
 } | null;
+
+type User = (Partial<Auth> & Partial<Profile>) | null;
 
 type State = {
   user: User;
-  login: (u: NonNullable<User>) => void;
+  login: (u: Auth) => void;
   logout: (clearStorage?: boolean) => void;
+  updateProfile: (profile: Profile) => void;
 };
 
 export const useUser = create<State>()(
@@ -25,6 +38,10 @@ export const useUser = create<State>()(
           localStorage.clear();
         }
       },
+      updateProfile: (profile) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, ...profile } : null,
+        })),
     }),
     { name: 'auth', partialize: (s) => ({ user: s.user }) },
   ),
