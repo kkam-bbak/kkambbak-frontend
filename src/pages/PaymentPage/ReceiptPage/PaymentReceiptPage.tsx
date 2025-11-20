@@ -12,6 +12,8 @@ import {
 import { useUser } from '@/stores/user';
 import Button from '@/components/Button/Button';
 import { Link } from 'react-router-dom';
+import Box from '@/components/Box/Box';
+import Select from '@/components/Select/Select';
 
 const PLAN = {
   PREMIUM: 'Premium',
@@ -78,33 +80,24 @@ function PaymentReceiptPage() {
               <h1 className="h1">Payment</h1>
 
               <div className={styles.info}>
-                <div>
-                  <label htmlFor="plan" className={styles.label}>
-                    Plan *
-                  </label>
-                  <select
-                    id="plan"
-                    className={styles.select}
-                    value={selected}
-                    onChange={handleSelectedClick}
-                  >
-                    <option value="">Standard(₩ 0)</option>
-                    {plans?.map(({ id, name, price }) => (
-                      <option key={id} value={id}>
-                        {`${PLAN[name]}(Per Month ₩ ${price})`}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  id="plan"
+                  label="Plan *"
+                  value={selected}
+                  onChange={handleSelectedClick}
+                >
+                  <option value="">Standard(₩ 0)</option>
+                  {plans?.map(({ id, name, price }) => (
+                    <option key={id} value={id}>
+                      {`${PLAN[name]}(Per Month ₩ ${price})`}
+                    </option>
+                  ))}
+                </Select>
+
+                <Box text={today} label="Begins *" />
 
                 <div>
-                  <span className={styles.label}>Begins *</span>
-                  <time className={styles.time}>{today}</time>
-                </div>
-
-                <div>
-                  <span className={styles.label}>Ends *</span>
-                  <time className={styles.time}>{nextMonth}</time>
+                  <Box text={nextMonth} label="Ends *" />
                   {daysLeft && (
                     <span className={styles['days-left']}>
                       There are {daysLeft} days left until expiration.

@@ -8,6 +8,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { getSubscriptionPlans } from '@/apis/subscriptions';
 import kakao from '@/assets/kakaopay.png';
 import { createPayments } from '@/apis/payments';
+import Box from '@/components/Box/Box';
+import Select from '@/components/Select/Select';
 
 const PLAN = {
   PREMIUM: 'Premium',
@@ -20,6 +22,7 @@ function PaymentCheckoutPage() {
   const { data: plans } = useQuery({
     queryKey: ['plans'],
     queryFn: getSubscriptionPlans,
+    placeholderData: [],
   });
 
   const { mutate } = useMutation({
@@ -73,36 +76,23 @@ function PaymentCheckoutPage() {
                 <h1 className="h1">Payment</h1>
 
                 <div className={styles.info}>
-                  <div>
-                    <label htmlFor="plan" className={styles.label}>
-                      Plan *
-                    </label>
-                    <select
-                      id="plan"
-                      className={styles.select}
-                      value={selected}
-                      onChange={(e) => setSelected(e.target.value)}
-                    >
-                      <option value="">Standard(₩ 0)</option>
-                      {plans.map(({ id, name, price }) => (
-                        <option key={id} value={id}>
-                          {`${PLAN[name]}(Per Month ₩ ${price})`}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    id="plan"
+                    label="Plan *"
+                    value={selected}
+                    onChange={(e) => setSelected(e.target.value)}
+                  >
+                    <option>Standard (₩ 0)</option>
+                    {plans.map(({ id, name, price }) => (
+                      <option key={id} value={id}>
+                        {`${PLAN[name]} (Per Month ₩ ${price})`}
+                      </option>
+                    ))}
+                  </Select>
 
-                  <div>
-                    <span className={styles.label}>Begins *</span>
-                    <time className={styles.time}>{today}</time>
-                  </div>
+                  <Box text={today} label="Begins *" />
 
-                  <div>
-                    <span className={styles.label}>Ends *</span>
-                    <time className={styles.time}>
-                      {selected ? nextMonth : ''}
-                    </time>
-                  </div>
+                  <Box text={selected ? nextMonth : ''} label="Ends *" />
                 </div>
               </div>
 
