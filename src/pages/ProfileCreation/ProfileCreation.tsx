@@ -1,220 +1,151 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../stores/user';
-import { http } from '../../apis/http';
 import styles from './ProfileCreation.module.css';
 import Header from '@/components/layout/Header/Header';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 import Mascot from '@/components/Mascot/Mascot';
+import Input from '@/components/Input/Input';
+import Select from '@/components/Select/Select';
+import Button from '@/components/Button/Button';
+import { useMutation } from '@tanstack/react-query';
+import { registerProfile, RegisterProfileInfo } from '@/apis/users';
 
-interface RegistrationData {
-  name: string;
-  gender: string;
-  countryOfOrigin: string;
-  profileImage?: string;
-}
+const COUNTRIES = [
+  'Direct input',
+  'South Korea',
+  'China',
+  'Vietnam',
+  'United States',
+  'Thailand',
+  'Japan',
+  'Philippines',
+  'Mongolia',
+  'Uzbekistan',
+  'Kazakhstan',
+  'Indonesia',
+];
 
 export default function ProfileCreation() {
-  const navigate = useNavigate();
   const user = useUser((s) => s.user);
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
-  const [name, setName] = useState('');
+  const [name, setName] = useState(user?.name || '');
   const [gender, setGender] = useState('');
   const [country, setCountry] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  const isFormValid = name.trim() && gender && country;
+  const { mutate, isPending } = useMutation({
+    mutationFn: (info: RegisterProfileInfo) => registerProfile(info),
+  });
 
-  const countries = [
-    'Direct input',
-    'South Korea',
-    'China',
-    'Vietnam',
-    'United States',
-    'Thailand',
-    'Japan',
-    'Philippines',
-    'Mongolia',
-    'Uzbekistan',
-    'Kazakhstan',
-    'Indonesia',
-  ];
+  const isProfileInfoValid = name.trim() && gender && country;
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const preview = URL.createObjectURL(file);
+    setProfileImage(preview);
+    setProfileImageFile(file);
+  };
+
+  const handleProfileUpload = () => {
+    mutate(
+      { name, gender, country, profileImageFile },
+      {
+        onSuccess: () => {
+          console.log('성공함');
+        },
+      },
+    );
+  };
 
   useEffect(() => {
-    const initializeProfile = async () => {
-      const defaultProfileImage =
-        'https://pub-2fe42e6f80304939bbdef33f2525fe73.r2.dev/31826a56-4c25-41f1-8d28-651de3a2889c';
-
-      try {
-        const response = await http.get('/users/profile');
-        const profileData = response.data?.body;
-
-        if (profileData) {
-          setProfileImage(profileData.profileImage || defaultProfileImage);
-
-          setName(profileData.name || '');
-        }
-      } catch (error) {
-        console.error('Failed to fetch profile:', error);
-        setProfileImage(defaultProfileImage);
-      }
+    return () => {
+      if (profileImage) URL.revokeObjectURL(profileImage);
     };
-
-    initializeProfile();
-  }, [user]);
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProfileImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setProfileImage(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleNext = async () => {
-    if (isFormValid) {
-      try {
-        setIsLoading(true);
-
-        let imageUrl: string | undefined;
-
-        if (profileImageFile) {
-          const formData = new FormData();
-          formData.append('file', profileImageFile);
-
-          const uploadResponse = await http.post('/upload/image', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-
-          imageUrl = uploadResponse.data?.body?.url;
-
-          if (!imageUrl) {
-            throw new Error('Failed to get image URL from upload');
-          }
-        }
-
-        const registrationData: RegistrationData = {
-          name,
-          gender,
-          countryOfOrigin: country,
-        };
-
-        if (imageUrl) {
-          registrationData.profileImage = imageUrl;
-        }
-
-        await http.patch('/users/register', registrationData);
-
-        navigate('/mainpage');
-      } catch (error) {
-        console.error('Failed to register profile:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+  }, [profileImage]);
 
   return (
-    <div className={`${styles.profileCreationContainer}`}>
-      {/* Header */}
+    <div className={`${styles['page-container']}`}>
       <Header />
 
       <Mascot
-        image={isFormValid ? 'jump' : 'basic'}
-        text={isFormValid ? 'Good job!' : 'First, Tell me about you'}
+        image={isProfileInfoValid ? 'jump' : 'basic'}
+        text={isProfileInfoValid ? 'Good job!' : 'First, Tell me about you'}
       />
 
       <ContentSection>
-        <div className={styles.formContainer}>
-          <div className={styles.formSection}>
-            <label className={styles.formLabel}>Profile image *</label>
-            <div className={styles.imageUploadArea}>
+        <div className={styles['content-container']}>
+          <div className={styles.test}>
+            <div className={styles['image-container']}>
+              <span>Profile image *</span>
+
               <input
                 type="file"
-                id="image-input"
+                className={styles['input-image']}
+                id="image"
                 accept="image/*"
-                onChange={handleImageUpload}
-                style={{ display: 'none' }}
+                onChange={handleImageChange}
               />
-              <label htmlFor="image-input" className={styles.imageUploadLabel}>
+              <label htmlFor="image" className={styles['upload-label']}>
                 {profileImage ? (
                   <img
                     src={profileImage}
                     alt="Profile"
-                    className={styles.profileImagePreview}
+                    className={styles.preview}
                   />
                 ) : (
-                  <div className={styles.imagePlaceholder}>
-                    <span className={styles.plusIcon}>+</span>
-                  </div>
+                  <div className={styles.add}>+</div>
                 )}
               </label>
             </div>
-          </div>
 
-          {/* Name Input Section */}
-          <div className={styles.formSection}>
-            <label className={styles.formLabel}>Name *</label>
-            <input
-              type="text"
-              className={styles.formInput}
+            <Input
+              id="name"
+              label="Name *"
               placeholder="Enter Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-          </div>
 
-          {/* Gender and Country Row */}
-          <div className={styles.formRow}>
-            {/* Gender Dropdown Section */}
-            <div className={styles.formSection}>
-              <label className={styles.formLabel}>Gender *</label>
-              <select
-                className={styles.formSelect}
+            <div className={styles.options}>
+              <Select
+                id="gender"
+                label="Gender *"
+                isFull
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
                 <option value="">Direct input</option>
                 <option value="MALE">MALE</option>
                 <option value="FEMALE">FEMALE</option>
-              </select>
-            </div>
+              </Select>
 
-            {/* Country Dropdown Section */}
-            <div className={styles.formSection}>
-              <label className={styles.formLabel}>Country of origin *</label>
-              <select
-                className={styles.formSelect}
+              <Select
+                id="country"
+                label="Country of origin *"
+                isFull
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
               >
-                {countries.map((c) => (
+                {COUNTRIES.map((c) => (
                   <option key={c} value={c === 'Direct input' ? '' : c}>
                     {c}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
-        </div>
 
-        <button
-          className={`${styles.nextButton} ${
-            isFormValid && !isLoading ? styles.active : styles.disabled
-          }`}
-          onClick={handleNext}
-          disabled={!isFormValid || isLoading}
-        >
-          {isLoading ? 'Saving...' : 'Next'}
-        </button>
+          <Button
+            isFull
+            onClick={handleProfileUpload}
+            disabled={!isProfileInfoValid || isPending}
+          >
+            Next
+          </Button>
+        </div>
       </ContentSection>
     </div>
   );

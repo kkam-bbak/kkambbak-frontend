@@ -6,3 +6,58 @@ export async function getProfile(): Promise<Profile> {
 
   return response.data.body;
 }
+
+export type RegisterProfileInfo = {
+  name: string;
+  gender: string;
+  country: string;
+  profileImageFile?: File;
+};
+
+export async function registerProfile(info: RegisterProfileInfo) {
+  const { country, gender, name, profileImageFile } = info;
+  let imageURL: string | undefined;
+
+  if (profileImageFile) {
+    imageURL = await uploadImage(profileImageFile);
+  }
+
+  type Data = {
+    name: string;
+    gender: string;
+    countryOfOrigin: string;
+    profileImage?: string;
+  };
+  let data: Data = {
+    name: name.trim(),
+    gender,
+    countryOfOrigin: country,
+  };
+
+  if (imageURL) {
+    data = { ...data, profileImage: imageURL };
+  }
+
+  const response = await http.patch('/users/register', data);
+
+  return response;
+}
+
+export async function uploadImage(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const uploadResponse = await http.post('/upload/image', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  const imageURL = uploadResponse.data?.body?.url;
+
+  if (!imageURL) {
+    throw new Error('Failed to get image URL from upload');
+  }
+
+  return imageURL;
+}
