@@ -13,6 +13,9 @@ import {
   PERSONALITY_IMAGE_MAP,
 } from '@/constants/users';
 import { MascotInfo } from '../../ProfileCreation';
+import { useMutation } from '@tanstack/react-query';
+import { registerPersonality } from '@/apis/users';
+import { useSearchParams } from 'react-router-dom';
 
 const DIRECT = 'direct';
 
@@ -27,6 +30,19 @@ function PersonalityContent({ updateMascot }: PersonalityContentProps) {
   const [topText, setTopText] = useState('');
   const [bottomText, setBottomText] = useState('');
   const isCompleted = topText.trim() && bottomText.trim();
+  const [, setSearchParams] = useSearchParams();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: () => registerPersonality({ topText, bottomText }),
+  });
+
+  const handleNextClick = () => {
+    mutate(undefined, {
+      onSuccess: () => {
+        setSearchParams({ step: 'korean' });
+      },
+    });
+  };
 
   const handlePersonalityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -157,7 +173,9 @@ function PersonalityContent({ updateMascot }: PersonalityContentProps) {
           </div>
         </div>
 
-        <Button disabled={!isCompleted}>Next</Button>
+        <Button disabled={!isCompleted || isPending} onClick={handleNextClick}>
+          Next
+        </Button>
       </div>
     </ContentSection>
   );

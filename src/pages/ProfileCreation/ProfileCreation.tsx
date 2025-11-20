@@ -66,7 +66,6 @@ export default function ProfileCreation() {
       {
         onSuccess: () => {
           setSearchParams({ step: 'personality' });
-          console.log('성공함');
         },
       },
     );

@@ -61,3 +61,18 @@ export async function uploadImage(file: File) {
 
   return imageURL;
 }
+
+type PersonalityInfo = {
+  topText: string;
+  bottomText: string;
+};
+export async function registerPersonality(info: PersonalityInfo) {
+  const { topText, bottomText } = info;
+  const data = {
+    personalityOrImage: topText.trim(),
+    preferredNameMeaning: bottomText.trim(),
+  };
+  const response = await http.post('/users/register-korean', data);
+
+  return response;
+}
