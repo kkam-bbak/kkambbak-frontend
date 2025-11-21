@@ -10,6 +10,9 @@ import kakao from '@/assets/kakaopay.png';
 import { createPayments } from '@/apis/payments';
 import Box from '@/components/Box/Box';
 import Select from '@/components/Select/Select';
+import { AxiosError } from 'axios';
+import { AppErrorResponse } from '@/apis/http';
+import { useNavigate } from 'react-router-dom';
 
 const PLAN = {
   PREMIUM: 'Premium',
@@ -18,6 +21,7 @@ const PLAN = {
 function PaymentCheckoutPage() {
   const [isJoin, setIsJoin] = useState(false);
   const [selected, setSelected] = useState('');
+  const navigate = useNavigate();
 
   const { data: plans } = useQuery({
     queryKey: ['plans'],
@@ -35,6 +39,12 @@ function PaymentCheckoutPage() {
     mutate(undefined, {
       onSuccess: (data) => {
         window.location.href = data.approvalUrl;
+      },
+      onError: (e: AxiosError<AppErrorResponse>) => {
+        const code = e.response.data.status.statusCode;
+        if (code === 'PA007') {
+          navigate('/payment/receipt');
+        }
       },
     });
   };
