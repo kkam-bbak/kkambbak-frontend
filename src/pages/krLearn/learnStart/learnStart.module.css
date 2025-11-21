@@ -1,6 +1,6 @@
 /* learnStart.css */
 
-.learn-start-container {
+.learnStartContainer {
   width: 100%;
 }
 
@@ -16,13 +16,15 @@
 }
 
 /* -------------------- 3. 학습 카드 영역 -------------------- */
-.learning-card {
+.learningCard {
   position: absolute;
   bottom: 0;
   box-sizing: border-box;
   width: 100%;
   height: 430px;
-  padding: 15px;
+  padding-left: 15px;
+  padding-top: 15px;
+  padding-right: 15px;
   overflow: hidden;
   color: black;
   background-color: #ff5000;
@@ -30,7 +32,7 @@
 }
 
 /* 카운트다운 바 컨테이너 */
-.countdown-bar-container {
+.countdownBarContainer {
   position: absolute;
   top: 0;
   left: 0;
@@ -41,7 +43,7 @@
   background-color: black;
 }
 
-.countdown-bar-fill {
+.countdownBarFill {
   position: absolute;
   top: 3px;
   left: 0;
@@ -52,7 +54,7 @@
 }
 
 /* 제목 바 */
-.card-title-bar {
+.cardTitleBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -63,7 +65,7 @@
 }
 
 /* 단어 표시 영역 (이미지) */
-.word-display-area {
+.wordDisplayArea {
   /* 🔥🔥 수정: 자식인 countdown-bar-container의 위치 기준점 */
   position: relative;
   display: flex;
@@ -80,20 +82,20 @@
 /* 이미지 Placeholder (사과 이미지 구현) */
 
 /* -------------------- 4. 입력 필드 -------------------- */
-.input-fields-container {
+.inputFieldsContainer {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.topic-name {
+.topicName {
   top: 16px;
   left: 16px;
   font-size: 18px;
   font-weight: 500;
 }
 
-.input-row {
+.inputRow {
   display: flex;
   align-items: center;
   height: 40px;
@@ -103,18 +105,20 @@
   border-radius: 10px;
 }
 
-.input-row label {
+.inputRow label {
   width: 90px;
   padding: 0 10px;
+
   font-size: 14px;
   font-weight: 500;
   color: #757575;
   text-align: left;
 }
 
-.input-row input {
+.inputRow input {
   flex-grow: 1;
   height: 100%;
+  width: 150px;
   font-size: 16px;
   font-weight: 500;
   color: white;
@@ -124,11 +128,11 @@
 }
 
 /* Translation 행 (주황색 배경) */
-.input-row.translation {
+.inputRow.translation {
   background-color: #ff5000;
 }
 
-.input-row.translation label {
+.inputRow.translation label {
   width: 90px;
   height: 100%;
   line-height: 44px;
@@ -136,31 +140,38 @@
   background-color: black;
 }
 
-.input-row.translation input {
+.inputRow.translation input {
   color: white;
   background-color: black;
 }
 
-/* 스피커 아이콘 */
-.speaker-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.speakerIcon {
   width: 44px;
   height: 100%;
-  color: white;
-  cursor: pointer;
   background-color: #000;
   border: none;
+  cursor: pointer;
+ 
+  transition: opacity 0.2s;
 }
 
-.speaker-icon:disabled {
-  color: #333; /* 비활성화 시 색상 */
+/* 2. 버튼 비활성화 상태 (disabled) */
+/* React의 disabled={!isSpeakerActive}가 true일 때 적용됨 */
+.speakerIcon:disabled {
   cursor: not-allowed;
+  opacity: 0.3;      /* 아이콘을 흐리게 만듦 */
+}
+
+/* 3. 내부 이미지 스타일 */
+.speakerIconImage {
+  width: 24px;       /* 아이콘 크기 (버튼보다 작게) */
+  height: 24px;
+  
+
 }
 
 /* -------------------- 5. 마이크 버튼 -------------------- */
-.mic-button {
+.micButton {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -176,33 +187,58 @@
   transition: background-color 0.1s, color 0.1s;
 }
 
-.action-buttons-container {
+/* -------------------- 6. 액션 버튼 (Try Again / Next) -------------------- */
+
+.actionButtonsContainer {
   display: flex;
   gap: 10px;
   margin-top: 10px;
+  width: 100%; /* 부모 너비 꽉 채우기 */
 }
 
-.action-button {
-  width: 156px;
-  height: 40px;
+.actionButton {
+  /* 레이아웃: 고정 너비 대신 flex-grow를 써서 반반씩 공간을 차지하게 함 */
+  flex-grow: 1; 
+  /* width: 156px;  <-- 삭제 추천 */
+  
+  height: 40px; /* 마이크 버튼과 높이 맞춤 (보통 50px) */
+
+  /* 🔥 [필수] 시각적 스타일 정의 */
+  background-color: white; /* 배경 흰색 */
+  color: black;            /* 글자 검은색 */
+  border: none;            /* 기본 테두리 제거 */
+  border-radius: 10px;     /* 둥근 모서리 */
+
+  /* 폰트 스타일 */
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  
+  /* 클릭 효과 (선택사항) */
+  transition: background-color 0.2s;
+  margin-top: 10px;
 }
 
-.mic-button.off {
+.actionButton:active {
+  background-color: #f0f0f0; /* 클릭 시 약간 어두워짐 */
+}
+
+.micButton.off {
   color: black;
   background-color: white;
 }
 
-.mic-button.on {
+.micButton.on {
   color: white;
   background-color: black;
 }
 
-.mic-button.on .mic-icon {
+.micButton.on .micIcon {
   color: white;
 }
 
 /* 비활성화 상태 */
-.mic-button.disabled {
+.micButton.disabled {
   color: #e3e3e3;
   cursor: not-allowed;
   background-color: white;

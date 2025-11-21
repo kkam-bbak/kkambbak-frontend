@@ -1,0 +1,46 @@
+.page-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.page-container.is-Join {
+  justify-content: flex-start;
+}
+
+.mascot-container {
+  position: relative;
+  top: 30px;
+}
+
+.button-wrap {
+  padding: 0 16px 16px;
+}
+
+.content-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffeb00 !important;
+}
+
+.pay img {
+  height: 20px;
+}
