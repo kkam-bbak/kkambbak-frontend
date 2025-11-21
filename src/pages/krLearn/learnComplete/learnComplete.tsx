@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; 
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
-import type { WordResult } from '../learnStart/learnStart'; // 경로 확인!
+import type { WordResult } from '../learnStart/learnStart'; 
 import styles from './learnComplete.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
@@ -46,13 +46,14 @@ const ResultRow = ({ icon: Icon, value }: { icon: React.ElementType; value: stri
   </div>
 );
 
-// 전달받을 데이터 타입
+// 🔥 [수정 1] LocationState에 categoryName 추가
 interface LocationState {
   sessionId?: number;
   resultId?: number;
   results?: WordResult[];
   topicName?: string;
-  learningDuration?: number; // 시간
+  learningDuration?: number;
+  categoryName?: string; // 🔥 추가됨
 }
 
 const LearnComplete: React.FC = () => {
@@ -65,10 +66,12 @@ const LearnComplete: React.FC = () => {
   const topicName = state?.topicName || 'Result'; 
   const learningDurationMs = state?.learningDuration || 0;
 
+  // 🔥 [수정 2] 카테고리 이름 가져오기 (없으면 기본값 'TOPIK')
+  const categoryName = state?.categoryName || 'TOPIK';
+
   const correctCount = results.filter(r => r.isCorrect).length;
   const totalCount = results.length || 0;
 
-  // 시간 포맷팅
   const learningTime = useMemo(() => formatDuration(learningDurationMs), [learningDurationMs]);
   const completionDate = useMemo(() => getFormattedCompletionDate(), []);
 
@@ -90,14 +93,18 @@ const LearnComplete: React.FC = () => {
             resultId: state?.resultId,
             results: results,
             topicName: topicName,
-            learningTime: learningTime // 시간 전달
+            learningTime: learningTime,
+            // categoryName: categoryName (리뷰 페이지에서도 필요하다면 추가)
         }
     });
   };
 
   const handleTryAgain = () => {
     if (currentSessionId) {
-      navigate(`/mainPage/learn/${currentSessionId}`); 
+      // 🔥 Try Again 할 때도 카테고리 정보를 유지해서 보냅니다.
+      navigate(`/mainPage/learn/${currentSessionId}`, {
+          state: { categoryName: categoryName }
+      }); 
     } else {
       navigate('/mainpage/learnList');
     }
@@ -105,24 +112,50 @@ const LearnComplete: React.FC = () => {
 
   const handleNextLearning = async () => {
     try {
+      console.log(`[Next Learning] Fetching list for category: ${categoryName}`);
+      
+      // 🔥 [수정 3] API 호출 시 category 파라미터 추가 (C007 에러 해결)
       const response = await http.get<NextLearningResponse>('/api/v1/learning/sessions', {
-        params: { limit: 10 }
+        params: { 
+            limit: 20,
+            category: categoryName // 🔥 필수!
+        }
       });
+
       const sessions = response.data.body.sessions;
 
       if (sessions && sessions.length > 0) {
-        // 현재 완료한 ID가 아닌 다른 세션 찾기
-        const nextSession = sessions.find(s => s.id !== currentSessionId);
+        // 1순위: 완료 안 된 것 중 다른 ID
+        let nextSession = sessions.find(s => !s.completed && s.id !== currentSessionId);
+        
+        // 2순위: 없으면 그냥 다음 번호
+        if (!nextSession) {
+            nextSession = sessions.find(s => s.id > (currentSessionId || 0));
+        }
+
+        // 3순위: 그것도 없으면 목록의 첫 번째 (현재 ID 제외)
+        if (!nextSession) {
+            nextSession = sessions.find(s => s.id !== currentSessionId);
+        }
+
         if (nextSession) {
-            navigate(`/mainPage/learn/${nextSession.id}`);
+            console.log(`[Next Learning] Starting: ${nextSession.title}`);
+            
+            // 🔥 [수정 4] 다음 학습으로 이동할 때도 카테고리 정보를 넘겨줘야 계속 유지됨
+            navigate(`/mainPage/learn/${nextSession.id}`, {
+                state: { categoryName: categoryName }
+            });
         } else {
-            alert("다음 학습 세션이 없습니다.");
+            console.log("[Next Learning] No suitable next session found.");
+            alert("더 이상 진행할 학습이 없습니다. 목록으로 이동합니다.");
             navigate('/mainpage/learnList');
         }
       } else {
+        console.log("[Next Learning] No sessions returned.");
         alert("학습 가능한 세션이 없습니다.");
         navigate('/mainpage/learnList');
       }
+
     } catch (error) {
       console.error("Failed to fetch next learning session:", error);
       navigate('/mainpage/learnList');
@@ -133,6 +166,7 @@ const LearnComplete: React.FC = () => {
     <div className={styles.learnCompleteContainer}>
       <Header hasBackButton />
       <Mascot image={characterImageSrc} text={speechBubbleText} />
+
       <div className={styles.completeCard}>
         <h1 className={styles.sessionCompleteTitle}>Session Complete!</h1>
         <div className={styles.resultsBox}>
@@ -141,10 +175,12 @@ const LearnComplete: React.FC = () => {
           <ResultRow icon={Clock} value={learningTime} />
           <ResultRow icon={Calendar} value={completionDate} />
         </div>
+
         <div className={styles.actionButtonsRow}>
           <button onClick={handleReview} className={styles.actionButton}>Review</button>
           <button onClick={handleTryAgain} className={styles.actionButton}>Try again</button>
         </div>
+
         <button onClick={handleNextLearning} className={styles.nextLearningButton}>
           Next learning
         </button>

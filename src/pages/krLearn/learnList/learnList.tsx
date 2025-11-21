@@ -231,7 +231,13 @@ const LearnList: React.FC = () => {
     handleCloseInfoModal();
     
     console.log(`[Confirm Start] Navigating to: /mainPage/learn/${topicId}`);
-    navigate(`/mainPage/learn/${topicId}`); 
+    
+    // 🔥 [수정] 이동할 때 categoryName을 함께 보냅니다!
+    navigate(`/mainPage/learn/${topicId}`, {
+        state: {
+            categoryName: activeTab.toUpperCase() // 'TOPIK' or 'CASUAL'
+        }
+    }); 
   };
 
   // 🔥 Start 버튼 클릭 시 로직

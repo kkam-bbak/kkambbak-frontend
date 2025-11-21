@@ -7,7 +7,7 @@ import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
-// --- 인터페이스 정의 (기존 유지) ---
+// --- 인터페이스 정의 ---
 interface ApiResponseBody<T> {
   status: { statusCode: string; message: string; description: string | null };
   body: T;
@@ -29,6 +29,7 @@ interface FirstVocabulary {
   imageId: string;
 }
 type LearningStartResponse = ApiResponseBody<LearningStartBody>;
+
 interface NextItem {
   itemId: number;
   korean: string;
@@ -36,6 +37,7 @@ interface NextItem {
   english: string;
   imageUrl: string; 
 }
+
 interface GradeData {
   correct: boolean;
   moved: boolean;
@@ -44,6 +46,7 @@ interface GradeData {
   correctAnswer: string | null;
 }
 type GradeResponse = ApiResponseBody<GradeData>;
+
 interface LearningContent {
   topicTitle: string;
   itemId: number;
@@ -52,17 +55,21 @@ interface LearningContent {
   translation: string;
   imageUrl: string;
 }
+
 export interface WordResult {
   romnized: string;
   korean: string;
   translation: string;
   isCorrect: boolean;
 }
+
 interface LocationState {
   wordsToRetry?: WordResult[];
   isRetryWrong?: boolean;
   baseResultId?: number;
+  categoryName?: string;
 }
+
 type LearningStatus = 'initial' | 'listen' | 'countdown' | 'speak';
 type ResultStatus = 'none' | 'processing' | 'correct' | 'incorrect';
 type ResultDisplayStatus = 'none' | 'initial_feedback' | 'meaning_revealed';
@@ -94,11 +101,61 @@ const nextItemToContent = (item: NextItem, topicTitle: string): LearningContent 
   imageUrl: item.imageUrl || 'https://placehold.co/100x100/E64A19/FFFFFF?text=' + item.korean,
 });
 
+// 🔥 [필수] WAV 변환 유틸리티 (서버가 WebM을 못 읽는 경우 대비)
+const writeWavHeader = (sampleRate: number, dataLength: number) => {
+  const buffer = new ArrayBuffer(44);
+  const view = new DataView(buffer);
+
+  const writeString = (view: DataView, offset: number, string: string) => {
+    for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+  };
+
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, 36 + dataLength, true);
+  writeString(view, 8, 'WAVE');
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); 
+  view.setUint16(22, 1, true); 
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true); 
+  writeString(view, 36, 'data');
+  view.setUint32(40, dataLength, true);
+
+  return buffer;
+};
+
+const convertToWav = async (webmBlob: Blob): Promise<File> => {
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const arrayBuffer = await webmBlob.arrayBuffer();
+  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+  const channelData = audioBuffer.getChannelData(0); // Mono
+  const dataLength = channelData.length * 2; 
+  const buffer = new ArrayBuffer(dataLength);
+  const view = new DataView(buffer);
+
+  for (let i = 0; i < channelData.length; i++) {
+    const sample = Math.max(-1, Math.min(1, channelData[i]));
+    view.setInt16(i * 2, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+  }
+
+  const header = writeWavHeader(audioBuffer.sampleRate, dataLength);
+  const wavBlob = new Blob([header, buffer], { type: 'audio/wav' });
+  return new File([wavBlob], "recording.wav", { type: "audio/wav" });
+};
+
+
 const LearnStart: React.FC = () => {
-  const { topicId: sessionIdParam } = useParams<{ topicId: string }>();
   const location = useLocation();
+  const state = location.state as LocationState;
+  const { topicId: sessionIdParam } = useParams<{ topicId: string }>();
+
   const navigate = useNavigate();
-  
+  const currentCategory = state?.categoryName || 'TOPIK';
+
   // Refs
   const hasFetched = useRef(false); 
   const startTimeRef = useRef<number>(0);
@@ -106,7 +163,7 @@ const LearnStart: React.FC = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  const state = location.state as LocationState;
+
   const wordsToRetry = state?.wordsToRetry;
   const isRetryWrong = state?.isRetryWrong || false;
   const initialBaseResultId = state?.baseResultId || null;
@@ -144,7 +201,7 @@ const LearnStart: React.FC = () => {
     window.speechSynthesis.speak(utterance);
   }, []);
 
-  // 데이터 처리
+  // 데이터 처리 및 타이머 시작
   const handleSessionData = (data: LearningStartBody) => {
       if (data.firstVocabulary) {
         setContent(firstVocabToContent(data.firstVocabulary, data.sessionTitle));
@@ -193,147 +250,39 @@ const LearnStart: React.FC = () => {
 
     } catch (error: any) {
       console.error('Failed to start session:', error);
-      
-      // 🔥 [수정 1] C001(중복) 에러여도 "오답 학습 모드(isRetryWrong)"면 무조건 Mock으로 진행!
-      if (error.response?.data?.status?.statusCode === 'C001' || isRetryWrong) {
-         console.warn("⚠️ 이미 진행 중인 세션입니다. (Mock Data 사용)");
-         
-         // 오답 모드면 wordsToRetry를 사용하거나 임시 데이터 사용
-         const mockBody: LearningStartBody = {
-             sessionId: numericSessionId,
-             resultId: 99999,
-             vocabIds: [1, 2, 3],
-             totalVocabularyCount: isRetryWrong ? (wordsToRetry?.length || 3) : 3,
-             baseResultId: null,
-             sessionTitle: "Casual_Emotions (Practice)",
-             firstVocabulary: {
-                 // 오답 목록이 있으면 첫 번째 단어를 보여줌
-                 vocabularyId: 101,
-                 korean: isRetryWrong && wordsToRetry?.[0] ? wordsToRetry[0].korean : "행복해요",
-                 romanization: isRetryWrong && wordsToRetry?.[0] ? wordsToRetry[0].romnized : "Haengbok-haeyo",
-                 english: isRetryWrong && wordsToRetry?.[0] ? wordsToRetry[0].translation : "I am happy",
-                 imageId: "https://placehold.co/200x200/orange/white?text=Mock"
-             }
-         };
-         handleSessionData(mockBody);
-         return; 
-      }
-      
-      navigate('/mainpage/learn/complete', { state: { message: 'Failed to load session data.' } });
+      // C001 등 에러 발생 시 안전하게 목록으로
+      alert("세션 시작 실패: " + (error.response?.data?.status?.message || "알 수 없는 오류"));
+      navigate('/mainpage/learnList');
     } finally {
       setIsLoading(false);
     }
   }, [sessionIdParam, navigate, wordsToRetry, isRetryWrong, baseResultId]);
 
+  // 🔥 채점 로직
   const startGrading = useCallback(async (action: 'GRADE' | 'NEXT_AFTER_WRONG', audioFile: File | null = null) => {
-      // Mock Mode 허용
-      if (resultId === null && content.topicTitle !== "Casual_Emotions (Practice)") { 
-          console.error('Result ID is missing.'); return; 
-      }
-      
+      if (resultId === null) { console.error('Result ID is missing.'); return; }
       const numericSessionId = Number(sessionIdParam);
 
-      // 🔥 [수정 2] Next 버튼 누를 땐 로딩 표시 없이 바로 넘어가게 함 (깜빡임 방지)
-      if (action === 'GRADE') {
-          setIsProcessing(true);
+      // 🔥 [중요] GRADE인데 파일이 없으면 멈춰야 L009 에러 안 남
+      if (action === 'GRADE' && !audioFile) {
+          console.error("❌ 녹음 파일이 생성되지 않았습니다. 채점 중단.");
+          alert("녹음된 소리가 없습니다. 다시 시도해주세요.");
+          setResultStatus('incorrect'); 
+          return;
       }
+
+      if (action === 'GRADE') setIsProcessing(true);
       setMicOn(false);
 
-      // ---------------------------------------------------------
-      // 🧪 Mock Mode 시뮬레이션 (오답 학습 or 테스트용)
-      // ---------------------------------------------------------
-      if (resultId === 99999) {
-          if (action === 'GRADE') {
-              await new Promise(resolve => setTimeout(resolve, 800));
-          }
-
-          let isMockCorrect = false;
-          
-          if (action === 'GRADE') {
-              isMockCorrect = Math.random() > 0.5; 
-          }
-
-          // 결과 저장
-          if (isMockCorrect || action === 'NEXT_AFTER_WRONG') {
-              resultsRef.current.push({
-                  romnized: content.romanized, 
-                  korean: content.korean,
-                  translation: content.translation,
-                  isCorrect: isMockCorrect
-              });
-          }
-
-          // 🔥 오답이고 GRADE면 여기서 멈춤 (Try Again UI 표시)
-          if (!isMockCorrect && action === 'GRADE') {
-              setResultStatus('incorrect');
-              setDisplayStatus('none');
-              setIsProcessing(false);
-              return; 
-          }
-
-          // 정답이거나 Next 버튼일 때만 다음으로 이동
-          const isLastQuestion = currentWordIndex >= totalWords;
-          
-          if (isLastQuestion) {
-                const endTime = Date.now();
-                const duration = endTime - startTimeRef.current;
-                
-                // 정답 화면 보여주고 이동
-                if (isMockCorrect) {
-                    setResultStatus('correct');
-                    setDisplayStatus('initial_feedback');
-                    setTimeout(() => {
-                        navigate('/mainpage/learn/complete', { 
-                            state: { 
-                                resultId: resultId,
-                                sessionId: numericSessionId,
-                                results: resultsRef.current,
-                                topicName: content.topicTitle,
-                                learningDuration: duration
-                            } 
-                        });
-                    }, 1000);
-                } else {
-                    // Next 버튼으로 끝낸 경우 바로 이동
-                    navigate('/mainpage/learn/complete', { 
-                        state: { 
-                            resultId: resultId,
-                            sessionId: numericSessionId,
-                            results: resultsRef.current,
-                            topicName: content.topicTitle,
-                            learningDuration: duration
-                        } 
-                    });
-                }
-          } else {
-                // 다음 문제 이동
-                if (isMockCorrect) {
-                    setResultStatus('correct');
-                    setDisplayStatus('initial_feedback');
-                    setTimeout(() => {
-                        setCurrentWordIndex((prev) => prev + 1);
-                        setStatus('initial');
-                        setResultStatus('none');
-                    }, 1000);
-                } else {
-                    // Next 버튼: 딜레이 없이 바로 이동
-                    setCurrentWordIndex((prev) => prev + 1);
-                    setStatus('initial');
-                    setResultStatus('none');
-                }
-          }
-          
-          setIsProcessing(false);
-          return; 
-      }
-
-      // ---------------------------------------------------------
-      // 🚀 Real Mode: 실제 API 호출
-      // ---------------------------------------------------------
       const formData = new FormData();
       formData.append('action', action);
       formData.append('itemId', String(content.itemId));
-      if (audioFile) formData.append('audioFile', audioFile);
+      
+      if (audioFile) {
+          // 🔥 파일이 실제로 존재하는지 확인 로그
+          console.log(`📁 Sending Audio: ${audioFile.name} (${audioFile.size} bytes)`);
+          formData.append('audioFile', audioFile);
+      }
 
       try {
         const response = await http.post<GradeResponse>(
@@ -343,7 +292,13 @@ const LearnStart: React.FC = () => {
         );
         const data = response.data.body;
         
-        // 결과 저장
+        console.log("✅ Server Response:", data.correct ? "CORRECT" : "WRONG");
+
+        setResultStatus(data.correct ? 'correct' : 'incorrect');
+        if (data.correct) setDisplayStatus('initial_feedback');
+        else setDisplayStatus('none');
+
+        // 결과 저장 (정답 or Next)
         if (data.correct || action === 'NEXT_AFTER_WRONG') {
             resultsRef.current.push({
                 romnized: content.romanized, 
@@ -353,25 +308,16 @@ const LearnStart: React.FC = () => {
             });
         }
 
-        // 🔥 오답이면 멈춤 (UI 갱신)
+        // 🔥 오답이면 멈춤 (Try Again 대기)
         if (!data.correct && action === 'GRADE') {
-            setResultStatus('incorrect');
-            setDisplayStatus('none'); // 메시지 숨김
             setIsProcessing(false);
             return; 
         }
 
-        // 정답 시 UI 갱신
-        if (data.correct) {
-            setResultStatus('correct');
-            setDisplayStatus('initial_feedback');
-        }
-
-        // 다음 진행 (완료)
+        // 완료 처리
         if (data.finished) {
              const endTime = Date.now();
              const duration = endTime - startTimeRef.current;
-
              setTimeout(() => {
                 if (isRetryWrong) {
                     navigate(`/mainpage/review/${content.topicTitle}`, { state: { baseResultId } });
@@ -382,20 +328,20 @@ const LearnStart: React.FC = () => {
                             sessionId: numericSessionId,
                             results: resultsRef.current,
                             topicName: content.topicTitle,
-                            learningDuration: duration
+                            learningDuration: duration,
+                            categoryName: currentCategory,
                         } 
                     });
                 }
-             }, data.correct ? 2000 : 0); // 정답이면 2초 대기 후 이동
+             }, 2000); 
              return;
         }
 
-        // 다음 문제 진행
+        // 다음 문제
         if (data.next) {
             const nextContent = nextItemToContent(data.next, content.topicTitle);
             
             if(data.correct){
-                // 정답: 2초 뒤 이동
                 setTimeout(() => {
                     setContent(nextContent);
                     setCurrentWordIndex((prev) => prev + 1);
@@ -403,7 +349,6 @@ const LearnStart: React.FC = () => {
                     setResultStatus('none');
                 }, 2000); 
             } else {
-                // 🔥 [수정 3] Next 버튼: 딜레이 없이 즉시 이동
                 if(action === 'NEXT_AFTER_WRONG'){
                     setContent(nextContent);
                     setCurrentWordIndex((prev) => prev + 1);
@@ -412,22 +357,29 @@ const LearnStart: React.FC = () => {
                 }
             }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Grading failed:', error);
+        
+        // 에러 메시지 상세 확인
+        const serverMsg = error.response?.data?.status?.message || "Unknown Error";
+        const serverDesc = error.response?.data?.status?.description || "";
+        console.log(`❌ API Error: ${serverMsg} / ${serverDesc}`);
+
+        // L009 에러(파일 누락)가 아니면 오답 처리
         setResultStatus('incorrect'); 
+        alert(`채점 실패: ${serverDesc || "다시 시도해주세요."}`);
       } finally {
         setIsProcessing(false);
       }
-    }, [resultId, content, navigate, isRetryWrong, baseResultId, sessionIdParam, currentWordIndex, totalWords]);
+    }, [resultId, content, navigate, isRetryWrong, baseResultId, sessionIdParam]);
 
-  // ... (useEffect, handleAction 등 나머지 코드는 변경 없음) ...
-  
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
     fetchLearningData();
   }, [fetchLearningData]);
 
+  // 타이머 로직 (기존 유지)
   useEffect(() => {
     let timer: number | undefined;
     if (isLoading || totalWords === 0) return; 
@@ -449,6 +401,7 @@ const LearnStart: React.FC = () => {
           if (newTime >= 10) {
             if (countdownRef.current !== null) clearInterval(countdownRef.current);
             setStatus('speak');
+            // 시간 초과 -> 오답 처리 (파일 없이 호출 -> startGrading에서 방어)
             startGrading('GRADE', null); 
             return 10;
           }
@@ -471,6 +424,7 @@ const LearnStart: React.FC = () => {
     else if (action === 'tryAgain') { setStatus('initial'); setResultStatus('none'); setDisplayStatus('none'); }
   };
 
+  // 녹음 로직 (WAV 변환 적용)
   const handleMicDown = async (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     if (!isMicActiveForRecording) return;
@@ -490,16 +444,42 @@ const LearnStart: React.FC = () => {
     }
   };
 
+  // 🔥 [중요] WAV 변환 후 전송
   const handleMicUp = () => {
     if (!isMicActiveForRecording || !micOn || !mediaRecorderRef.current) return;
-    mediaRecorderRef.current.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const audioFile = new File([audioBlob], "recording.webm", { type: 'audio/webm' });
-        startGrading('GRADE', audioFile);
-        if (mediaRecorderRef.current?.stream) {
-            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+
+    mediaRecorderRef.current.onstop = async () => {
+        try {
+            if (audioChunksRef.current.length === 0) {
+                console.error("❌ No audio data recorded.");
+                return;
+            }
+
+            const webmBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+            console.log(`🎙️ WebM Blob created. Size: ${webmBlob.size}`);
+
+            // WAV 변환
+            const wavFile = await convertToWav(webmBlob);
+            console.log(`🎵 Converted to WAV. Size: ${wavFile.size}`);
+            
+            if (wavFile.size === 0) {
+                alert("녹음 오류: 파일 크기가 0입니다.");
+                return;
+            }
+
+            // 전송
+            startGrading('GRADE', wavFile);
+
+        } catch (error) {
+            console.error("❌ WAV Conversion Error:", error);
+            alert("오디오 처리 중 오류가 발생했습니다.");
+        } finally {
+            if (mediaRecorderRef.current?.stream) {
+                mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+            }
         }
     };
+
     mediaRecorderRef.current.stop();
     setMicOn(false);
   };
