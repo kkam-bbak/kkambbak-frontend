@@ -1,0 +1,159 @@
+
+/* -------------------- 3. 요약 카드 (Session Complete!) -------------------- */
+.summaryTitle {
+    /* JSX: className={styles.summaryTitle} */
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: black;
+    margin-left: 20px;
+}
+
+.summaryDetails {
+    /* JSX: className={styles.summaryDetails} */
+    top: 56px;
+    height: 131px;
+    border-radius: 10px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 15px;
+    margin-right: 15px;
+    background-color: black;
+    margin-bottom: 5px;
+}
+.detailItem {
+    /* JSX: className={styles.detailItem} */
+    font-size: 12px;
+    font-weight: 500;
+    padding-left: 10px;
+}
+.roleName {
+    /* JSX: className={styles.roleName} */
+    padding-top: 5px;
+    font-weight: 500;
+    font-size: 18px;
+    padding-bottom: 5px;
+}
+
+/* -------------------- 4. 히스토리 영역 -------------------- */
+
+.completeHistoryArea {
+    /* JSX: className={styles.completeHistoryArea} */
+    /* 스크롤 영역 */
+    padding-top: 10px;
+    max-height: 160px;
+    overflow-y: auto;
+    margin-left: 15px;
+    margin-right: 15px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.turnDisplayBox {
+    /* JSX: className={styles.turnDisplayBox} */
+    width: 100%;
+    height: 120px;
+    background-color: #101010;
+    border-radius: 10px;
+    margin-bottom: 45px;
+    position: relative;
+}
+
+.contentBox {
+    /* JSX: className={styles.contentBox} */
+    padding-top: 5px;
+}
+
+/* 역할 태그 */
+.roleTagContainer {
+    /* JSX: className={styles.roleTagContainer} */
+    width: 68px;
+    height: 20px;
+    border-radius: 5px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    color: black;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+/* 텍스트 줄: 하이픈 클래스명을 카멜 케이스로 변경 */
+.textLine {
+    /* JSX: className={styles.textLine} */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.completeKoreanText {
+    /* JSX: className={styles.completeKoreanText} */
+    font-size: 13px;
+    font-weight: 500;
+    color: #757575;
+}
+.completeRomanizedText {
+    /* JSX: className={styles.completeRomanizedText} */
+    font-size: 13px;
+    font-weight: 500;
+    color: #757575;
+}
+
+
+/* TurnDisplay에서 사용되는 다른 클래스들 */
+.completeEnglishText {
+    /* JSX: className={styles.completeEnglishText} */
+    color: #007CFF;
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: 15px;
+    margin-top: 10px;
+    display: block;
+}
+.smallMicIcon.active {
+    /* JSX: className={`${styles.smallMicIcon} ${styles.active}`} */
+    color: white;
+    font-size: 14px;
+}
+
+/* -------------------- 5. 하단 액션 버튼 -------------------- */
+
+.buttonsContainer {
+    /* JSX: className={styles.buttonsContainer} */
+    position: relative;
+    display: flex;
+    justify-content: center; 
+    gap: 15px;
+    padding: 10px 0; 
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+/* 하이픈 클래스명을 카멜 케이스로 변경 */
+.actionButton {
+    /* JSX: className={styles.actionButton} */
+    height: 40px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+.tryAgain {
+    /* JSX: className={styles.tryAgain} */
+    composes: actionButton; /* actionButton 스타일 상속 */
+    background-color: white;
+    color: black;
+    width: 159px;
+}
+.nextLearning {
+    /* JSX: className={styles.nextLearning} */
+    composes: actionButton; /* actionButton 스타일 상속 */
+    background-color: white;
+    color: black;
+    width: 153px;
+}

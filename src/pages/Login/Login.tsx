@@ -16,7 +16,7 @@ export default function Home() {
     try {
       setIsLoading(true);
       // Guest 로그인 API 호출
-      const response = await http.post('/api/v1/users/guest-login');
+      const response = await http.post('/users/guest-login');
 
       // API 응답에서 필요한 정보 추출
       const { body } = response.data;

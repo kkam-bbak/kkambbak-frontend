@@ -17,9 +17,13 @@ import LearnComplete from '../pages/krLearn/learnComplete/learnComplete';
 import LearnReview from '../pages/krLearn/learnReview/learnReview';
 import RoleList from '../pages/rolePlay/roleList';
 import RolePlay from '../pages/rolePlay/rolePlay';
+import RolePlayComplete from '../pages/rolePlay/rolePlayComplete';
 
 import { useUser } from '../stores/user';
 import BaseLayout from '@/components/layout/BaseLayout/BaseLayout';
+import PaymentCheckoutPage from '@/pages/PaymentPage/CheckoutPage/PaymentCheckoutPage';
+import PaymentReceiptPage from '@/pages/PaymentPage/ReceiptPage/PaymentReceiptPage';
+import CheckoutResultPage from '@/pages/PaymentPage/CheckoutPage/CheckoutResultPage/CheckoutResultPage';
 
 function Protected() {
   const user = useUser((s) => s.user);
@@ -55,27 +59,38 @@ export const router = createBrowserRouter([
       },
       {
         path: 'mainpage',
+        element: <MainLayout />,
         //element: <Protected />,
         children: [
+          { index: true, element: <MainPage /> },
+          { path: 'surveyStart', element: <SurveyStart /> },
+          { path: 'survey', element: <Survey /> },
+          { path: 'learnList', element: <LearnList /> },
+          { path: 'roleList', element: <RoleList /> },
+          { path: 'rolePlay/:roleId', element: <RolePlay /> },
+          { path: 'rolePlay/complete', element: <RolePlayComplete /> },
           {
-            element: <MainLayout />,
-            children: [
-              { index: true, element: <MainPage /> },
-              { path: 'surveyStart', element: <SurveyStart /> },
-              { path: 'survey', element: <Survey /> },
-              { path: 'learnList', element: <LearnList /> },
-              { path: 'roleList', element: <RoleList /> },
-              { path: 'rolePlay/:roleId', element: <RolePlay /> },
-
-              // LearnList.tsx에서 navigate(`/mainpage/learn/${topicId}`) 로 사용해야 합니다.
-              {
-                path: 'learn/:topicId',
-                element: <LearnStart />,
-              },
-              { path: 'learn/complete', element: <LearnComplete /> },
-
-              { path: 'learn/review', element: <LearnReview /> },
-            ],
+            path: 'learn/:topicId',
+            element: <LearnStart />,
+          },
+          { path: 'learn/complete', element: <LearnComplete /> },
+          { path: 'learn/review', element: <LearnReview /> },
+        ],
+      },
+      {
+        path: 'payment',
+        children: [
+          {
+            path: 'checkout',
+            element: <PaymentCheckoutPage />,
+          },
+          {
+            path: 'checkout/result',
+            element: <CheckoutResultPage />,
+          },
+          {
+            path: 'receipt',
+            element: <PaymentReceiptPage />,
           },
         ],
       },
