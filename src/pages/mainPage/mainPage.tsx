@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import  styles from './mainPage.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
+import learnVideo from '../../assets/Learn Korean with one blink.mp4';
+import roleplayVideo from '../../assets/Role Play.mp4';
 
 // Navigate Prop 타입 정의
 interface NavigateProp {
@@ -15,11 +17,23 @@ interface NavigateProp {
 // --------------------------------------------------
 const LearnContent: React.FC<NavigateProp> = ({ navigate }) => (
   <>
-    <div className={styles.menuHeader}>
+   <div className={styles.menuHeader}>
       <h2>Learn Korean in the blink</h2>
     </div>
     <div className={styles.extendedContent}>
-      <div className={styles.contentImageBox}>이미지 들어감</div>
+      
+      {/* 🔥 [수정] 이미지 박스 안에 video 태그 추가 */}
+      <div className={styles.contentImageBox}>
+        <video
+          src={learnVideo}
+          className={styles.videoElement} // CSS 스타일링용 클래스
+          autoPlay
+          loop
+          muted        // 소리 끔 (필수: 없으면 자동재생 안됨)
+          playsInline  // 모바일 전체화면 방지 (필수)
+        />
+      </div>
+
       <div className={styles.contentButtons}>
         <button
           className={`${styles.actionButton} ${styles.white} ${styles.fullWidth}`}
@@ -41,7 +55,17 @@ const RoleContent: React.FC<NavigateProp> = ({ navigate }) => (
       <h2>Role Play</h2>
     </div>
     <div className={styles.extendedContent}>
-      <div className={`${styles.contentImageBox} ${styles.blue}`}>이미지 들어감</div>
+      {/* 🔥 [수정] 이미지 박스 안에 video 태그 추가 */}
+      <div className={styles.contentImageBox}>
+        <video
+          src={roleplayVideo}
+          className={styles.videoElement} // CSS 스타일링용 클래스
+          autoPlay
+          loop
+          muted        // 소리 끔 (필수: 없으면 자동재생 안됨)
+          playsInline  // 모바일 전체화면 방지 (필수)
+        />
+      </div>
       <div className={`${styles.contentButtons} ${styles.center}`}>
         <button
           className={`${styles.actionButton} ${styles.white} ${styles.fullWidth}`}
