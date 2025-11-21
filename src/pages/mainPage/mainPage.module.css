@@ -1,304 +1,99 @@
-/* MainPage.module.css */
-
-/* --- 1. 공통 및 상단 섹션 --- */
-.mainContainer {
-  position: relative;
-  width: 100%;
+.page {
+  height: 100%;
 }
 
-.mainBubble {
-  /* 말풍선 위치&크기 */
-  top: 32px !important;
-  left: 50px !important;
-  width: 260px !important;
-  height: 72px !important;
-}
-
-/* -------------------- 2. 하단 메뉴 영역 (애니메이션) -------------------- */
-.menuContainer {
-  /* position: absolute; 제거, 컴포넌트 JSX에서 위치 지정 */
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* 기존 contentImageBox 스타일 유지하면서 overflow: hidden 추가 */
-.contentImageBox {
-  /* 너비, 높이, border-radius 등 기존 스타일 유지 */
-  width: 100%; 
-  height: 120px; 
-  border-radius: 20px; /* (예시) 둥근 모서리 */
-
-  position: relative;
-  overflow: hidden; /* 🔥 동영상이 둥근 모서리를 튀어나가지 않게 자름 */
-  background-color: #000; /* 로딩 전 검은 배경 */
-}
-
-
-.videoElement {
+.nav {
+  position: fixed;
+  bottom: 0;
   width: 100%;
   height: 100%;
-  
-  /* 🔥 [수정] contain(여백 생김) -> cover(꽉 채움) */
-  /* cover를 쓰면 빈 공간 없이 꽉 차지만, 위아래가 조금 잘릴 수 있습니다. */
-  object-fit: cover; 
-  
-  /* (선택 사항) 위아래가 잘릴 때 '윗부분'을 우선해서 보여주고 싶다면 아래 속성 추가 */
-  /* object-position: center top; */
-
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
+  max-height: 60vh;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 
-.menuItem {
-  position: absolute;
-  left: 0;
-  box-sizing: border-box;
-  width: 100%;
-  overflow: hidden;
-  color: black;
-  cursor: pointer;
-
-  /* 상단 좌우 모서리만 둥글게 유지 */
-  border-radius: 15px 15px 0 0;
-
-  /* 애니메이션: Top과 Height 모두 트랜지션 적용 */
-  transition: top 0.5s ease-in-out, height 0.5s ease-in-out, z-index 0.1s;
-}
-
-/* 프로필이 활성화되어 전체 화면을 덮을 때의 스타일 */
-.profileActive { /* .menu-item.profile-active */
-  padding-top: 0;
-  border-radius: 0; /* 모든 둥근 모서리 제거 */
-}
-
-/* 탭 헤더 (접혀있을 때 보이는 부분: 40px 높이) */
-.tabHeader {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  height: 40px;
-  padding: 0 20px;
-}
-
-.tabHeader h3 {
-  /* CSS Module에서는 중첩 셀렉터가 아닌 개별 클래스로 관리 권장 */
-  /* 단, h3에 top, left 속성은 위치 지정 요소가 아니므로 제거하거나 확인 필요 */
-  font-size: 18px;
-  font-weight: 500; /* 탭 제목 굵기 통일 */
-}
-
-/* 확장된 콘텐츠 영역 */
-.tabContent {
-  /* 1️⃣ Flexbox 컨테이너로 지정 */
-  display: flex;
-  flex-direction: column;
-
-  /* 탭 헤더(40px)를 제외한 나머지 높이를 100%로 채워야 함 */
-  height: calc(
-    100% - 40px
-  ); /* .menu-item 전체 높이에서 탭 헤더 높이(40px) 제외 */
-
-  /* 탭 헤더 40px를 제외한 나머지 영역에 패딩 적용 (Profile은 예외 처리) */
-  padding: 10px 20px 20px;
-}
-
-.extendedContent {
-  /* 2️⃣ 남은 공간을 모두 차지하도록 flex-grow 설정 */
-  display: flex;
-  flex-grow: 1; /* 이 영역이 남은 수직 공간을 모두 차지 */
-  flex-direction: column;
-}
-
-
-.contentButtons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 0;
-  margin-top: auto; /* 상위 flex-grow: 1; 덕분에 하단에 붙음 */
-}
-
-.contentButtons.center {
-  justify-content: center;
-}
-
-.menuHeader {
-  margin-bottom: 20px;
-}
-
-/* 확장된 콘텐츠의 h2 제목 */
-.menuHeader h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 500; /* 굵기 제거 */
-}
-
-/* --- Content Styles (Learn, Role, Game) --- */
-
-.contentImageBox {
-  width: 100%;
-  height: 165px;
-  aspect-ratio: 16 / 9; 
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  position: relative;
-  border-radius: 20px;
-}
-
-.blue { /* .menu-item-role .content-image-box.blue */
-  background-color: #007cff;
-}
-
-.green { /* .menu-item-1vs1 .content-image-box.green */
-  background-color: #39ff14;
-}
-
-.actionButton {
-  height: 45px;
-  font-size: 16px;
-  color: black;
-  cursor: pointer;
-  border: none;
-  border-radius: 10px;
-}
-
-.actionButton.white {
-  width: 48%;
-  height: 40px;
-  background-color: white;
-}
-
-.actionButton.fullWidth {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 328px;
-  max-width: 100%; /* 부모 컨테이너를 넘지 않도록 설정 */
-  height: 40px;
-  padding: 0;
-  font-family: Inter, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: black;
-  background-color: white;
-  border-radius: 10px;
-}
-
-/* --- Profile Styles (Full Screen Mode) --- */
-
-.profileTopBar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-}
-
-.profileTopHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.profileTitle {
-  margin: 0;
+.title {
   font-size: 18px;
   font-weight: normal;
 }
 
-.profileImageBox {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100px;
-  height: 100px;
-  margin: 10px auto 30px;
-  overflow: hidden;
-  background-color: #fb14ff;
-  border-radius: 50%;
-}
-
-.profileAvatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.profileFieldsContainer {
-  display: grid;
-  gap: 15px;
-  padding: 0 20px;
-}
-
-.profileField label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-  color: black;
-}
-
-.profileField input,
-.profileDescriptionBox {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-height: 45px;
-  padding: 12px 15px;
-  color: black; /* 텍스트 색상을 검은색으로 조정 (흰색 배경에 잘 보이도록) */
-  background-color: rgb(255 255 255 / 90%); /* 배경을 흰색 반투명으로 조정 */
-  border: 1px solid #eee;
-  border-radius: 8px;
-}
-
-.profileDescriptionBox {
-  min-height: 70px;
-  align-items: flex-start; /* 텍스트가 상단에 정렬되도록 수정 */
-}
-
-.profileRowFields {
-  display: flex;
-  gap: 15px;
-}
-
-.halfWidth { /* .profile-row-fields .half-width */
-  flex: 1;
-}
-
-.noRoundsLeft {
-  margin-top: 5px;
-  font-size: 12px;
-  color: rgb(0 0 0 / 60%); /* 글자색을 검은색으로 조정 */
-  text-align: right;
-}
-
-.profileButtons {
-  position: sticky;
+.item {
+  position: absolute;
   bottom: 0;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: space-between;
+  left: 0;
   width: 100%;
-  padding: 20px;
-  background-color: #da70d6; /* 프로필 색상 유지 */
+  padding: 16px;
+  cursor: pointer;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  transition: grid-template-rows 0.3s ease;
 }
 
-.profileButtons .actionButton {
-  width: 30%;
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  height: 100%;
+  transition: grid-template-rows 0.3s ease, height 0.2s ease;
 }
 
-/* 추가적인 탭 헤더 스타일 */
-.largeText {
-    font-size: 1.5em;
-    font-weight: bold;
+.learn .panel {
+  transition: none;
 }
 
-.collapsedText {
-    font-size: 1.2em;
-    font-weight: 500;
+.panel.is-open {
+  grid-template-rows: 1fr;
+}
+
+.nav[data-open='role'] .role .panel {
+  height: calc(60vh - 52px - 52px - 52px); /* 각 nav의 header 높이 */
+}
+
+.nav[data-open='profile'] .title {
+  display: none;
+}
+
+.nav[data-open='profile'] .profile .panel {
+  height: calc(100vh - 12px - 16px); /* 상, 하단 여백  */
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  overflow: hidden;
+}
+
+.learn {
+  top: 0;
+  padding-bottom: calc(
+    52px * 2 + 32px
+  ); /* role, profile header * 2 + 추가 여백 */
+
+  background-color: var(--color-primary-orange);
+}
+
+.role {
+  padding-bottom: calc(52px + 16px); /* profile header + 추가 여백 */
+  background-color: var(--color-primary-blue);
+}
+
+.profile {
+  background-color: var(--color-primary-pink);
+}
+
+@media (min-width: 600px) {
+  .nav {
+    position: absolute;
+    bottom: 0;
+    height: 430px;
+  }
+
+  .nav[data-open='role'] .role .panel {
+    height: 266px;
+  }
+
+  .nav[data-open='profile'] .profile .panel {
+    height: calc(720px - 12px - 16px); /* 상, 하단 여백 */
+  }
 }
