@@ -11,9 +11,8 @@ import Box from '@/components/Box/Box';
 function CheckoutResultPage() {
   const { user } = useUser();
   const { data, isLoading } = useQuery({
-    queryKey: ['payments', 'result', user.accessToken],
+    queryKey: ['payments', 'result', user?.name],
     queryFn: getPaymentsResult,
-    enabled: false,
   });
   const [searchParams] = useSearchParams();
 
@@ -34,11 +33,14 @@ function CheckoutResultPage() {
       </div>
 
       <div className={styles.info}>
-        <Box text="Premium" label="Item *" />
+        <Box
+          text={data?.planName === 'PREMIUM' ? 'Premium' : ''}
+          label="Item *"
+        />
 
-        <Box text="Emily Parker" label="User Name *" />
+        <Box text={data?.userName ?? ''} label="User Name *" />
 
-        <Box text="XXXXX@gmail.com" label="Email *" />
+        <Box text={data?.userEmail ?? ''} label="Email *" />
       </div>
 
       <Link to={'/mainpage/learnList'}>

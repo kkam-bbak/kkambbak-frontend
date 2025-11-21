@@ -15,8 +15,14 @@ export async function createPayments(
   return response.data.body;
 }
 
-export async function getPaymentsResult() {
+type ResponsePaymentsResult = {
+  userName: string;
+  userEmail: string;
+  planName: string;
+};
+
+export async function getPaymentsResult(): Promise<ResponsePaymentsResult> {
   const response = await http.get('/payments/result');
 
-  return response;
+  return response.data.body;
 }
