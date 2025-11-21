@@ -39,6 +39,23 @@ button {
   border: 0;
 }
 
+h1 {
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  list-style-type: none;
+}
+
 #root {
   display: flex;
   align-items: center;
