@@ -1,4 +1,4 @@
-.role-list-container {
+.roleListContainer {
   width: 100%;
 }
 
@@ -14,7 +14,7 @@
 /* -------------------- 2. 하단 목록 섹션 (Role-common.css의 .content-window 사용) -------------------- */
 
 /* 목록 헤더 (Role Play 타이틀 및 Subscribe 버튼) */
-.role-list-content-header {
+.roleListContentHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,14 +22,14 @@
   background-color: transparent; /* content-window의 파란색 배경을 사용 */
 }
 
-.role-list-title {
+.roleListTitle {
   margin: 0;
   font-size: 18px;
   font-weight: 500;
   color: black; /* 파란색 배경 위 흰색 텍스트 */
 }
 
-.subscribe-button {
+.subscribeButton {
   width: 81px;
   height: 22px;
   padding: 5px 10px;
@@ -43,7 +43,7 @@
 }
 
 /* 역할극 목록 컨테이너 (스크롤 가능) */
-.role-list-items-container {
+.roleListItemsContainer {
   /* content-window의 height 430px 기준, 헤더(약 60px)를 제외한 나머지 공간 사용 */
   height: calc(100% - 60px);
   padding: 0 15px 10px;
@@ -54,19 +54,19 @@
 
 /* 🔥 content-window 스크롤바 제거 (RoleList의 요구사항) */
 .content-window::-webkit-scrollbar,
-.role-list-items-container::-webkit-scrollbar {
+.roleListItemsContainer::-webkit-scrollbar {
   display: none;
 }
 
 .content-window,
-.role-list-items-container {
+.roleListItemsContainer {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 /* -------------------- 3. 단어 개별 항목 (선택/비선택 상태 처리) -------------------- */
 
-.role-item-row {
+.roleItemRow {
   box-sizing: border-box;
 
   /* 🔥 정렬: 수직 정렬로 변경 */
@@ -85,12 +85,12 @@
 }
 
 /* 🔥 선택된 항목의 스타일 */
-.role-item-row.selected {
+.roleItemRow.selected {
   color: white; /* 🔥 텍스트 색상 흰색으로 변경 */
 }
 
 /* 1. 제목 및 Start 버튼을 감싸는 헤더 (항목의 첫 줄) */
-.role-item-header {
+.roleItemHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -98,14 +98,14 @@
   margin-bottom: 13px;
 }
 
-.role-item-title {
+.roleItemTitle {
   font-size: 18px;
   font-weight: 500;
   color: inherit; /* 부모(.role-item-row)의 색상을 상속받음 (회색/흰색) */
 }
 
 /* 2. 시간 정보를 담는 영역 (항목의 두 번째 줄) */
-.role-item-info {
+.roleItemInfo {
   display: flex;
   gap: 11px;
   align-items: center;
@@ -113,7 +113,7 @@
   width: 100%;
 }
 
-.role-start-button {
+.roleStartButton {
   /* 이 버튼은 isSelected가 아닐 때 JSX에서 렌더링되지 않으므로, 스타일은 Selected 상태를 반영 */
   width: 65px;
   height: 20px;
@@ -126,13 +126,13 @@
   border-radius: 5px;
 }
 
-.role-time {
+.roleTime {
   font-size: 12px;
   font-weight: 500;
   color: inherit;
 }
 
-.role-time-icon {
+.roleTimeIcon {
   width: 10px;
   height: 10px;
   color: inherit;

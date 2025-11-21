@@ -1,0 +1,358 @@
+
+/* -------------------- 2. 카드 내부 컴포넌트 스타일 -------------------- */
+
+/* 카드 타이틀 바 */
+.cardTitleBar {
+    /* JSX: className={styles.cardTitleBar} */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: transparent;
+}
+
+.cardTitleText {
+    /* JSX: className={styles.cardTitleText} */
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+    color: black;
+}
+
+.cardStepText {
+    /* JSX: className={styles.cardStepText} */
+    font-size: 18px;
+    font-weight: 500;
+}
+
+
+/* 대화 기록 스크롤 영역 */
+.turnHistoryArea {
+    /* JSX: className={styles.turnHistoryArea} */
+    padding-left: 15px;
+    padding-right: 15px;
+    height: calc(100% - 145px); 
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* 텍스트 표시 박스 (검은색) */
+.textDisplayBox {
+    /* JSX: className={styles.textDisplayBox} */
+    width: 100%;
+    height: 120px;
+    background-color: #101010;
+    border-radius: 10px;
+    margin-bottom: 45px;
+    position: relative;
+}
+
+.historyBox{
+    /* JSX: className={styles.historyBox} */
+    composes: textDisplayBox; /* textDisplayBox 스타일 상속 */
+    margin-bottom: 35px;
+}
+
+
+.dividerLine {
+    /* JSX: className={styles.dividerLine} */
+    width: 328px;
+    border: 1px solid black;
+}
+
+.textLine {
+    /* JSX: className={styles.textLine} */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 15px 15px 15px;
+}
+
+/* 한국어 원문 텍스트 */
+.koreanText {
+    /* JSX: className={styles.koreanText} */
+    font-size: 13px;
+    color: white;
+    font-weight: 500;
+    margin-bottom: -15px;
+}
+
+/* 🎧 듣기 버튼 */
+.ttsButton {
+    /* JSX: className={styles.ttsButton} */
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: color 0.2s;
+    color: #757575;
+    margin-right: 15px;
+}
+
+.ttsButton.active {
+    /* JSX: className={`${styles.ttsButton} ${styles.active}`} */
+    color: white;
+}
+
+/* 📝 로마자 발음 */
+.romanizedText {
+    /* JSX: className={styles.romanizedText} */
+    font-size: 13px;
+    font-weight: 500;
+    color: #757575;
+    transition: color 0.3s;
+}
+
+.romanizedText.correct {
+    /* JSX: className={`${styles.romanizedText} ${styles.correct}`} */
+    color: rgb(57 255 20 / 100%);
+}
+
+.romanizedText.incorrect,
+.romanizedText.oos {
+    /* JSX: className={`${styles.romanizedText} ${styles.incorrect}`} */
+    /* JSX: className={`${styles.romanizedText} ${styles.oos}`} */
+    color: rgb(255 0 0 / 100%);
+}
+
+/* 🎙️ 작은 마이크 아이콘 */
+.smallMicIcon {
+    /* JSX: className={styles.smallMicIcon} */
+    width: 20px;
+    height: 20px;
+    color: #757575;
+    transition: color 0.2s;
+    margin-right: 13px;
+}
+
+.smallMicIcon.active {
+    /* JSX: className={`${styles.smallMicIcon} ${styles.active}`} */
+    color: white;
+}
+
+
+/* 영어 번역 텍스트 */
+.englishText {
+    /* JSX: className={styles.englishText} */
+    color: #007CFF;
+    font-size: 13px;
+    font-weight: 500;
+    display: block; 
+    margin-left: 15px;
+}
+
+
+.roleContainer {
+    /* JSX: className={styles.roleContainer} */
+    width: 44px;
+    height: 20px;
+    background-color: white;
+    color: black;
+    border-radius: 5px;
+    margin-left: 0px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.costomer { /* 오타 costomer -> customer가 맞지만, 원본 유지 */
+    /* JSX: className={styles.costomer} */
+    composes: roleContainer; /* roleContainer 스타일 상속 */
+    width: 68px;
+}
+
+/* -------------------- 4. 턴 2 (선택지) 스타일 -------------------- */
+.choiceOptionsArea {
+    /* JSX: className={styles.choiceOptionsArea} */
+    width: 100%;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.activeChoiceContent {
+    /* JSX: className={styles.activeChoiceContent} */
+    width: 300px;
+    height: 120px;
+    top: 52px;
+    left: 15px;
+    background-color: #101010;
+    border-radius: 10px;
+}
+
+.choiceItem { 
+    /* JSX: className={styles.choiceItem} */
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+    width: 100%; 
+}
+
+.choiceButtonAction {
+    /* JSX: className={styles.choiceButtonAction} */
+    width: 60px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    background-color: white;
+    color: black;
+}
+
+/* -------------------- 4. 메인 마이크 버튼 -------------------- */
+.micArea {
+    /* JSX: className={styles.micArea} */
+    position: absolute; 
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 72px; 
+    background-color: transparent; 
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.mainMicButton {
+    /* JSX: className={styles.mainMicButton} */
+    width: 328px;
+    height: 40px; 
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, transform 0.1s;
+    border: none;
+    cursor: pointer;
+}
+
+.mainMicIcon {
+    /* JSX: className={styles.mainMicIcon} */
+    font-size: 20px; 
+    transition: color 0.3s;
+}
+
+/* 마이크 버튼 상태: CSS Modules에서 조합 클래스 사용 */
+.mainMicButton.off {
+    /* JSX: className={`${styles.mainMicButton} ${styles.off}`} */
+    background-color: white;
+}
+
+.mainMicButton.off .mainMicIcon {
+    color: black;
+}
+
+.mainMicButton.on {
+    /* JSX: className={`${styles.mainMicButton} ${styles.on}`} */
+    color: white;
+    background-color: black;
+}
+
+.mainMicButton.on .mainMicIcon {
+    color: white;
+}
+
+.mainMicButton.disabled {
+    /* JSX: className={`${styles.mainMicButton} ${styles.disabled}`} */
+    cursor: not-allowed;
+    background-color: #e3e3e3;
+    opacity: 0.3;
+}
+
+/* 마이크 상태 텍스트 (ON/OFF) */
+.micStatusText {
+    /* JSX: className={styles.micStatusText} */
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+
+/*choice 버튼 스타일*/
+.choiceOptionsArea {
+    /* JSX: className={styles.choiceOptionsArea} */
+    position:absolute;
+    top: 190px;
+}
+
+.micArea.choiceButton {
+    /* JSX: className={`${styles.micArea} ${styles.choiceButton}`} */
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    background-color: transparent; 
+}
+
+
+.choiceButton .choiceButtonAction {
+    /* JSX: className={styles.choiceButtonAction} */
+    width: 60px;
+    height: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: white; 
+    color: #1a1a1a;
+    border: 2px solid #eeeeee;
+}
+
+.choiceButton .choiceButtonAction.selected {
+    /* JSX: className={`${styles.choiceButtonAction} ${styles.selected}`} */
+    background-color: #1a1a1a; 
+    color: white; 
+    border: 2px solid #1a1a1a;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.micArea .selectSubmitButton {
+    /* JSX: className={styles.selectSubmitButton} */
+    flex-grow: 1; 
+    max-width: 176px; 
+    height: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px; 
+    background-color: white;
+    color: black;
+    border: none;
+    cursor: pointer;
+}
+/* ⭐ 기본 상태 (선택 전) */
+.micArea .selectSubmitButton,
+.micArea .selectSubmitButton.off.disabled { 
+    /* JSX: className={styles.off} ${styles.disabled} */
+    background-color: white;
+    color: #1a1a1a;
+    opacity: 0.5; 
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ⭐ 활성화 상태 (선택 후) */
+.micArea .selectSubmitButton.on {
+    /* JSX: className={styles.on} */
+    background-color: white;
+    color: #1a1a1a;
+    opacity: 1; 
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+/* ⭐⭐⭐ 핵심 수정: 버튼이 실제로 눌리는 순간 (:active) ⭐⭐⭐ */
+/* JSX에서 styles.on이 적용된 버튼에 :active 의사 클래스 사용 */
+.micArea .selectSubmitButton.on:active {
+    background-color: #1a1a1a; 
+    color: white; 
+}
