@@ -8,7 +8,7 @@ type BoxProps = {
 function Box({ label, text, ...props }: BoxProps) {
   return (
     <div className={styles.box} {...props}>
-      {label && <span>{label}</span>}
+      {label && <span className={styles.label}>{label}</span>}
       <span className={styles.text}>{text}</span>
     </div>
   );

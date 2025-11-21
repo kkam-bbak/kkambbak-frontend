@@ -4,6 +4,10 @@
   gap: 8px;
 }
 
+.label {
+  color: var(--color-grayscale-6);
+}
+
 .text {
   height: 40px;
   padding: 8px;
