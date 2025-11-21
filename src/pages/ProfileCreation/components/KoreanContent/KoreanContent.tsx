@@ -9,12 +9,14 @@ import { generateName, createName, SelectedName } from '@/apis/users';
 import { useNavigate } from 'react-router-dom';
 import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
 import { MascotInfo } from '../../ProfileCreation';
+import { useUser } from '@/stores/user';
 
 type KoreanContentProps = {
   updateMascot: (info: MascotInfo) => void;
 };
 
 function KoreanContent({ updateMascot }: KoreanContentProps) {
+  const user = useUser((s) => s.user);
   const [selected, setSelected] = useState({ name: '', meaning: '' });
   const navigate = useNavigate();
 
@@ -121,22 +123,24 @@ function KoreanContent({ updateMascot }: KoreanContentProps) {
         )}
 
         <div className={styles.buttons}>
-          <div className={styles['try-again']}>
-            <Button
-              isFull
-              onClick={handleRetryClick}
-              disabled={data?.remainingAttempts === 0}
-            >
-              Try again
-            </Button>
-            {data && (
-              <span className={styles.remain}>
-                {data.remainingAttempts > 0
-                  ? `${data.remainingAttempts} credits left`
-                  : 'No rounds left'}
-              </span>
-            )}
-          </div>
+          {!user?.isGuest && (
+            <div className={styles['try-again']}>
+              <Button
+                isFull
+                onClick={handleRetryClick}
+                disabled={data?.remainingAttempts === 0}
+              >
+                Try again
+              </Button>
+              {data && (
+                <span className={styles.remain}>
+                  {data.remainingAttempts > 0
+                    ? `${data.remainingAttempts} credits left`
+                    : 'No rounds left'}
+                </span>
+              )}
+            </div>
+          )}
           <Button
             isFull
             disabled={!selected.name || isCreatePending || !data}
