@@ -2,8 +2,8 @@ import Header from '@/components/layout/Header/Header';
 import styles from './PaymentReceiptPage.module.css';
 import Mascot from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
-import { useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   cancelSubscriptions,
   getSubscriptionPlans,
@@ -21,28 +21,33 @@ const PLAN = {
 
 function PaymentReceiptPage() {
   const { user } = useUser();
-  const [selected, setSelected] = useState('1');
-  const [isOpenModal, setIsOpenModal] = useState(false);
-  const [daysLeft, setDaysLeft] = useState<'' | number>('');
 
-  const { data: plans, isLoading } = useQuery({
+  const [selected, setSelected] = useState('');
+  const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const queryClient = useQueryClient();
+
+  const { data: plans } = useQuery({
     queryKey: ['plans'],
     queryFn: getSubscriptionPlans,
   });
   const { data: active } = useQuery({
-    queryKey: ['subscriptions', 'active', user.accessToken],
+    queryKey: ['subscriptions', 'active', user?.name],
     queryFn: getSubscriptionStatus,
   });
 
+  const isCancelled = active?.status === 'CANCELLED';
+  const daysLeft = getDaysLeft(active?.endDate);
+
   const { mutate } = useMutation({
-    mutationFn: () => cancelSubscriptions('1'),
+    mutationFn: (id: number) => cancelSubscriptions(id),
   });
 
   const handleSelectedClick = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelected(value);
 
-    if (!value) {
+    if (value !== String(active?.planName)) {
       setIsOpenModal(true);
     }
   };
@@ -52,18 +57,29 @@ function PaymentReceiptPage() {
   };
 
   const handleChangeButtonClick = (e: React.MouseEvent) => {
+    if (!active) return;
     e.stopPropagation();
 
-    mutate(undefined, {
-      onSuccess: () => {},
+    mutate(active.subscriptionId, {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['subscriptions'] });
+      },
       onSettled: () => {
         handleCloseModal();
-        setDaysLeft(getDaysLeft('2025-12-19T22:47:56.392204072'));
       },
     });
   };
 
-  const { today, nextMonth } = getSubscriptionPeriod();
+  const { begins, ends } = getSubscriptionPeriod(
+    active?.startDate,
+    active?.endDate,
+  );
+
+  useEffect(() => {
+    if (active) {
+      setSelected(active.planName);
+    }
+  }, [active]);
 
   return (
     <div className={styles['page-container']}>
@@ -88,17 +104,17 @@ function PaymentReceiptPage() {
                 >
                   <option value="">Standard(₩ 0)</option>
                   {plans?.map(({ id, name, price }) => (
-                    <option key={id} value={id}>
+                    <option key={id} value={name}>
                       {`${PLAN[name]}(Per Month ₩ ${price})`}
                     </option>
                   ))}
                 </Select>
 
-                <Box text={today} label="Begins *" />
+                <Box text={begins} label="Begins *" />
 
                 <div>
-                  <Box text={nextMonth} label="Ends *" />
-                  {daysLeft && (
+                  <Box text={ends} label="Ends *" />
+                  {isCancelled && (
                     <span className={styles['days-left']}>
                       There are {daysLeft} days left until expiration.
                     </span>
@@ -107,7 +123,7 @@ function PaymentReceiptPage() {
               </div>
             </div>
 
-            {daysLeft && (
+            {isCancelled && (
               <Link to={'/payment/checkout'}>
                 <Button isFull>Extend</Button>
               </Link>
@@ -140,12 +156,14 @@ function PaymentReceiptPage() {
 
 export default PaymentReceiptPage;
 
-function getSubscriptionPeriod() {
-  const today = new Date();
-  const nextMonth = new Date(today);
-  nextMonth.setMonth(today.getMonth() + 1);
+function getSubscriptionPeriod(start?: Date, end?: Date) {
+  const begins = start && new Date(start);
+  const ends = end && new Date(end);
 
-  return { today: formatDate(today), nextMonth: formatDate(nextMonth) };
+  return {
+    begins: begins ? formatDate(begins) : '',
+    ends: ends ? formatDate(ends) : '',
+  };
 }
 
 function formatDate(date: Date) {
@@ -155,7 +173,9 @@ function formatDate(date: Date) {
   return `${day} ${month}, ${year}`;
 }
 
-function getDaysLeft(endDate: string) {
+function getDaysLeft(endDate?: Date) {
+  if (!endDate) return;
+
   const today = new Date();
   const end = new Date(endDate);
 
