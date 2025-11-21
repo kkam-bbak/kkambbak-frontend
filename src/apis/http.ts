@@ -1,6 +1,14 @@
 import axios from 'axios';
 import { useUser } from '../stores/user';
 
+export type AppErrorResponse = {
+  status: {
+    description: string;
+    message: string;
+    statusCode: string;
+  };
+};
+
 const API_ERROR_CODES = {
   TOKEN_EXPIRED: 'J001',
 } as const;
@@ -35,6 +43,7 @@ http.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
+
     const errorCode = err.response?.data?.status?.statusCode;
 
     if (
