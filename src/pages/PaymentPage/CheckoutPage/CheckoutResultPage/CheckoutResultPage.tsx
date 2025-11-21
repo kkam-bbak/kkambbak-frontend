@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getPaymentsResult } from '@/apis/payments';
 import { useUser } from '@/stores/user';
 import { Link, useSearchParams } from 'react-router-dom';
+import Box from '@/components/Box/Box';
 
 function CheckoutResultPage() {
   const { user } = useUser();
@@ -33,20 +34,11 @@ function CheckoutResultPage() {
       </div>
 
       <div className={styles.info}>
-        <div>
-          <span className={styles.title}>item *</span>
-          <span className={styles.box}>Premium</span>
-        </div>
+        <Box text="Premium" label="Item *" />
 
-        <div>
-          <span className={styles.title}>User Name *</span>
-          <span className={styles.box}>Emily Parker</span>
-        </div>
+        <Box text="Emily Parker" label="User Name *" />
 
-        <div>
-          <span className={styles.title}>Email *</span>
-          <span className={styles.box}>XXXXX@gmail.com</span>
-        </div>
+        <Box text="XXXXX@gmail.com" label="Email *" />
       </div>
 
       <Link to={'/mainpage/learnList'}>
