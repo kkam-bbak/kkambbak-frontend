@@ -241,7 +241,7 @@ const LearnStart: React.FC = () => {
       console.log(`[LearnStart] POST Request: /sessions/${numericSessionId}/start`);
 
       const response = await http.post<LearningStartResponse>(
-        `/api/v1/learning/sessions/${numericSessionId}/start`,
+        `/learning/sessions/${numericSessionId}/start`,
         bodyPayload,
         {}
       );
@@ -286,7 +286,7 @@ const LearnStart: React.FC = () => {
 
       try {
         const response = await http.post<GradeResponse>(
-          `/api/v1/learning/${numericSessionId}/grade`, 
+          `/learning/${numericSessionId}/grade`, 
           formData, 
           { headers: { 'Content-Type': 'multipart/form-data' } }
         );

@@ -198,7 +198,7 @@ const handleDoneMessageClick = async () => {
       });
 
       // API 호출
-      await http.post('/api/v1/surveys', { rawResponses });
+      await http.post('/surveys', { rawResponses });
 
       navigate('../learnList');
     } catch (error) {

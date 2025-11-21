@@ -143,7 +143,7 @@ const LearnList: React.FC = () => {
       try {
         const cursorParam = cursor !== null ? String(cursor) : undefined;
         
-        const response = await http.get('/api/v1/learning/sessions', {
+        const response = await http.get('/learning/sessions', {
           params: {
             category: categoryParam,
             cursor: cursorParam,

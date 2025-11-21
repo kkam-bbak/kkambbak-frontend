@@ -34,7 +34,7 @@ const formatMinutesToDisplay = (minutes: number): string => {
 // --- API 함수 ---
 const getRoleplayScenarios = async (): Promise<RoleplayScenario[]> => {
   try {
-    const response = await http.get('/api/v1/roleplay/all');
+    const response = await http.get('/roleplay/all');
     return response.data.body;
   } catch (error) {
     console.error('Failed to fetch roleplay scenarios:', error);

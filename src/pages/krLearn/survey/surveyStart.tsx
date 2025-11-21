@@ -41,7 +41,7 @@ const SurveyStart: React.FC = () => {
     // 2. /api/v1/surveys/check API 호출 (Axios 방식)
     // http.get()은 두 번째 인자로 config 객체를 받지만,
     // 이 요청은 별도의 header나 body가 필요 없으므로, config 객체(headers 등)를 제거합니다.
-    const response = await http.get('/api/v1/surveys/check'); 
+    const response = await http.get('/surveys/check'); 
 
     // 3. 응답 데이터 접근 (Axios는 response.data로 접근)
     // response.data가 API의 JSON 본문입니다.

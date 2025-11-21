@@ -164,7 +164,7 @@ const RolePlayComplete: React.FC = () => {
             console.log(`[Next Learning] Fetching list for category: ${categoryName}`);
             
             // 🔥 [수정 4] API 호출 시 category 파라미터 전달 (C007 에러 해결)
-            const response = await http.get<NextLearningResponse>('/api/v1/learning/sessions', {
+            const response = await http.get<NextLearningResponse>('/learning/sessions', {
                 params: { limit: 20, category: categoryName }
             });
 

@@ -35,7 +35,7 @@ interface DialogueData {
 // --- API 함수 (기존 유지) ---
 const startRoleplaySession = async (scenarioId: number): Promise<DialogueData> => {
   try {
-    const response = await http.post('/api/v1/roleplay/start', {}, { params: { scenarioId } });
+    const response = await http.post('/roleplay/start', {}, { params: { scenarioId } });
     return response.data.body;
   } catch (error) {
     console.error('Failed to start roleplay session:', error);
@@ -45,7 +45,7 @@ const startRoleplaySession = async (scenarioId: number): Promise<DialogueData> =
 
 const getNextDialogue = async (sessionId: number): Promise<DialogueData> => {
   try {
-    const response = await http.post('/api/v1/roleplay/next', {}, { params: { sessionId } });
+    const response = await http.post('/roleplay/next', {}, { params: { sessionId } });
     return response.data.body;
   } catch (error) {
     console.error('Failed to get next dialogue:', error);
@@ -68,7 +68,7 @@ const evaluatePronunciation = async (
     const formData = new FormData();
     formData.append('audioFile', audioFile);
     if (audioFile.size === 0) throw new Error('Audio file is empty');
-    const response = await http.post('/api/v1/roleplay/evaluate', formData, {
+    const response = await http.post('/roleplay/evaluate', formData, {
       params: { sessionId, dialogueId },
     });
     console.log('📊 Evaluation:', { dialogueId, score: response.data.body.score, feedback: response.data.body.feedback });
@@ -88,7 +88,7 @@ interface SessionSummary {
 
 const completeRoleplaySession = async (sessionId: number): Promise<SessionSummary> => {
   try {
-    const response = await http.post('/api/v1/roleplay/complete', {}, { params: { sessionId } });
+    const response = await http.post('/roleplay/complete', {}, { params: { sessionId } });
     console.log('✅ Session completed:', response.data.body);
     return response.data.body;
   } catch (error) {
