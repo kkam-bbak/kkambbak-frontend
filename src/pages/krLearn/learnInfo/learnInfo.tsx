@@ -47,7 +47,9 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
   const topicDisplay = `${tab === 'casual' ? 'Casual_' : ''}${topic.title}`;
   const wordCount = topic.vocabularies;
   // 🔥 모달 클래스도 styles 사용
-  const modalClassName = `${styles.learnInfoModalOverlay} ${isOpen ? styles.open : ''}`;
+  const modalClassName = `${styles.learnInfoModalOverlay} ${
+    isOpen ? styles.open : ''
+  }`;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -169,14 +171,20 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
                 .padStart(2, '0')}`}</span>
             </div>
 
-            <div className={`${styles.wordDisplayAreaInfo} ${getInputClass('image')}`}>
+            <div
+              className={`${styles.wordDisplayAreaInfo} ${getInputClass(
+                'image',
+              )}`}
+            >
               {/* 내용 없음 */}
             </div>
 
             <div className={styles.inputFieldsContainerInfo}>
               {/* Romnized */}
               <div
-                className={`${styles.inputRowInfo} ${getInputClass('romnized')}`}
+                className={`${styles.inputRowInfo} ${getInputClass(
+                  'romnized',
+                )}`}
               >
                 <label>Romnized</label>
                 <input type="text" readOnly value={isFieldsActive ? '' : ''} />
@@ -186,16 +194,12 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
                   }`}
                   disabled={currentStep !== 7}
                 >
-                 
-                  <img 
-                  src={soundButton} 
-                  alt="listen" 
-                  className={styles.speakerIconImage} 
-                
-                  
-                />
+                  <img
+                    src={soundButton}
+                    alt="listen"
+                    className={styles.speakerIconImage}
+                  />
                 </button>
-                
               </div>
 
               {/* Korean */}
@@ -208,9 +212,9 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
 
               {/* Translation */}
               <div
-                className={`${styles.inputRowInfo} ${styles.translationInfo} ${getInputClass(
-                  'translation',
-                )}`}
+                className={`${styles.inputRowInfo} ${
+                  styles.translationInfo
+                } ${getInputClass('translation')}`}
               >
                 <label>Translation</label>
                 <input type="text" readOnly value={isFieldsActive ? '' : ''} />
