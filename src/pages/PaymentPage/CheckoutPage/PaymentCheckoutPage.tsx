@@ -82,8 +82,8 @@ function PaymentCheckoutPage() {
                     value={selected}
                     onChange={(e) => setSelected(e.target.value)}
                   >
-                    <option>Standard (₩ 0)</option>
-                    {plans.map(({ id, name, price }) => (
+                    <option value="">Standard (₩ 0)</option>
+                    {plans?.map(({ id, name, price }) => (
                       <option key={id} value={id}>
                         {`${PLAN[name]} (Per Month ₩ ${price})`}
                       </option>
