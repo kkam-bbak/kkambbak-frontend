@@ -1,0 +1,62 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: space-between;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE, Edge */
+}
+
+.section::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.header {
+  position: relative;
+  display: flex;
+  height: 194px;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: normal;
+  line-height: 150%;
+}
+
+.image {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 156px;
+  height: 194px;
+  overflow: hidden;
+  object-fit: cover;
+  border-radius: 10px;
+  transform: translateX(-50%);
+}
+
+.korean-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.row {
+  display: flex;
+  gap: 16px;
+  margin: 10px 0;
+}
+
+.row > div {
+  width: 100%;
+}
+
+@media (max-width: 320px) {
+  .section .row span {
+    white-space: nowrap;
+  }
+}
