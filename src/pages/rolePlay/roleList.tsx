@@ -97,7 +97,7 @@ const RoleList: React.FC = () => {
   };
 
   const handleSubscribe = () => {
-    alert('구독 페이지로 이동합니다.');
+     navigate('/payment/checkout');
   };
 
   // 로딩 중 표시
