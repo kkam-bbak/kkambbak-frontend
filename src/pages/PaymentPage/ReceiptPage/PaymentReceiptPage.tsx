@@ -47,7 +47,7 @@ function PaymentReceiptPage() {
     const value = e.target.value;
     setSelected(value);
 
-    if (value !== String(active.planName)) {
+    if (value !== String(active?.planName)) {
       setIsOpenModal(true);
     }
   };
@@ -57,6 +57,7 @@ function PaymentReceiptPage() {
   };
 
   const handleChangeButtonClick = (e: React.MouseEvent) => {
+    if (!active) return;
     e.stopPropagation();
 
     mutate(active.subscriptionId, {
