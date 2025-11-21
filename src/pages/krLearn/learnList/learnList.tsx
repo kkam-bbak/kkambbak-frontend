@@ -104,6 +104,8 @@ const TopicCard: React.FC<TopicCardProps> = ({
 // --------------------------------------------------------------------------
 
 const LearnList: React.FC = () => {
+  const [isNavigating, setIsNavigating] = useState(false);
+
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'topik' | 'casual'>('topik');
   const [activeTopicId, setActiveTopicId] = useState<number | null>(null);
@@ -231,36 +233,35 @@ const LearnList: React.FC = () => {
 
 // 🔥 학습 시작 컨펌 후 최종 라우팅
 const handleConfirmStart = (topicId: number) => {
-  handleCloseInfoModal();
-  
-  // 🔥 topicId가 숫자인지 확인 (API에서 온 ID는 number 타입)
-  console.log(`[Confirm Start] Topic ID Type:`, typeof topicId); //타입확인
-  console.log(`[Confirm Start] Final Navigation attempt to: /mainPage/learn/${topicId}`); // 🔥 로그 추가
-  
-  // URL이 정확한지 다시 한번 확인
-  navigate(`/mainPage/learn/${topicId}`); 
-};
+    if (isNavigating) return; // 이미 이동 중이면 클릭 무시
+    
+    setIsNavigating(true); // 이동 시작! 잠금 걸기
+    handleCloseInfoModal();
+    
+    console.log(`[Confirm Start] Navigating to: /mainPage/learn/${topicId}`);
+    navigate(`/mainPage/learn/${topicId}`); 
+    
+    // (참고: 페이지가 이동되면 이 컴포넌트는 언마운트되므로 false로 되돌릴 필요가 거의 없습니다)
+  };
 
   // 🔥 Start 버튼 클릭 시 로직: 최초 이용 확인
 const handleStartLearning = (topicId: number) => {
-  const topic = topicsToDisplay.find((t) => t.id === topicId);
-  if (!topic) return;
+    if (isNavigating) return; // 이동 중이면 무시
 
-  setSelectedTopic(topic);
+    const topic = topicsToDisplay.find((t) => t.id === topicId);
+    if (!topic) return;
 
-  const hasSeenInfo = localStorage.getItem(HAS_SEEN_INFO_KEY);
+    // ... (기존 로직 동일)
+    const hasSeenInfo = localStorage.getItem(HAS_SEEN_INFO_KEY);
 
-  if (!hasSeenInfo) {
-    // 1. 처음이면 모달 띄우고 기록 남기기
-    console.log(`[Start Learning] First visit. Showing Info Modal for Topic ID: ${topicId}`); // 🔥 로그 추가
-    setIsInfoModalOpen(true);
-    localStorage.setItem(HAS_SEEN_INFO_KEY, 'true');
-  } else {
-    // 2. 이미 봤다면 바로 학습 페이지로 이동
-    console.log(`[Start Learning] Returning user. Navigating directly to Topic ID: ${topicId}`); // 🔥 로그 추가
-    handleConfirmStart(topicId);
-  }
- };
+    if (!hasSeenInfo) {
+      setIsInfoModalOpen(true);
+      setSelectedTopic(topic);
+      localStorage.setItem(HAS_SEEN_INFO_KEY, 'true');
+    } else {
+      handleConfirmStart(topicId);
+    }
+  };
 
   // 🔥 모달 닫기 핸들러
   const handleCloseInfoModal = () => {
@@ -319,13 +320,14 @@ const handleStartLearning = (topicId: number) => {
             <p className="no-sessions-message">No learning sessions available.</p>
           ) : (
             topicsToDisplay.map((topic) => (
-              <TopicCard
-                key={topic.id}
-                topic={topic}
-                onStart={handleStartLearning}
-                onCardClick={handleCardClick}
-                isActive={topic.id === activeTopicId}
-                isCompleted={topic.completed}
+              <TopicCard
+                key={topic.id}
+                topic={topic}
+                // 🔥 핸들러 연결 확인
+                onStart={handleStartLearning} 
+                onCardClick={handleCardClick}
+                isActive={topic.id === activeTopicId}
+                isCompleted={topic.completed}
               />
             ))
           )}

@@ -22,7 +22,9 @@
   box-sizing: border-box;
   width: 100%;
   height: 430px;
-  padding: 15px;
+  padding-left: 15px;
+  padding-top: 15px;
+  padding-right: 15px;
   overflow: hidden;
   color: black;
   background-color: #ff5000;
@@ -106,6 +108,7 @@
 .inputRow label {
   width: 90px;
   padding: 0 10px;
+
   font-size: 14px;
   font-weight: 500;
   color: #757575;
@@ -115,6 +118,7 @@
 .inputRow input {
   flex-grow: 1;
   height: 100%;
+  width: 150px;
   font-size: 16px;
   font-weight: 500;
   color: white;
@@ -141,24 +145,29 @@
   background-color: black;
 }
 
-/* 스피커 아이콘 */
 .speakerIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 44px;
   height: 100%;
-  color: white;
-  cursor: pointer;
   background-color: #000;
   border: none;
+  cursor: pointer;
+ 
+  transition: opacity 0.2s;
 }
 
-
-/*.speakerIcon:global(:disabled)*/
+/* 2. 버튼 비활성화 상태 (disabled) */
+/* React의 disabled={!isSpeakerActive}가 true일 때 적용됨 */
 .speakerIcon:disabled {
-  color: #333; /* 비활성화 시 색상 */
   cursor: not-allowed;
+  opacity: 0.3;      /* 아이콘을 흐리게 만듦 */
+}
+
+/* 3. 내부 이미지 스타일 */
+.speakerIconImage {
+  width: 24px;       /* 아이콘 크기 (버튼보다 작게) */
+  height: 24px;
+  
+
 }
 
 /* -------------------- 5. 마이크 버튼 -------------------- */
@@ -178,15 +187,40 @@
   transition: background-color 0.1s, color 0.1s;
 }
 
+/* -------------------- 6. 액션 버튼 (Try Again / Next) -------------------- */
+
 .actionButtonsContainer {
   display: flex;
   gap: 10px;
   margin-top: 10px;
+  width: 100%; /* 부모 너비 꽉 채우기 */
 }
 
 .actionButton {
-  width: 156px;
-  height: 40px;
+  /* 레이아웃: 고정 너비 대신 flex-grow를 써서 반반씩 공간을 차지하게 함 */
+  flex-grow: 1; 
+  /* width: 156px;  <-- 삭제 추천 */
+  
+  height: 40px; /* 마이크 버튼과 높이 맞춤 (보통 50px) */
+
+  /* 🔥 [필수] 시각적 스타일 정의 */
+  background-color: white; /* 배경 흰색 */
+  color: black;            /* 글자 검은색 */
+  border: none;            /* 기본 테두리 제거 */
+  border-radius: 10px;     /* 둥근 모서리 */
+
+  /* 폰트 스타일 */
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  
+  /* 클릭 효과 (선택사항) */
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.actionButton:active {
+  background-color: #f0f0f0; /* 클릭 시 약간 어두워짐 */
 }
 
 .micButton.off {

@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header/Header';
 import soundButton from '../../../assets/soundButton.png';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
+import { http } from '../../../apis/http';
 
 interface Topic {
   id: number;

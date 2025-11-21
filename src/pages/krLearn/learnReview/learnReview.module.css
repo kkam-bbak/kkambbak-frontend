@@ -86,13 +86,21 @@
 .wordResultList {
   position: relative;
   padding: 0 15px;
-  max-height: 450px;
+  
+  /* 🔥 수정 1: 내용이 없어도 최소한 이만큼은 공간을 확보함 */
+  min-height: 450px; 
+  /* 또는 아예 고정하고 싶다면 */
+  /* height: 450px; */
+  
   overflow-y: scroll; /* 스크롤 기능은 유지 */
 
   /* IE 및 구형 Edge */
   -ms-overflow-style: none;
   /* Firefox */
   scrollbar-width: none;
+  
+  /* 🔥 수정 2: (선택사항) 빈 공간일 때 배경색이 필요하다면 추가 */
+  /* background-color: rgba(0,0,0,0.1); */
 }
 
 /* Chrome, Safari, Edge 최신 버전 */

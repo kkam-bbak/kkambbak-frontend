@@ -1,113 +1,23 @@
 import React from 'react';
-import {useLocation, useNavigate } from 'react-router-dom';
-import { http } from '../../../apis/http';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
 import styles from './learnReview.module.css';
-import ContentSection from '@/components/layout/ContentSection/ContentSection';
-// --- 학습 데이터 구조 정의 ---
+import type { WordResult } from '../learnStart/learnStart'; // 경로 확인!
 
-interface WordResult {
-  romnized: string;
-
-  korean: string;
-
-  translation: string;
-
-  isCorrect: boolean;
+interface ReviewState {
+  sessionId?: number;
+  resultId?: number;
+  results?: WordResult[]; 
+  topicName?: string; 
+  learningTime?: string; 
 }
 
-// --- 더미 데이터 ---
-
-const DUMMY_SUMMARY = {
-  topicName: 'Emotions',
-
-  correctCount: 18,
-
-  totalCount: 25,
-
-  learningTime: '6m 30s',
-
-  completionDate: 'Tuesday, November 3, 2023',
-};
-
-const DUMMY_WORD_RESULTS: WordResult[] = [
-  {
-    romnized: 'Sa - gwa',
-    korean: '사 - 과',
-    translation: 'Apple',
-    isCorrect: true,
-  },
-
-  { romnized: 'Ott', korean: '옷', translation: 'Cloth', isCorrect: false },
-
-  { romnized: 'Bab', korean: '밥', translation: 'Rice', isCorrect: true },
-
-  {
-    romnized: 'Dang - geun',
-    korean: '당 - 근',
-    translation: 'Carrot',
-    isCorrect: false,
-  },
-
-  { romnized: 'Mul', korean: '물', translation: 'Water', isCorrect: true },
-
-  {
-    romnized: 'Hae - sal',
-    korean: '해 - 살',
-    translation: 'Sunshine',
-    isCorrect: true,
-  },
-
-  {
-    romnized: 'Ba - da',
-    korean: '바 - 다',
-    translation: 'Sea',
-    isCorrect: false,
-  },
-
-  {
-    romnized: 'Bi - haeng',
-    korean: '비 - 행',
-    translation: 'Flight',
-    isCorrect: true,
-  },
-
-  // 스크롤 테스트를 위해 더미 데이터 추가
-
-  {
-    romnized: 'Gong - bu',
-    korean: '공 - 부',
-    translation: 'Study',
-    isCorrect: false,
-  },
-
-  {
-    romnized: 'Cha - kkan',
-    korean: '착 - 한',
-    translation: 'Kind',
-    isCorrect: true,
-  },
-];
-
-// --- END DUMMY DATA ---
-
-// 결과 요약 항목 렌더링 컴포넌트
-
-const ResultRow = ({
-  icon: Icon,
-  value,
-}: {
-  icon: React.ElementType;
-  value: string;
-}) => (
+const ResultRow = ({ icon: Icon, value }: { icon: React.ElementType; value: string }) => (
   <div className={styles.resultRow}>
     <Icon className={styles.resultIcon} />
-
     <span className={styles.resultValue}>{value}</span>
   </div>
 );
-
-// 단어별 결과 목록 행 컴포넌트
 
 const WordResultRow: React.FC<{
   label: string;
@@ -117,9 +27,7 @@ const WordResultRow: React.FC<{
 }> = ({ label, value, isResult = false, isCorrect }) => (
   <div className={styles.WordResultRow}>
     <span className={styles.wordLabel}>{label}</span>
-
     <span className={styles.wordValue}>{value}</span>
-
     {isResult && (
       <span className={`${styles.resultTag} ${isCorrect ? styles.correct : styles.wrong}`}>
         {isCorrect ? 'Correct' : 'Wrong'}
@@ -131,93 +39,87 @@ const WordResultRow: React.FC<{
 const LearnReview: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const state = location.state as ReviewState;
+  
+  const wordResults = state?.results || [];
+  const topicName = state?.topicName || 'Result';
+  const sessionId = state?.sessionId;
+  const resultId = state?.resultId;
+  const learningTime = state?.learningTime || "0m 0s"; 
 
-  const summary = DUMMY_SUMMARY;
-  const state = location.state as { updatedWordResults?: WordResult[] };
-  const wordResults = state?.updatedWordResults || DUMMY_WORD_RESULTS;
-
-  // 'Only wrong try Again' 클릭 핸들러 (틀린 단어만 재학습 시작)
+  const totalCount = wordResults.length;
+  const correctCount = wordResults.filter((w) => w.isCorrect).length;
+  
+  const completionDate = new Date().toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
 
   const handleWrongOnlyTryAgain = () => {
+    if (!sessionId) { navigate('/mainpage/learnList'); return; }
+
     const incorrectWords = wordResults.filter((w) => !w.isCorrect);
+    if (incorrectWords.length === 0) {
+        alert("틀린 문제가 없습니다! 완벽해요 🎉");
+        return;
+    }
 
-    console.log(
-      'Navigating to learning page with only incorrect words:',
-      incorrectWords,
-    );
-
-    navigate(`/mainPage/learn/${summary.topicName}/retry-wrong`);
+    navigate(`/mainPage/learn/${sessionId}`, {
+      state: {
+        isRetryWrong: true,       
+        baseResultId: resultId,   
+        wordsToRetry: incorrectWords, 
+        sessionId: sessionId
+      }
+    });
   };
 
-  // 'Try again' 클릭 핸들러 (전체 학습 다시 시작)
-
   const handleTryAgain = () => {
-    console.log('Navigating to learning page to retry all words.');
-
-    navigate(`/mainPage/learn/${summary.topicName}`);
+    if (sessionId) {
+      navigate(`/mainPage/learn/${sessionId}`);
+    } else {
+      navigate('/mainpage/learnList');
+    }
   };
 
   return (
     <div className={styles.ReviewPageContainer}>
-      {/* 1. 상단 타이틀 및 요약 (스크롤 시 고정) */}
-
       <div className={styles.reviewHeader}>
         <h1 className={styles.reviewTitle}>Session Result Review</h1>
-
-        {/* 결과 요약 박스 (검은색 배경) */}
-
         <div className={styles.reviewResultsBox}>
-          <h2 className={styles.resultsTopicTitle}>{summary.topicName}_Result</h2>
-
-          <ResultRow
-            icon={CheckCircle}
-            value={`${summary.correctCount}/${summary.totalCount} Vocabularies correct`}
-          />
-
-          <ResultRow icon={Clock} value={summary.learningTime} />
-
-          <ResultRow icon={Calendar} value={summary.completionDate} />
+          <h2 className={styles.resultsTopicTitle}>{topicName} Result</h2>
+          <ResultRow icon={CheckCircle} value={`${correctCount}/${totalCount} Vocabularies correct`} />
+          <ResultRow icon={Clock} value={learningTime} />
+          <ResultRow icon={Calendar} value={completionDate} />
         </div>
       </div>
 
-      {/* 2. 단어별 결과 목록 (스크롤 되는 본문 내용) */}
-
       <div className={styles.wordResultList}>
-        {wordResults.map((word, index) => (
-          <div key={index} className={styles.rvWordResultContainer}>
-            <WordResultRow
-              label="Romnized"
-              value={word.romnized}
-              isResult={true}
-              isCorrect={word.isCorrect}
-            />
-
-            <WordResultRow label="Korean" value={word.korean} />
-
-            <WordResultRow label="Translation" value={word.translation} />
-          </div>
-        ))}
+        {wordResults.length === 0 ? (
+            <div style={{color:'white', textAlign:'center', padding:'20px'}}>No review data.</div>
+        ) : (
+            wordResults.map((word, index) => (
+              <div key={word.romnized || index} className={styles.rvWordResultContainer}>
+                <WordResultRow label="Romnized" value={word.romnized} isResult={true} isCorrect={word.isCorrect} />
+                <WordResultRow label="Korean" value={word.korean} />
+                <WordResultRow label="Translation" value={word.translation} />
+              </div>
+            ))
+        )}
       </div>
-
-      {/* 3. 하단 고정 버튼 */}
 
       <div className={styles.reviewActionContainer}>
         <button
           className={styles.reviewActionButton}
           onClick={handleWrongOnlyTryAgain}
+          disabled={correctCount === totalCount} 
+          style={correctCount === totalCount ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
         >
           Only wrong try Again
         </button>
-
-        <button
-          className={styles.reviewActionButton}
-          onClick={handleTryAgain}
-        >
+        <button className={styles.reviewActionButton} onClick={handleTryAgain}>
           Try again
         </button>
       </div>
-
-      {/* ⚠️ 이 컨테이너는 fixed로 설정되어 페이지 스크롤과 독립적으로 움직입니다. */}
     </div>
   );
 };
