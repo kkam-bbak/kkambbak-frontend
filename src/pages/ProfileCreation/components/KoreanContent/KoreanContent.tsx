@@ -139,7 +139,7 @@ function KoreanContent({ updateMascot }: KoreanContentProps) {
           </div>
           <Button
             isFull
-            disabled={!selected || isCreatePending || !data}
+            disabled={!selected.name || isCreatePending || !data}
             onClick={handleCreateClick}
           >
             Create profile
