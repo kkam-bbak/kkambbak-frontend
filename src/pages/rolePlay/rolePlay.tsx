@@ -1,38 +1,66 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import styles from './rolePlay.module.css';
 import { http } from '../../apis/http';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
-// --- API 응답 타입 정의 ---
+// --- 인터페이스 정의 ---
 interface ChoiceOption {
-  id: number;
-  korean: string;
-  romanized: string;
-  english: string;
-  isCorrect: boolean;
+  id: number;
+  korean: string;
+  romanized: string;
+  english: string;
+  isCorrect: boolean;
 }
 
 interface DialogueData {
-  sessionId: number;
-  dialogueId: number;
-  korean: string;
-  romanized: string;
-  english: string;
-  speaker: 'AI' | 'USER';
-  mismatchKorean: string;
-  mismatchEnglish: string;
-  mismatchRomanized: string;
-  coreWord: string;
-  role: string;
-  choices?: ChoiceOption[];
-  result?: string; 
-  userResponseData?: any; 
+  sessionId: number;
+  dialogueId: number;
+  korean: string;
+  romanized: string;
+  english: string;
+  speaker: 'AI' | 'USER';
+  mismatchKorean: string;
+  mismatchEnglish: string;
+  mismatchRomanized: string;
+  coreWord: string;
+  role: string;
+  choices?: ChoiceOption[];
+  result?: string; 
+  userResponseData?: any; 
+  sessionTitle: string;
+}
+const LS_KEY_COMPLETIONS = 'roleplay_completions';
+interface CompletionData {
+  isCompleted: boolean;
+  actualTime: number; // minutes 단위
 }
 
-// --- API 함수 (기존 유지) ---
+type CompletedScenarios = { [scenarioId: number]: CompletionData };
+
+// --- LocalStorage 저장 함수 ---
+const saveCompletionToLocalStorage = (scenarioId: number, elapsedMinutes: number) => {
+    try {
+        const storedData = localStorage.getItem(LS_KEY_COMPLETIONS);
+        const completions: CompletedScenarios = storedData ? JSON.parse(storedData) : {};
+        
+        // 현재 시나리오 ID와 걸린 시간 업데이트
+        completions[scenarioId] = {
+            isCompleted: true,
+            actualTime: elapsedMinutes, 
+        };
+        
+        // LocalStorage에 다시 저장
+        localStorage.setItem(LS_KEY_COMPLETIONS, JSON.stringify(completions));
+        console.log(`✅ Scenario ${scenarioId} completion saved to LocalStorage.`);
+    } catch (e) {
+        console.error('Failed to save completion to LocalStorage', e);
+    }
+};
+
+// ... (API 함수들 생략) ...
 const startRoleplaySession = async (scenarioId: number): Promise<DialogueData> => {
   try {
     const response = await http.post('/roleplay/start', {}, { params: { scenarioId } });
@@ -59,19 +87,12 @@ interface EvaluationResult {
   feedback: 'GOOD' | 'RETRY' | 'WRONG';
 }
 
-const evaluatePronunciation = async (
-  audioFile: File,
-  sessionId: number,
-  dialogueId: number
-): Promise<EvaluationResult> => {
+const evaluatePronunciation = async (audioFile: File, sessionId: number, dialogueId: number): Promise<EvaluationResult> => {
   try {
     const formData = new FormData();
     formData.append('audioFile', audioFile);
     if (audioFile.size === 0) throw new Error('Audio file is empty');
-    const response = await http.post('/roleplay/evaluate', formData, {
-      params: { sessionId, dialogueId },
-    });
-    console.log('📊 Evaluation:', { dialogueId, score: response.data.body.score, feedback: response.data.body.feedback });
+    const response = await http.post('/roleplay/evaluate', formData, { params: { sessionId, dialogueId } });
     return response.data.body;
   } catch (error) {
     console.error('❌ Evaluation failed:', error);
@@ -89,7 +110,6 @@ interface SessionSummary {
 const completeRoleplaySession = async (sessionId: number): Promise<SessionSummary> => {
   try {
     const response = await http.post('/roleplay/complete', {}, { params: { sessionId } });
-    console.log('✅ Session completed:', response.data.body);
     return response.data.body;
   } catch (error) {
     console.error('❌ Failed to complete roleplay session:', error);
@@ -135,6 +155,37 @@ const RolePlay: React.FC = () => {
   const { roleId } = useParams<{ roleId: string }>(); 
   const scenarioId = roleId;
 
+  // 🔥 Location State에서 scenarioTitle을 받기 위한 인터페이스 (WordResult는 생략)
+  interface LocationState {
+      wordsToRetry?: any[];
+      isRetryWrong?: boolean;
+      baseResultId?: number;
+      scenarioTitle?: string; // 🔥 [수정] 필수: 제목
+  }
+  
+  const location = useLocation();
+  const state = location.state as LocationState; // State 정의 순서 맞춤
+
+  // 🔥 [수정] state에서 제목을 가져와 상태로 정의
+  const initialTitle = state?.scenarioTitle || 'Role Play_At a Cafe'; 
+  const [scenarioTitle, setScenarioTitle] = useState(initialTitle); 
+
+  // Variables derived from state
+  const wordsToRetry = state?.wordsToRetry;
+  const isRetryWrong = state?.isRetryWrong || false;
+  const initialBaseResultId = state?.baseResultId || null;
+
+  // Refs
+  const hasFetched = useRef(false); 
+  const startTimeRef = useRef<number>(0);
+  const resultsRef = useRef<any[]>([]); // WordResult[]
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const ttsPlayedRef = useRef<{ [key: string]: boolean }>({});
+  const audioMimeTypeRef = useRef<string>('audio/wav');
+  const sessionStartTimeRef = useRef<number>(Date.now());
+
+  // States
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [currentDialogue, setCurrentDialogue] = useState<DialogueData | null>(null);
   const [turnHistory, setTurnHistory] = useState<any[]>([]);
@@ -154,30 +205,15 @@ const RolePlay: React.FC = () => {
   
   const timerRef = useRef<number | null>(null);
   const flowTimerRef = useRef<number | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const ttsPlayedRef = useRef<{ [key: string]: boolean }>({});
-  const audioMimeTypeRef = useRef<string>('audio/wav');
-  const sessionStartTimeRef = useRef<number>(Date.now());
 
   const speakKoreanText = useCallback((text: string, onFinish: ((success: boolean) => void) | null = null) => {
-    if (!('speechSynthesis' in window)) {
-      if (onFinish) onFinish(false);
-      return;
-    }
-
-    if (window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-      setTimeout(() => speakKoreanText(text, onFinish), 50);
-      return;
-    }
-
+    if (!('speechSynthesis' in window)) { if (onFinish) onFinish(false); return; }
+    if (window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); setTimeout(() => speakKoreanText(text, onFinish), 50); return; }
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'ko-KR';
     utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.volume = 1;
-
     utterance.onend = () => { if (onFinish) onFinish(true); };
     utterance.onerror = (event) => { if (event.error !== 'interrupted') if (onFinish) onFinish(false); };
     window.speechSynthesis.speak(utterance);
@@ -193,6 +229,11 @@ const RolePlay: React.FC = () => {
         setSessionId(initialDialogue.sessionId);
         setCurrentDialogue(initialDialogue);
         setError(null);
+        
+        // 🔥 [수정] 초기 API 응답에서 제목을 가져와 상태로 저장
+        if (initialDialogue.sessionTitle) {
+            setScenarioTitle(initialDialogue.sessionTitle);
+        }
       } catch (err: any) {
         const errorMsg = err?.response?.data?.status?.message || err?.message || 'Unknown error';
         setError(`Failed to start roleplay: ${errorMsg}`);
@@ -239,10 +280,18 @@ const RolePlay: React.FC = () => {
       if (err?.response?.data?.status?.statusCode === 'R016') {
         try {
           const sessionSummary = await completeRoleplaySession(sessionId);
-          const elapsedMs = Date.now() - sessionStartTimeRef.current;
-          const minutes = Math.floor(elapsedMs / 60000);
-          const seconds = Math.floor((elapsedMs % 60000) / 1000);
-          const timeTaken = `${minutes}m ${seconds}s`;
+          const elapsedMs = Date.now() - sessionStartTimeRef.current;
+          const minutes = Math.floor(elapsedMs / 60000);
+          const seconds = Math.floor((elapsedMs % 60000) / 1000);
+          
+          // 🚩 LocalStorage에 완료 정보 저장
+          const scenarioIntId = parseInt(scenarioId || '0');
+          if (scenarioIntId > 0) {
+              const elapsedMinutes = elapsedMs / 60000;
+              saveCompletionToLocalStorage(scenarioIntId, elapsedMinutes);
+          }
+          
+          const timeTaken = `${minutes}m ${seconds}s`;
 
           navigate('/mainpage/rolePlay/complete', {
             state: {
@@ -250,23 +299,21 @@ const RolePlay: React.FC = () => {
               scenarioId: parseInt(scenarioId || '0'),
               sessionSummary,
               timeTaken,
-              rolePlayName: 'Role Play_At a Cafe',
+              rolePlayName: scenarioTitle, 
               turns: turnHistory
             }
           });
         } catch (completeErr) {
-          console.error('Complete API Failed:', completeErr);
           setError('세션 완료 처리 중 오류가 발생했습니다.');
           setStep(STEPS.DONE);
         }
       } else {
-        console.error('Next Dialogue API Failed:', err);
         setError('다음 대사를 불러올 수 없습니다.');
         setStep(STEPS.DONE);
       }
       setIsLoadingNextTurn(false);
     }
-  }, [sessionId, navigate, turnHistory, scenarioId]);
+  }, [sessionId, navigate, turnHistory, scenarioId, scenarioTitle]);
 
   const handleRecordingGrading = useCallback((feedback: string) => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -296,18 +343,17 @@ const RolePlay: React.FC = () => {
     setGradingResult(resultDisplay);
 
     setTimeout(() => {
-      // 연습 결과까지 포함해서 히스토리에 저장하고 다음으로 이동
       if (selectedChoiceData && practiceLineData) { // practiceLineData는 정답 텍스트를 담고 있음
         const finalTurn = {
-            ...selectedChoiceData, // 이전 선택 정보 (speaker, userResponseData 등)
-            korean: practiceLineData.korean, // 🔥 최종 정답 문장으로 덮어씌움
+            ...selectedChoiceData, 
+            korean: practiceLineData.korean, 
             romanized: practiceLineData.romanized,
             english: practiceLineData.english,
-            result: gradingResult, // 최종 발음 평가 결과
+            result: gradingResult, 
         };
         setTurnHistory(prev => [...prev, finalTurn]);
-        setSelectedChoiceData(null); // Clear temporary feedback
-        setPracticeLineData(null); // Clear practice data
+        setSelectedChoiceData(null); 
+        setPracticeLineData(null); 
       }
       moveToNextTurn();
     }, 1500);
@@ -500,7 +546,7 @@ const RolePlay: React.FC = () => {
       try {
         if (audioChunksRef.current.length === 0) return;
         const mimeType = audioMimeTypeRef.current;
-        const fileExtension = mimeType === 'audio/wav' ? 'wav' : mimeType === 'audio/mp4' ? 'mp4' : 'webm';
+        const fileExtension = mimeType.includes('wav') ? 'wav' : 'webm';
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         const audioFile = new File([audioBlob], `recording-${Date.now()}.${fileExtension}`, { type: mimeType });
 
@@ -777,7 +823,7 @@ const RolePlay: React.FC = () => {
         <Mascot image={characterImage} text={currentBubbleText} />
         <ContentSection color="blue">
             <div className={styles.cardTitleBar}>
-                <span className={styles.cardTitleText}>Role Play_At a Cafe</span>
+                <span className={styles.cardTitleText}>{scenarioTitle}</span>
                 <span className={styles.cardStepText}>{turnHistory.length + 1}/6</span>
             </div>
             <div className={`${styles.turnHistoryArea} ${isScrollLocked ? styles.scrollLocked : ''}`} ref={scrollRef}>

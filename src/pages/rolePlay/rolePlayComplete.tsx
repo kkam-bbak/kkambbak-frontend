@@ -180,21 +180,21 @@ const RolePlayComplete: React.FC = () => {
 
                 if (nextSession) {
                     // 🔥 다음 학습으로 이동할 때 카테고리 정보 유지
-                    navigate(`/mainpage/learn/${nextSession.id}`, {
+                    navigate(`/mainpage/roleplay/${nextSession.id}`, {
                         state: { categoryName: categoryName }
                     });
                 } else {
                     alert("더 이상 진행할 학습이 없습니다.");
-                    navigate('/mainpage/learnList');
+                    navigate('/mainpage/roleList');
                 }
             } else {
                 alert("학습 가능한 세션이 없습니다.");
-                navigate('/mainpage/learnList');
+                navigate('/mainpage/roleList');
             }
 
         } catch (error) {
             console.error("Failed to fetch next learning session:", error);
-            navigate('/mainpage/learnList');
+            navigate('/mainpage/roleList');
         }
     }, [navigate, currentScenarioId, categoryName]);
 

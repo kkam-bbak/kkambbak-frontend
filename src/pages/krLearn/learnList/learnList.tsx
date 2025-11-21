@@ -183,7 +183,7 @@ const LearnList: React.FC = () => {
     setActiveTopicId(null); 
     
     fetchSessions(activeTab, null, true);
-  }, [activeTab, fetchSessions]);
+  }, [activeTab]);
 
   // 초기 로드 시 첫 번째 항목 활성화 (완료 안 된 것 우선 혹은 첫 번째)
   useEffect(() => {
