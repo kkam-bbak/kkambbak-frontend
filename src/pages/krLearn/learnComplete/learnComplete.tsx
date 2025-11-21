@@ -1,165 +1,187 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; 
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
-import './learnComplete.css'; // CSS 파일 임포트
+import type { WordResult } from '../learnStart/learnStart'; 
+import styles from './learnComplete.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
+import { http } from '../../../apis/http';
 
-// --- 유틸리티 함수: 시간 및 날짜 처리 ---
-
-/**
- * 밀리초(ms)를 "Xm Ys" 형식의 문자열로 변환합니다.
- * (현재는 더미 데이터를 그대로 반환하며, 실제 앱에서는 학습 시작/종료 시점을 기반으로 계산해야 합니다.)
- * @param durationMs 학습에 걸린 시간 (밀리초)
- * @returns {string} 형식화된 시간 문자열 (예: "6m 30s")
- */
+// 유틸리티
 const formatDuration = (durationMs: number): string => {
-  // 💡 실제 구현에서는 durationMs를 사용하여 분과 초를 계산합니다.
-  // 예시: const totalSeconds = Math.round(durationMs / 1000);
-  // const minutes = Math.floor(totalSeconds / 60);
-  // const seconds = totalSeconds % 60;
-  // return `${minutes}m ${seconds}s`;
-
-  // 현재는 더미 데이터를 반영하여 "6m 30s"를 반환합니다.
-  return '6m 30s';
+  const totalSeconds = Math.round(durationMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}m ${seconds}s`;
 };
 
-/**
- * 현재 날짜를 "Weekday, Month Day, Year" 형식의 문자열로 변환합니다.
- * @returns {string} 형식화된 날짜 문자열 (예: "Monday, November 10, 2025")
- */
 const getFormattedCompletionDate = (): string => {
   const now = new Date();
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  return now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+};
+
+// API 응답 타입
+interface Session {
+  id: number;
+  title: string;
+  categoryName: string;
+  vocabularyCount: number;
+  completed: boolean;
+  durationSeconds: number;
+}
+interface NextLearningResponse {
+  status: { statusCode: string; message: string; description: string | null };
+  body: {
+    categoryName: string;
+    sessions: Session[];
+    nextCursor: number | null;
+    hasNext: boolean;
   };
-  // 언어는 'en-US' (미국 영어)로 지정하여 이미지와 동일한 형식으로 출력합니다.
-  return now.toLocaleDateString('en-US', options);
-};
+}
 
-// --- 더미 결과 데이터 ---
-const DUMMY_RESULTS = {
-  topicName: 'Casual_Emotions',
-  correctCount: 12, // <-- 이 값을 변경하여 테스트
-  totalCount: 26,
-};
-// --- END DUMMY DATA ---
-
-// 결과 항목을 렌더링하는 보조 컴포넌트
-const ResultRow = ({
-  icon: Icon,
-  value,
-}: {
-  icon: React.ElementType;
-  value: string;
-}) => (
-  <div className="result-row">
-    <Icon className="result-icon" />
-    <span className="result-value">{value}</span>
+const ResultRow = ({ icon: Icon, value }: { icon: React.ElementType; value: string }) => (
+  <div className={styles.resultRow}>
+    <Icon className={styles.resultIcon}/>
+    <span className={styles.resultValue}>{value}</span>
   </div>
 );
 
+// 🔥 [수정 1] LocationState에 categoryName 추가
+interface LocationState {
+  sessionId?: number;
+  resultId?: number;
+  results?: WordResult[];
+  topicName?: string;
+  learningDuration?: number;
+  categoryName?: string; // 🔥 추가됨
+}
+
 const LearnComplete: React.FC = () => {
   const navigate = useNavigate();
-  const { correctCount, totalCount, topicName } = DUMMY_RESULTS; // DUMMY_RESULTS에서 직접 비구조화 할당
+  const location = useLocation();
+  const state = location.state as LocationState;
 
-  // 1. 학습 시간 (임시로 390000ms를 가정 = 6분 30초)
-  // 💡 실제 앱에서는 이 값이 학습 시작/종료 시점을 기반으로 상위 컴포넌트/상태에서 전달되어야 합니다.
-  const learningDurationMs = 390000;
-  const learningTime = useMemo(
-    () => formatDuration(learningDurationMs),
-    [learningDurationMs],
-  );
+  const results = state?.results || []; 
+  const currentSessionId = state?.sessionId ? Number(state.sessionId) : null;
+  const topicName = state?.topicName || 'Result'; 
+  const learningDurationMs = state?.learningDuration || 0;
 
-  // 2. 완료 날짜 (실시간으로 가져와서 형식화)
+  // 🔥 [수정 2] 카테고리 이름 가져오기 (없으면 기본값 'TOPIK')
+  const categoryName = state?.categoryName || 'TOPIK';
+
+  const correctCount = results.filter(r => r.isCorrect).length;
+  const totalCount = results.length || 0;
+
+  const learningTime = useMemo(() => formatDuration(learningDurationMs), [learningDurationMs]);
   const completionDate = useMemo(() => getFormattedCompletionDate(), []);
 
-  // 3. 말풍선 텍스트 및 캐릭터 이미지 결정 로직
   const { speechBubbleText, mascotImage: characterImageSrc } = useMemo(() => {
     let text = '';
     let mascot: MascotImage;
-
-    if (correctCount === totalCount) {
-      text = 'Perfect!!!';
-      mascot = 'shining';
-    } else if (correctCount >= totalCount * (2 / 3)) {
-      // 3분의 2 이상
-      text = "It's not bad~";
-      // imgSrc = goodImg;
-      mascot = 'smile';
-    } else if (correctCount >= totalCount * (1 / 2)) {
-      // 절반 이상
-      text = 'So so~';
-      // imgSrc = sosoImg;
-      mascot = 'thinking';
-    } else {
-      // 절반 이하
-      text = "I'm sorry ..";
-      // imgSrc = badImg;
-      mascot = 'gloomy';
-    }
+    if (totalCount > 0 && correctCount === totalCount) { text = 'Perfect!!!'; mascot = 'shining'; } 
+    else if (totalCount > 0 && correctCount >= totalCount * (2 / 3)) { text = "It's not bad~"; mascot = 'smile'; } 
+    else if (totalCount > 0 && correctCount >= totalCount * (1 / 2)) { text = 'So so~'; mascot = 'thinking'; } 
+    else { text = "I'm sorry .."; mascot = 'gloomy'; }
     return { speechBubbleText: text, mascotImage: mascot };
-  }, [correctCount, totalCount]); // correctCount 또는 totalCount가 변경될 때마다 재계산
+  }, [correctCount, totalCount]);
 
-  // 1. 로그아웃 핸들러
-  // const handleLogout = () => navigate('/auth/login');
-
-  // 2. Review 페이지 이동 핸들러
-  const handleReview = () => navigate('/mainpage/learn/review');
-
-  // 3. Try again (현재 학습 시작 화면으로 돌아감)
-  const handleTryAgain = () => {
-    navigate(`/mainPage/learn/${topicName}`);
+  // 핸들러
+  const handleReview = () => {
+    navigate('/mainpage/learn/review', {
+        state: {
+            sessionId: currentSessionId,
+            resultId: state?.resultId,
+            results: results,
+            topicName: topicName,
+            learningTime: learningTime,
+            // categoryName: categoryName (리뷰 페이지에서도 필요하다면 추가)
+        }
+    });
   };
 
-  // 4. Next learning (다음 학습) 핸들러
-  const handleNextLearning = () => {
-    navigate('/mainpage/learnList');
+  const handleTryAgain = () => {
+    if (currentSessionId) {
+      // 🔥 Try Again 할 때도 카테고리 정보를 유지해서 보냅니다.
+      navigate(`/mainPage/learn/${currentSessionId}`, {
+          state: { categoryName: categoryName }
+      }); 
+    } else {
+      navigate('/mainpage/learnList');
+    }
+  };
+
+  const handleNextLearning = async () => {
+    try {
+      console.log(`[Next Learning] Fetching list for category: ${categoryName}`);
+      
+      // 🔥 [수정 3] API 호출 시 category 파라미터 추가 (C007 에러 해결)
+      const response = await http.get<NextLearningResponse>('/api/v1/learning/sessions', {
+        params: { 
+            limit: 20,
+            category: categoryName // 🔥 필수!
+        }
+      });
+
+      const sessions = response.data.body.sessions;
+
+      if (sessions && sessions.length > 0) {
+        // 1순위: 완료 안 된 것 중 다른 ID
+        let nextSession = sessions.find(s => !s.completed && s.id !== currentSessionId);
+        
+        // 2순위: 없으면 그냥 다음 번호
+        if (!nextSession) {
+            nextSession = sessions.find(s => s.id > (currentSessionId || 0));
+        }
+
+        // 3순위: 그것도 없으면 목록의 첫 번째 (현재 ID 제외)
+        if (!nextSession) {
+            nextSession = sessions.find(s => s.id !== currentSessionId);
+        }
+
+        if (nextSession) {
+            console.log(`[Next Learning] Starting: ${nextSession.title}`);
+            
+            // 🔥 [수정 4] 다음 학습으로 이동할 때도 카테고리 정보를 넘겨줘야 계속 유지됨
+            navigate(`/mainPage/learn/${nextSession.id}`, {
+                state: { categoryName: categoryName }
+            });
+        } else {
+            console.log("[Next Learning] No suitable next session found.");
+            alert("더 이상 진행할 학습이 없습니다. 목록으로 이동합니다.");
+            navigate('/mainpage/learnList');
+        }
+      } else {
+        console.log("[Next Learning] No sessions returned.");
+        alert("학습 가능한 세션이 없습니다.");
+        navigate('/mainpage/learnList');
+      }
+
+    } catch (error) {
+      console.error("Failed to fetch next learning session:", error);
+      navigate('/mainpage/learnList');
+    }
   };
 
   return (
-    <div className="learn-complete-container">
+    <div className={styles.learnCompleteContainer}>
       <Header hasBackButton />
-
       <Mascot image={characterImageSrc} text={speechBubbleText} />
 
-      {/* 4. 세션 완료 결과 카드 (주황색 배경) */}
-      <div className="learning-card complete-card">
-        <h1 className="session-complete-title">Session Complete!</h1>
-
-        {/* 결과 박스 (검은색 배경) */}
-        <div className="results-box">
-          {/* 1. 학습 이름: Casual_Emotions Result */}
-          <h2 className="comresults-topic-title">{topicName} Result</h2>
-
-          {/* 2. 정답 수: 18/25 Vocabularies correct */}
-          <ResultRow
-            icon={CheckCircle}
-            value={`${correctCount}/${totalCount} Vocabularies correct`}
-          />
-
-          {/* 3. 학습 시간: **formatDuration 함수 사용** */}
+      <div className={styles.completeCard}>
+        <h1 className={styles.sessionCompleteTitle}>Session Complete!</h1>
+        <div className={styles.resultsBox}>
+          <h2 className={styles.comresultsTopicTitle}>{topicName} Result</h2>
+          <ResultRow icon={CheckCircle} value={`${correctCount}/${totalCount} Vocabularies correct`} />
           <ResultRow icon={Clock} value={learningTime} />
-
-          {/* 4. 날짜: **getFormattedCompletionDate 함수 사용** */}
           <ResultRow icon={Calendar} value={completionDate} />
         </div>
 
-        {/* Review / Try Again 버튼 */}
-        <div className="action-buttons-row">
-          <button onClick={handleReview} className="action-button white-bg">
-            Review
-          </button>
-          <button onClick={handleTryAgain} className="action-button white-bg">
-            Try again
-          </button>
+        <div className={styles.actionButtonsRow}>
+          <button onClick={handleReview} className={styles.actionButton}>Review</button>
+          <button onClick={handleTryAgain} className={styles.actionButton}>Try again</button>
         </div>
 
-        {/* Next learning 버튼 */}
-        <button onClick={handleNextLearning} className="next-learning-button">
+        <button onClick={handleNextLearning} className={styles.nextLearningButton}>
           Next learning
         </button>
       </div>
