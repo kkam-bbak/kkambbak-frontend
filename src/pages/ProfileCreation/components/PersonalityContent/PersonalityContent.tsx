@@ -62,20 +62,6 @@ function PersonalityContent({ updateMascot }: PersonalityContentProps) {
     setImage(value);
   };
 
-  const handleTopTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (personality === DIRECT && image === DIRECT) {
-      setTopText(e.target.value);
-    }
-  };
-
-  const handleBottomTextChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
-    if (meaning === DIRECT) {
-      setBottomText(e.target.value);
-    }
-  };
-
   useEffect(() => {
     if (personality && image) {
       const result = PERSONALITY_IMAGE_MAP[personality]?.[image] ?? '';
@@ -142,7 +128,8 @@ function PersonalityContent({ updateMascot }: PersonalityContentProps) {
             <Textarea
               placeholder="Enter Your Personality of image"
               value={topText}
-              onChange={handleTopTextChange}
+              readOnly={!(personality === DIRECT && image === DIRECT)}
+              onChange={(e) => setTopText(e.target.value)}
             />
           </div>
 
@@ -168,7 +155,8 @@ function PersonalityContent({ updateMascot }: PersonalityContentProps) {
             <Textarea
               placeholder="Enter your meaning of your name"
               value={bottomText}
-              onChange={handleBottomTextChange}
+              readOnly={meaning !== DIRECT}
+              onChange={(e) => setBottomText(e.target.value)}
             />
           </div>
         </div>
