@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../stores/user';
 import IconImage from '../../assets/ICON.png';
 import styles from './Splash.module.css';
+import SplashVideo from '../../assets/splash.mp4';
 
 export default function Splash() {
   const navigate = useNavigate();
@@ -21,10 +22,15 @@ export default function Splash() {
   }, [user, navigate]);
 
   return (
-    <div className={styles['splash-container']}>
-      <div className={styles['splash-content']}>
-        <img src={IconImage} alt="App Icon" className={styles['splash-icon']} />
+    <div className={styles.contentImageBox}>
+        <video
+          src={SplashVideo}
+          className={styles.videoElement} // CSS 스타일링용 클래스
+          autoPlay
+          loop
+          muted        // 소리 끔 (필수: 없으면 자동재생 안됨)
+          playsInline  // 모바일 전체화면 방지 (필수)
+        />
       </div>
-    </div>
   );
 }

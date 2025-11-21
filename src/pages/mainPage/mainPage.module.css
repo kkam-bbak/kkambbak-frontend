@@ -1,11 +1,13 @@
-/* 로그인아웃 버튼, 상단섹션크기, 하단섹션 크기, 말풍선 위치, 캐릭터 위치&크기 */
+/* MainPage.module.css */
 
-.main-container {
+/* --- 1. 공통 및 상단 섹션 --- */
+.mainContainer {
   position: relative;
   width: 100%;
 }
 
-.main-bubble {
+.mainBubble {
+  /* 말풍선 위치&크기 */
   top: 32px !important;
   left: 50px !important;
   width: 260px !important;
@@ -13,16 +15,44 @@
 }
 
 /* -------------------- 2. 하단 메뉴 영역 (애니메이션) -------------------- */
-.menu-container {
-  /* position: absolute; */
+.menuContainer {
+  /* position: absolute; 제거, 컴포넌트 JSX에서 위치 지정 */
   top: 0;
   left: 0;
   width: 100%;
-
-  /* height: 100%; */
 }
 
-.menu-item {
+/* 기존 contentImageBox 스타일 유지하면서 overflow: hidden 추가 */
+.contentImageBox {
+  /* 너비, 높이, border-radius 등 기존 스타일 유지 */
+  width: 100%; 
+  height: 120px; 
+  border-radius: 20px; /* (예시) 둥근 모서리 */
+
+  position: relative;
+  overflow: hidden; /* 🔥 동영상이 둥근 모서리를 튀어나가지 않게 자름 */
+  background-color: #000; /* 로딩 전 검은 배경 */
+}
+
+
+.videoElement {
+  width: 100%;
+  height: 100%;
+  
+  /* 🔥 [수정] contain(여백 생김) -> cover(꽉 채움) */
+  /* cover를 쓰면 빈 공간 없이 꽉 차지만, 위아래가 조금 잘릴 수 있습니다. */
+  object-fit: cover; 
+  
+  /* (선택 사항) 위아래가 잘릴 때 '윗부분'을 우선해서 보여주고 싶다면 아래 속성 추가 */
+  /* object-position: center top; */
+
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.menuItem {
   position: absolute;
   left: 0;
   box-sizing: border-box;
@@ -39,13 +69,13 @@
 }
 
 /* 프로필이 활성화되어 전체 화면을 덮을 때의 스타일 */
-.menu-item.profile-active {
+.profileActive { /* .menu-item.profile-active */
   padding-top: 0;
-  border-radius: 0; /* 모든 둥근 모서리 제거 (앱 컨테이너가 둥근 모서리를 담당) */
+  border-radius: 0; /* 모든 둥근 모서리 제거 */
 }
 
 /* 탭 헤더 (접혀있을 때 보이는 부분: 40px 높이) */
-.tab-header {
+.tabHeader {
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -53,15 +83,15 @@
   padding: 0 20px;
 }
 
-.tab-header h3 {
-  top: 16px;
-  left: 16px;
+.tabHeader h3 {
+  /* CSS Module에서는 중첩 셀렉터가 아닌 개별 클래스로 관리 권장 */
+  /* 단, h3에 top, left 속성은 위치 지정 요소가 아니므로 제거하거나 확인 필요 */
   font-size: 18px;
   font-weight: 500; /* 탭 제목 굵기 통일 */
 }
 
 /* 확장된 콘텐츠 영역 */
-.tab-content {
+.tabContent {
   /* 1️⃣ Flexbox 컨테이너로 지정 */
   display: flex;
   flex-direction: column;
@@ -75,27 +105,32 @@
   padding: 10px 20px 20px;
 }
 
-.extended-content {
+.extendedContent {
   /* 2️⃣ 남은 공간을 모두 차지하도록 flex-grow 설정 */
   display: flex;
   flex-grow: 1; /* 이 영역이 남은 수직 공간을 모두 차지 */
   flex-direction: column;
 }
 
-.content-buttons {
+
+.contentButtons {
   display: flex;
   align-items: center;
   justify-content: center;
   padding-bottom: 0;
-  margin-top: auto;
+  margin-top: auto; /* 상위 flex-grow: 1; 덕분에 하단에 붙음 */
 }
 
-.menu-header {
+.contentButtons.center {
+  justify-content: center;
+}
+
+.menuHeader {
   margin-bottom: 20px;
 }
 
 /* 확장된 콘텐츠의 h2 제목 */
-.menu-header h2 {
+.menuHeader h2 {
   margin: 0;
   font-size: 18px;
   font-weight: 500; /* 굵기 제거 */
@@ -103,23 +138,26 @@
 
 /* --- Content Styles (Learn, Role, Game) --- */
 
-.content-image-box {
-  padding: 50px 0;
-  margin: 20px 0;
-  text-align: center;
-  background-color: #ff5000;
-  border-radius: 10px;
+.contentImageBox {
+  width: 100%;
+  height: 165px;
+  aspect-ratio: 16 / 9; 
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  border-radius: 20px;
 }
 
-.menu-item-role .content-image-box.blue {
+.blue { /* .menu-item-role .content-image-box.blue */
   background-color: #007cff;
 }
 
-.menu-item-1vs1 .content-image-box.green {
+.green { /* .menu-item-1vs1 .content-image-box.green */
   background-color: #39ff14;
 }
 
-.action-button {
+.actionButton {
   height: 45px;
   font-size: 16px;
   color: black;
@@ -128,17 +166,18 @@
   border-radius: 10px;
 }
 
-.action-button.white {
+.actionButton.white {
   width: 48%;
   height: 40px;
   background-color: white;
 }
 
-.action-button.full-width {
+.actionButton.fullWidth {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 328px;
+  max-width: 100%; /* 부모 컨테이너를 넘지 않도록 설정 */
   height: 40px;
   padding: 0;
   font-family: Inter, sans-serif;
@@ -151,14 +190,14 @@
 
 /* --- Profile Styles (Full Screen Mode) --- */
 
-.profile-top-bar {
+.profileTopBar {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
 }
 
-.profile-top-header {
+.profileTopHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -166,13 +205,13 @@
   margin-bottom: 20px;
 }
 
-.profile-title {
+.profileTitle {
   margin: 0;
   font-size: 18px;
   font-weight: normal;
 }
 
-.profile-image-box {
+.profileImageBox {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,60 +223,61 @@
   border-radius: 50%;
 }
 
-.profile-image-box .profile-avatar {
+.profileAvatar {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.profile-fields-container {
+.profileFieldsContainer {
   display: grid;
   gap: 15px;
   padding: 0 20px;
 }
 
-.profile-field label {
+.profileField label {
   display: block;
   margin-bottom: 5px;
   font-weight: 500;
   color: black;
 }
 
-.profile-field input,
-.profile-description-box {
+.profileField input,
+.profileDescriptionBox {
   box-sizing: border-box;
   display: flex;
   align-items: center;
   width: 100%;
   min-height: 45px;
   padding: 12px 15px;
-  color: white;
-  background-color: rgb(255 255 255 / 10%);
-  border: none;
+  color: black; /* 텍스트 색상을 검은색으로 조정 (흰색 배경에 잘 보이도록) */
+  background-color: rgb(255 255 255 / 90%); /* 배경을 흰색 반투명으로 조정 */
+  border: 1px solid #eee;
   border-radius: 8px;
 }
 
-.profile-description-box {
+.profileDescriptionBox {
   min-height: 70px;
+  align-items: flex-start; /* 텍스트가 상단에 정렬되도록 수정 */
 }
 
-.profile-row-fields {
+.profileRowFields {
   display: flex;
   gap: 15px;
 }
 
-.profile-row-fields .half-width {
+.halfWidth { /* .profile-row-fields .half-width */
   flex: 1;
 }
 
-.no-rounds-left {
+.noRoundsLeft {
   margin-top: 5px;
   font-size: 12px;
-  color: rgb(255 255 255 / 60%);
+  color: rgb(0 0 0 / 60%); /* 글자색을 검은색으로 조정 */
   text-align: right;
 }
 
-.profile-buttons {
+.profileButtons {
   position: sticky;
   bottom: 0;
   box-sizing: border-box;
@@ -245,9 +285,20 @@
   justify-content: space-between;
   width: 100%;
   padding: 20px;
-  background-color: #da70d6;
+  background-color: #da70d6; /* 프로필 색상 유지 */
 }
 
-.profile-buttons .action-button {
+.profileButtons .actionButton {
   width: 30%;
+}
+
+/* 추가적인 탭 헤더 스타일 */
+.largeText {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.collapsedText {
+    font-size: 1.2em;
+    font-weight: 500;
 }

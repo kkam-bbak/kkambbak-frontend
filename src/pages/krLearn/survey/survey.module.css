@@ -65,12 +65,22 @@
 
 /* -------------------- 4. 시작/완료/스킵 버튼 (크기 일치 및 위치 조정) -------------------- */
 
+
+
 .skipButtonContainer {
-  box-sizing: border-box;
-  margin-top: 120px;
+  /* box-sizing: border-box; */ /* 필요시 유지 */
+  
+  /* ⭐️ 수정된 부분 시작 */
+  position: absolute;  /* 화면(부모) 기준 절대 위치 */
+  bottom: 30px;        /* 바닥에서 30px 위에 고정 (페이지네이션 아래 위치 고려) */
+            
+  width: 328px !important;         /* 가로 너비를 꽉 채워서 중앙 정렬 유도 */
+  display: flex;       /* 내부 버튼 중앙 328정렬을 위해 필요시 사용 */
+  justify-content: center; 
+  margin-top: 0;       /* 기존 margin-top 제거 */
+  z-index: 10;         /* 다른 요소 위에 떠 있도록 설정 */
+  /* ⭐️ 수정된 부분 끝 */
 }
-
-
 
 /* -------------------- 5. 페이지네이션 및 완료 화면 -------------------- */
 

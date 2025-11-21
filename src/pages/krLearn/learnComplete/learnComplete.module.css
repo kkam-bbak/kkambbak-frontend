@@ -1,6 +1,6 @@
 /* learnComplete.css */
 
-.learn-complete-container {
+.learnCompleteContainer {
   width: 100%;
 }
 
@@ -14,7 +14,7 @@
 /* -------------------- 3. 학습 결과 카드 영역 -------------------- */
 
 /* learnStart.css의 .learning-card 재활용 */
-.complete-card {
+.completeCard {
   position: absolute;
   bottom: 0;
   box-sizing: border-box;
@@ -28,7 +28,7 @@
 }
 
 /* Session Complete! 제목 스타일 */
-.session-complete-title {
+.sessionCompleteTitle {
   position: absolute;
   font-size: 18px;
   font-weight: 500;
@@ -36,17 +36,17 @@
 }
 
 /* 결과 박스 (검은색 배경) */
-.results-box {
+.resultsBox {
   padding: 1px 15px 15px; /* 내부 패딩 */
   margin-top: 52px; /* 제목과의 간격 */
   margin-bottom: 16px; /* 아래 여백 */
   color: white; /* 결과 값은 흰색 */
-  background-color: #000;
+  background-color: black;
   border-radius: 10px;
 }
 
 /* 학습 이름 제목 스타일 */
-.comresults-topic-title {
+.comresultsTopicTitle {
   margin-bottom: 15px;
   font-size: 18px;
   font-weight: 500;
@@ -54,19 +54,19 @@
 }
 
 /* 결과 항목 행 스타일 */
-.result-row {
+.resultRow {
   display: flex;
   gap: 10px;
   align-items: center;
   margin-bottom: 10px; /* 행 간격 */
 }
 
-.result-row:last-child {
+.resultRow:last-child {
   margin-bottom: 0; /* 마지막 행은 간격 제거 */
 }
 
 /* 아이콘 스타일 */
-.result-icon {
+.resultIcon {
   width: 20px;
   height: 20px;
   margin-right: 5px;
@@ -74,7 +74,7 @@
 }
 
 /* 결과 값 스타일 */
-.result-value {
+.resultValue {
   font-size: 12px;
   font-weight: 500;
   color: white; /* 텍스트 색상: 흰색 */
@@ -83,13 +83,13 @@
 /* -------------------- 4. 버튼 영역 -------------------- */
 
 /* Review / Try Again 버튼 컨테이너 */
-.action-buttons-row {
+.actionButtonsRow {
   display: flex;
   justify-content: space-between;
 }
 
 /* Review / Try Again 버튼 기본 스타일 재활용 */
-.action-button {
+.actionButton {
   /* learnStart.css의 .action-button 재활용: width: 156px, height: 40px */
 
   width: 153px; /* flex-grow 때문에 100%는 의미 없지만 명시적으로 */
@@ -97,17 +97,13 @@
   font-size: 14px; /* 텍스트 크기 증가 */
   font-weight: 600;
   border-radius: 10px; /* 모서리 둥글게 */
-}
-
-/* 흰색 배경 버튼 */
-.action-button.white-bg {
   color: black; /* 텍스트: 주황색 */
   background-color: white; /* 배경: 흰색 */
   border: none;
 }
 
 /* Next learning 버튼 */
-.next-learning-button {
+.nextLearningButton {
   position: absolute;
   bottom: 14px; /* 요청하신대로 하단에서 14px 간격 */
   left: 50%; /* 가운데 정렬을 위해 왼쪽 50% 지정 */

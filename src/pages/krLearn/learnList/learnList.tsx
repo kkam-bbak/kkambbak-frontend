@@ -1,12 +1,23 @@
-// learnList.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './learnList.css';
-import LearnInfo from '../learnInfo/learnInfo'; // 🔥 경로 수정
+import { http } from '../../../apis/http';
+import styles from './learnList.module.css';
+import LearnInfo from '../learnInfo/learnInfo';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
-// Topic 인터페이스는 유지
+
+// API 응답의 sessions 항목에 맞는 인터페이스 정의
+interface Session {
+  id: number;
+  title: string;
+  categoryName: 'TOPIK' | 'CASUAL';
+  vocabularyCount: number;
+  completed: boolean;
+  durationSeconds: number;
+}
+
+// 화면에 표시할 Topic 인터페이스 (Session 기반)
 interface Topic {
   id: number;
   title: string;
@@ -15,87 +26,21 @@ interface Topic {
   completed: boolean;
 }
 
-// 🔥 localStorage 키 정의 (최초 이용 확인용)
 const HAS_SEEN_INFO_KEY = 'hasSeenLearnInfo';
 
-// 데이터는 유지
-const topikList: Topic[] = [
-  {
-    id: 1,
-    title: 'Topik 1',
-    vocabularies: 30,
-    time: '4m 17s',
-    completed: false,
-  },
-  {
-    id: 2,
-    title: 'Topik 2',
-    vocabularies: 30,
-    time: '6m 20s',
-    completed: false,
-  },
-  {
-    id: 3,
-    title: 'Topik 3',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  {
-    id: 4,
-    title: 'Topik 4',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  {
-    id: 9,
-    title: 'Topik 5',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  {
-    id: 10,
-    title: 'Topik 6',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-];
+const formatDuration = (durationSeconds: number): string => {
+  const minutes = Math.floor(durationSeconds / 60);
+  const seconds = durationSeconds % 60;
+  return `${minutes}m ${seconds}s`;
+};
 
-const casualList: Topic[] = [
-  {
-    id: 5,
-    title: 'Emotions',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  {
-    id: 6,
-    title: 'Fruits',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  {
-    id: 7,
-    title: 'Places',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-  { id: 8, title: 'Body', vocabularies: 30, time: '5m 15s', completed: false },
-  { id: 11, title: 'Food', vocabularies: 30, time: '5m 15s', completed: false },
-  {
-    id: 12,
-    title: 'Travel',
-    vocabularies: 30,
-    time: '5m 15s',
-    completed: false,
-  },
-];
+const sessionToTopic = (session: Session): Topic => ({
+  id: session.id,
+  title: session.title,
+  vocabularies: session.vocabularyCount,
+  time: formatDuration(session.durationSeconds),
+  completed: session.completed,
+});
 
 // TopicCard 컴포넌트 정의는 유지
 interface TopicCardProps {
@@ -113,20 +58,30 @@ const TopicCard: React.FC<TopicCardProps> = ({
   isActive,
   isCompleted,
 }) => {
+  // 🔥 [수정 1] 완료된 항목은 항상 버튼 노출, 진행 중인 항목은 활성화(클릭)되었을 때만 노출
   const showButton = isCompleted || (isActive && !isCompleted);
-  const buttonText = isCompleted ? 'Learn Again' : 'Start';
-  const statusClass = isActive ? 'active-text' : 'inactive-text';
+  
+  // 🔥 [수정 2] 버튼 텍스트 변경 (Start -> learn again)
+  const buttonText = isCompleted ? 'learn again' : 'Start';
+  
+  // 완료된 항목은 'learnAgain' 스타일(회색 버튼) 적용, 아니면 기본 'active' 스타일
+  // (CSS에 .learnAgain 클래스가 있어야 회색으로 보입니다)
+  const buttonStyleClass = isCompleted ? styles.learnAgain : '';
+
+  // 텍스트 색상 (완료 여부 무관하게 활성화/비활성화만 따짐, 혹은 완료되면 active 느낌으로 처리 가능)
+  const statusClass = isActive ? styles['active-text'] : styles['inactive-text'];
 
   return (
     <div
-      className={`topic-card ${isCompleted ? 'completed' : ''}`}
+      // CSS Modules을 사용하므로 styles.completed를 명시적으로 사용해야 합니다.
+      className={`${styles.topicCard} ${isCompleted ? styles.completed : ''} ${isActive ? styles.activeCard : ''}`}
       onClick={() => onCardClick(topic.id)}
     >
-      <div className="card-header">
+      <div className={styles.cardHeader}>
         <h3 className={statusClass}>{topic.title}</h3>
         {showButton && (
           <button
-            className={`topic-start-button ${isCompleted ? 'learn-again' : ''}`}
+            className={`${styles.topicStartButton} ${buttonStyleClass}`}
             onClick={(e) => {
               e.stopPropagation();
               onStart(topic.id);
@@ -136,14 +91,15 @@ const TopicCard: React.FC<TopicCardProps> = ({
           </button>
         )}
       </div>
-      <div className="card-divider"></div>
-      <div className="card-footer">
-        <span className={`vocab-count ${statusClass}`}>
+      <div className={styles.cardDivider}></div>
+      <div className={styles.cardFooter}>
+        <span className={`${styles.vocabCount} ${statusClass}`}>
           {topic.vocabularies} Vocabularies
         </span>
-        <span className={`time-info ${statusClass}`}>
+        {/* 🔥 시간 정보: 완료된 경우 실제 학습 시간, 미완료 시 예상 시간이 표시됨 */}
+        <span className={`${styles.timeInfo} ${statusClass}`}>
           {topic.time}
-          <div className="time-icon">🕒</div>
+          <div className={styles.timeIcon}>🕒</div>
         </span>
       </div>
     </div>
@@ -159,109 +115,225 @@ const LearnList: React.FC = () => {
 
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
+  
+  // 🔥 중복 클릭 방지 상태
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  // 🔥 학습 시작 컨펌 후 최종 라우팅
+  // API 상태 관리
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | number | null>(null);
+  const [hasNext, setHasNext] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // 학습 목록을 API에서 가져오는 함수
+  const fetchSessions = useCallback(
+    async (
+      category: 'topik' | 'casual',
+      cursor: string | number | null,
+      isInitial: boolean = false,
+    ) => {
+      if (isLoading || (!hasNext && !isInitial)) return;
+
+      setIsLoading(true); 
+      const categoryParam = category.toUpperCase();
+      const limit = 4; // or 10
+
+      try {
+        const cursorParam = cursor !== null ? String(cursor) : undefined;
+        
+        const response = await http.get('/api/v1/learning/sessions', {
+          params: {
+            category: categoryParam,
+            cursor: cursorParam,
+            limit: limit,
+          },
+        });
+
+        const data = response.data.body;
+        const newSessions: Session[] = data.sessions || [];
+        
+        setSessions((prevSessions) => 
+            isInitial ? newSessions : [...prevSessions, ...newSessions]
+        );
+        
+        setNextCursor(data.nextCursor);
+        setHasNext(data.hasNext);
+        
+      } catch (error) {
+        console.error('Failed to fetch learning sessions:', error);
+        if (isInitial) {
+            setSessions([]);
+            setActiveTopicId(null);
+        }
+        setHasNext(false); 
+      } finally {
+        setIsLoading(false); 
+      }
+    },
+    [hasNext]
+  );
+
+  // 탭 변경 시 초기 목록 로드
+  useEffect(() => {
+    setSessions([]);
+    setNextCursor(null);
+    setHasNext(true);
+    setActiveTopicId(null); 
+    
+    fetchSessions(activeTab, null, true);
+  }, [activeTab, fetchSessions]);
+
+  // 초기 로드 시 첫 번째 항목 활성화 (완료 안 된 것 우선 혹은 첫 번째)
+  useEffect(() => {
+    if (sessions.length > 0 && activeTopicId === null) {
+      // 1. 완료되지 않은 첫 번째 찾기
+      const firstIncomplete = sessions.find(s => !s.completed);
+      // 2. 없으면 그냥 첫 번째
+      setActiveTopicId(firstIncomplete ? firstIncomplete.id : sessions[0].id);
+    }
+  }, [sessions, activeTopicId]);
+
+  // 스크롤 이벤트 핸들러 (무한 스크롤)
+  const handleScroll = useCallback(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    const isNearBottom =
+      scrollContainer.scrollTop + scrollContainer.clientHeight >=
+      scrollContainer.scrollHeight - 50;
+
+    if (isNearBottom && hasNext && !isLoading) {
+      fetchSessions(activeTab, nextCursor);
+    }
+  }, [hasNext, isLoading, nextCursor, activeTab, fetchSessions]);
+  
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [handleScroll]);
+
+  const topicsToDisplay: Topic[] = sessions.map(sessionToTopic);
+
+  // 🔥 학습 시작 확정 후 이동
   const handleConfirmStart = (topicId: number) => {
+    if (isNavigating) return; 
+    
+    setIsNavigating(true); 
     handleCloseInfoModal();
-    navigate(`/mainPage/learn/${topicId}`);
+    
+    console.log(`[Confirm Start] Navigating to: /mainPage/learn/${topicId}`);
+    
+    // 🔥 [수정] 이동할 때 categoryName을 함께 보냅니다!
+    navigate(`/mainPage/learn/${topicId}`, {
+        state: {
+            categoryName: activeTab.toUpperCase() // 'TOPIK' or 'CASUAL'
+        }
+    }); 
   };
 
-  // 🔥 Start 버튼 클릭 시 로직: 최초 이용 확인
+  // 🔥 Start 버튼 클릭 시 로직
   const handleStartLearning = (topicId: number) => {
+    if (isNavigating) return; 
+
     const topic = topicsToDisplay.find((t) => t.id === topicId);
     if (!topic) return;
 
-    setSelectedTopic(topic);
-    const hasSeenInfo = localStorage.getItem(HAS_SEEN_INFO_KEY);
+    // 이미 완료된 항목이면 튜토리얼 없이 바로 이동 (Learn Again)
+    if (topic.completed) {
+        handleConfirmStart(topicId);
+        return;
+    }
 
+    // 처음 학습이면 튜토리얼 모달 띄우기
+    const hasSeenInfo = localStorage.getItem(HAS_SEEN_INFO_KEY);
     if (!hasSeenInfo) {
-      // 1. 처음이면 모달 띄우고 기록 남기기
       setIsInfoModalOpen(true);
+      setSelectedTopic(topic);
       localStorage.setItem(HAS_SEEN_INFO_KEY, 'true');
     } else {
-      // 2. 이미 봤다면 바로 학습 페이지로 이동
       handleConfirmStart(topicId);
     }
   };
 
-  // 🔥 모달 닫기 핸들러
   const handleCloseInfoModal = () => {
     setIsInfoModalOpen(false);
     setSelectedTopic(null);
   };
 
-  // 카드 클릭 핸들러: 활성화된 ID 업데이트
   const handleCardClick = (topicId: number) => {
     setActiveTopicId(topicId);
   };
 
+  const handleTabChange = (tab: 'topik' | 'casual') => {
+    if (tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  };
+  
   const activeBubbleText =
     activeTab === 'topik'
       ? 'Should I help you prepare\nfor the exam?'
       : 'Can I help you with daily conversation?';
 
-  const topicsToDisplay = activeTab === 'topik' ? topikList : casualList;
-
-  // 디폴트 활성화 로직
-  useEffect(() => {
-    if (topicsToDisplay.length > 0) {
-      setActiveTopicId(topicsToDisplay[0].id);
-    }
-  }, [topicsToDisplay]);
-
-  // 탭 변경 로직
-  const handleTabChange = (tab: 'topik' | 'casual') => {
-    setActiveTab(tab);
-    setActiveTopicId(null);
-  };
-
   return (
-    <div className="content-lit-container">
-      <Header hasBackButton />
-
-      <Mascot image="basic" text={activeBubbleText} />
+    <div className={styles.contentLitContainer}>
+      
+      {!isInfoModalOpen && (
+        <>
+          <Header hasBackButton />
+          <Mascot image="basic" text={activeBubbleText} />
+        </>
+      )}
 
       <ContentSection>
-        {/* 탭 버튼 */}
-        <div className="tab-buttons-container">
+        <div className={styles.tabButtonsContainer}>
           <button
-            className={`tab-button ${activeTab === 'topik' ? 'active' : ''}`}
+            className={`${styles.tabButton} ${activeTab === 'topik' ? styles.activeTabButton : ''}`}
             onClick={() => handleTabChange('topik')}
           >
             Topik
           </button>
           <button
-            className={`tab-button ${activeTab === 'casual' ? 'active' : ''}`}
+            className={`${styles.tabButton} ${activeTab === 'casual' ? styles.activeTabButton : ''}`}
             onClick={() => handleTabChange('casual')}
           >
             Casual
           </button>
         </div>
 
-        {/* 학습 목록 */}
-        <div className="scrollable-list">
-          {topicsToDisplay.map((topic) => (
-            <TopicCard
-              key={topic.id}
-              topic={topic}
-              onStart={handleStartLearning}
-              onCardClick={handleCardClick}
-              isActive={topic.id === activeTopicId}
-              isCompleted={topic.completed}
-            />
-          ))}
-          <div style={{ height: '20px' }}></div>
+        <div className={`${styles.scrollableList}`} ref={scrollRef}>
+          {topicsToDisplay.length === 0 && !isLoading ? (
+            <p className="no-sessions-message">No learning sessions available.</p>
+          ) : (
+            topicsToDisplay.map((topic) => (
+              <TopicCard
+                key={topic.id}
+                topic={topic}
+                onStart={handleStartLearning} 
+                onCardClick={handleCardClick}
+                isActive={topic.id === activeTopicId}
+                isCompleted={topic.completed}
+              />
+            ))
+          )}
         </div>
       </ContentSection>
 
-      {/* 🔥🔥🔥 LearnInfo 모달 렌더링 🔥🔥🔥 */}
       {isInfoModalOpen && selectedTopic && (
         <LearnInfo
           topic={selectedTopic}
           tab={activeTab}
           isOpen={isInfoModalOpen}
           onClose={handleCloseInfoModal}
-          // LearnInfoProps에 맞게 수정: onConfirmStart는 ID를 받아야 함
           onConfirmStart={() => handleConfirmStart(selectedTopic.id)}
         />
       )}
