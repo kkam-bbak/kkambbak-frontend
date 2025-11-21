@@ -4,7 +4,7 @@ import Textarea from '@/components/Textarea/Textarea';
 import styles from './KoreanContent.module.css';
 import CheckIcon from '@/components/icons/CheckIcon/CheckIcon';
 import { useEffect, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { generateName, createName, SelectedName } from '@/apis/users';
 import { useNavigate } from 'react-router-dom';
 import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
@@ -19,6 +19,7 @@ function KoreanContent({ updateMascot }: KoreanContentProps) {
   const user = useUser((s) => s.user);
   const [selected, setSelected] = useState({ name: '', meaning: '' });
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const {
     mutate: generateNameMutate,
@@ -58,7 +59,8 @@ function KoreanContent({ updateMascot }: KoreanContentProps) {
 
     const info = { historyId: data.historyId, ...selected };
     createNameMutate(info, {
-      onSuccess: () => {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['user'] });
         // TODO: 프로필 페이지로 이동해야 함
         navigate('/mainpage');
       },
