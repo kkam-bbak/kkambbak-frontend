@@ -69,15 +69,17 @@ export const router = createBrowserRouter([
               { path: 'rolePlay/:roleId', element: <RolePlay /> },
 
               // LearnList.tsx에서 navigate(`/mainpage/learn/${topicId}`) 로 사용해야 합니다.
-              {
-                path: 'learn/:topicId',
-                element: <LearnStart />,
-              },
+             
               { path: 'learn/complete', element: <LearnComplete /> },
 
               { path: 'learn/review', element: <LearnReview /> },
 
               { path: 'learn/:topicId/retry-wrong', element: <LearnWrong /> },
+
+               {
+                path: 'learn/:topicId',
+                element: <LearnStart />,
+              },
               
             ],
           },

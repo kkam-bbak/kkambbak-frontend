@@ -1,66 +1,64 @@
-/* learnInfo.css */
+/* learnInfo.module.css */
 
-/**/
-.info-bubble {
-  width: 298px;
-  height: 72px;
-  top: 30px;
-  left: 31px;
-}
-/* -------------------- 0. 모달 오버레이 및 기본 컨테이너 -------------------- */
-
-/* 🔥 LearnInfo 모달 오버레이: 전체 화면을 덮음 */
-.learn-info-modal-overlay {
+/* -------------------- 0. 모달 오버레이 -------------------- */
+.learnInfoModalOverlay {
   position: fixed;
+  top: 65px;
+  left: 50;
   width: 360px;
   height: 720px;
-  /* 🔥 수정: 투명도를 주어 아래 LearnList 배경이 비치도록 합니다. */
-  background-color: rgba(0, 0, 0, 0.7);
-  bottom: 2.8%;
-  justify-content: center;
-  border-radius: 40px; /*모달 전체 규격 맞춤*/
+  
+  background-color: rgba(0, 0, 0, 0.95); 
+  
   z-index: 9999;
   overflow: hidden;
+  
+  display: flex;
+  flex-direction: column;
 }
 
-/* 🔥 모달 컨테이너: LearnStart의 배경 역할 (고정된 뷰포트) */
-.info-card-container {
-  width: 360px;
-  height: 720px;
-  background-color: #000;
+/* 🔥 전역 클래스(.info-bubble) 스타일 덮어쓰기 */
+/* Mascot 컴포넌트 내부 클래스라 module이 아니므로 :global 사용 */
+.learnInfoModalOverlay :global(.info-bubble) {
+  top: 100px !important;
+}
+
+/* 🔥 모달 컨테이너 */
+.infoCardContainer {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
   position: relative;
   font-family: 'Inter', sans-serif;
   color: white;
 
-  /* 🔥🔥🔥 애니메이션 초기 위치: 화면 전체 높이만큼 아래에 숨김 🔥🔥🔥 */
-  transform: translateY(720px);
+  transform: translateY(100%);
   transition: transform 0.4s ease-out;
 }
-.learn-info-modal-overlay.open .info-card-container {
+
+.learnInfoModalOverlay.open .infoCardContainer {
   transform: translateY(0);
 }
 
-/* -------------------- 3. 학습 카드 영역 (슬라이드 애니메이션 적용) -------------------- */
+/* -------------------- 3. 학습 카드 영역 -------------------- */
 
 .learningCardInfo {
   position: absolute;
   width: 100%;
   height: 430px;
+  left: 0; 
+  bottom: 0;
   background-color: #ff5000;
   border-radius: 15px 15px 0 0;
-  /* 🔥 하단 마이크 버튼까지 보이도록 상하 패딩 조정 */
   padding: 15px 16px;
   box-sizing: border-box;
   color: black;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* 🔥 space-between 제거 후 flex-start로 변경 */
-
-  top: 290px;
+  justify-content: flex-start;
   z-index: 10;
 }
 
-/* 🔥🔥 카드 전체의 흐림 효과 오버레이 🔥🔥 */
 .learningCardInfo::before {
   content: '';
   position: absolute;
@@ -68,7 +66,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  /* ✨ Step 3, 4, 5, 6, 7, 8에만 흐림 효과 적용 */
   background-color: transparent;
   pointer-events: none;
   z-index: 9;
@@ -76,12 +73,11 @@
   transition: background-color 0.4s ease-out;
 }
 
-/* 🔥 Step 3, 4, 5, 6, 7, 8: 흐림 효과 적용 */
-.learningCardInfo.card-fade::before {
+/* .cardFade는 TSX에서 styles.cardFade로 참조 */
+.cardFade::before {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
-/* 제목 및 페이지 */
 .cardTitleBarInfo {
   display: flex;
   justify-content: space-between;
@@ -91,34 +87,39 @@
   color: black;
 }
 
+/* 내부 텍스트 스타일들 */
+.topicNameInfo {
+  /* 필요 시 스타일 추가 */
+}
+.wordCountInfo {
+  /* 필요 시 스타일 추가 */
+}
+
+
 /* 빈 영역 */
-/* 빈 영역 (검은색 박스) */
 .wordDisplayAreaInfo {
   width: 100%;
-  height: 160px; /* 높이 고정 유지 */
-
+  height: 160px;
   background-color: #000;
   border-radius: 10px;
-
-  /* 🔥 flex-grow/align-items 제거 (height가 고정되었으므로) */
   display: flex;
   justify-content: center;
   align-items: center;
-
-  margin-bottom: 8px; /* 🔥 입력 필드와의 간격 8px */
-  flex-shrink: 0; /* 높이 고정 유지 */
+  margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 /* 입력 필드 컨테이너 */
 .inputFieldsContainerInfo {
   display: flex;
   flex-direction: column;
-  gap: 8px; /* 🔥 간격 8px */
-  margin-bottom: 8px; /* 마이크 버튼과의 간격 8px */
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .inputRowInfo {
-  display: 328px;
+  width: 100%; /* display: 328px 오류 수정 */
+  display: flex; /* flex 추가 */
   align-items: center;
   height: 40px;
   background-color: #000;
@@ -146,115 +147,125 @@
   font-size: 16px;
 }
 
-
-/* .speaker-icon-info 에 flex 속성을 추가하여 내부 아이콘을 중앙 정렬 */
 .speakerIconInfo {
   width: 44px;
   height: 100%;
   background-color: #000;
   border: none;
   cursor: pointer;
-  /* 🔥 추가/수정: 내부 요소를 중앙 정렬 */
   display: flex;
   justify-content: center;
   align-items: center;
-  /* color 속성은 아이콘 심볼에 직접 적용 */
 }
 
-/* 🔥 새로운 클래스: 아이콘 심볼에 직접 크기와 색상 적용 */
-.speakerIconInfo .speaker-icon-symbol {
-  font-size: 20px;
-  color: white; /* 항상 흰색 */
-  z-index: 10;
-  /* Step 7 하이라이트는 이 아이콘의 색상을 바꾸지 않습니다. */
+.speakerIconImage {
+  width: 24px;  /* 이미지 크기에 맞게 조절하세요 */
+  height: 24px; 
+  object-fit: contain; /* 이미지 비율 유지 */
+  cursor: pointer;
+  position: relative;
+  z-index: 10; /* 흐림 효과 위로 올라오게 하기 위함 */
+  margin-right: 110px;
+  /* 이미지는 폰트 설정이 필요 없습니다. */
 }
 
-/* -------------------- 4. 입력 필드 (Translation 색상 수정) -------------------- */
-
-/*  Translation 행 */
-.inputRowInfo.translationInfo {
+/* Translation Row */
+.translationInfo {
   background-color: black;
 }
-.input-row-info.translationInfo label {
-  background-color: black; /* 🔥 레이블 배경 투명 */
-  color: #757575; /* 🔥 레이블 텍스트는 검은색 */
+/* 부모가 .translationInfo일 때 내부 label 선택 (CSS Module 중첩) */
+.translationInfo label {
+  background-color: black;
+  color: #757575;
 }
-.input-row-info.translationInfo input {
-  background-color: black; /* 🔥 입력 필드 배경 주황색 */
-  color: #ff5000; /* 🔥 입력 필드 텍스트 검은색 */
-  /* padding 유지 */
+.translationInfo input {
+  background-color: black;
+  color: #ff5000;
 }
 
-/* 🔥 흐림 효과가 적용된 상태에서 원색을 표시하고 싶을 때 사용 (Step 2, 7) */
-.wordDisplayAreaInfo.highlight-no-fade,
-.inputRowInfo.highlight-no-fade {
-  /* 카드 전체의 흐림 효과를 뚫고 불투명하게 보이도록 z-index를 높이고 opacity를 1로 설정 */
+/* 하이라이트 효과 */
+.highlightNoFade {
   z-index: 10;
   position: relative;
   opacity: 1 !important;
 }
-/* 🔥 주황색 테두리 적용 */
-.wordDisplayAreaInfo.border-highlight-orange {
-  border: 2px solid #ff5000;
-}
-.inputRowInfo.border-highlight-orange {
+
+.borderHighlightOrange {
   border: 2px solid #ff5000;
 }
 
+/* 마이크 버튼 */
 .micButtonInfo {
-  /* 🔥 info-card-container를 기준으로 절대 위치 설정 */
   position: absolute;
   bottom: 16px;
   left: 16px;
   right: 16px;
-  width: 328px; /* 360px - 16px * 2 */
-
+  /* width: 100% - 32px (padding) 으로 자동 조정됨 (left/right 설정 시) */
   height: 50px;
   border: none;
   border-radius: 10px;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
   transition: all 0.2s;
-
-  /* 🔥 마이크 버튼이 다른 요소 위에 보이도록 높은 Z-index 설정 */
   z-index: 20;
 }
 
-.micButtonInfo .mic-icon {
+.micIcon {
+  font-size: 24px;
+  
+  /* 🔥 핵심 1: 위치 및 레이어 순서 명시 */
+  position: relative; 
+  z-index: 50;
+  
+  /* 🔥 핵심 2: 이모지 폰트 강제 지정 */
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+  
+  /* 색상 전환 효과 (상위 클래스에서 color를 제어하므로 inherit 권장하지만, 안 보이면 직접 지정) */
   transition: color 0.2s;
+  
+  display: inline-block;
+  line-height: 1;
 }
 
-/* 🔥 ON (Step 4) */
-.micButtonInfo.on {
+/* 상태별 스타일 */
+.on {
   background-color: #000;
   color: white;
   border: 2px solid #ff5000;
 }
-.mic-button-info.on .mic-icon {
+.on .micIcon {
   color: white;
 }
 
-/* 🔥 OFF (Step 3, 5, 8) */
-.micButtonInfo.off {
+.off {
   background-color: white;
   color: black;
 }
-.micButtonInfo.off .mic-icon {
+.off .micIcon {
   color: #ff5000;
 }
 
-/* 🔥 Disabled (Step 0, 1, 2, 6, 7) */
-.micButtonInfo.disabled-info {
+.disabledInfo {
   background-color: rgba(255, 255, 255, 0.5);
   color: rgba(0, 0, 0, 0.4);
   cursor: not-allowed;
 }
-.micButtonInfo.disabled-info .mic-icon {
+.disabledInfo .micIcon {
   color: rgba(0, 0, 0, 0.4);
+}
+
+/* 마스코트 래퍼 */
+.mascotWrapper {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
 }
