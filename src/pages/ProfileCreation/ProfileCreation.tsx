@@ -96,7 +96,7 @@ export default function ProfileCreation() {
 
       <ContentSection>
         <div className={styles['content-container']}>
-          <div className={styles.test}>
+          <div>
             <div className={styles['image-container']}>
               <span>Profile image *</span>
 

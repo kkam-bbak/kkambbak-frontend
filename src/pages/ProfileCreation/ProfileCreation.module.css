@@ -1,3 +1,12 @@
+.content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: space-between;
+  height: 100%;
+  overflow-y: auto;
+}
+
 .page-container {
   height: 100%;
 }
@@ -42,18 +51,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.content-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  justify-content: space-between;
-  height: 100%;
-}
-
-.test {
-  overflow-y: auto;
 }
 
 /* Responsive */
