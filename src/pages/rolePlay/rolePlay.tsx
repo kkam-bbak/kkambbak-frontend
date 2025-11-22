@@ -7,35 +7,61 @@ import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // --- 인터페이스 정의 ---
+interface ApiResponseBody<T> {
+  status: { statusCode: string; message: string; description: string | null };
+  body: T;
+}
+
+// 다음 턴 API 응답 타입 정의
+type NextDialogueResponse = ApiResponseBody<DialogueData>;
+
+// 시작 API 응답 타입 정의 (startRoleplaySession 함수용)
+type StartRoleplayResponse = ApiResponseBody<DialogueData>;
+
+// 완료 API 응답 타입 정의 (completeRoleplaySession 함수용)
+interface SessionSummary {
+  sessionId: number;
+  totalSentence: number;
+  correctSentence: number;
+  completedAt: string;
+}
+type CompleteRoleplayResponse = ApiResponseBody<SessionSummary>;
+
 interface ChoiceOption {
-  id: number;
-  korean: string;
-  romanized: string;
-  english: string;
-  isCorrect: boolean;
+  id: number;
+  korean: string;
+  romanized: string;
+  english: string;
+  isCorrect: boolean;
 }
 
 interface DialogueData {
-  sessionId: number;
-  dialogueId: number;
-  korean: string;
-  romanized: string;
-  english: string;
-  speaker: 'AI' | 'USER';
-  mismatchKorean: string;
-  mismatchEnglish: string;
-  mismatchRomanized: string;
-  coreWord: string;
-  role: string;
-  choices?: ChoiceOption[];
-  result?: string; 
-  userResponseData?: any; 
+  sessionId: number;
+  dialogueId: number;
+  korean: string;
+  romanized: string;
+  english: string;
+  speaker: 'AI' | 'USER';
+  mismatchKorean: string;
+  mismatchEnglish: string;
+  mismatchRomanized: string;
+  coreWord: string;
+  role: string;
+  choices?: ChoiceOption[];
+  result?: string; 
+  userResponseData?: { 
+        selectedId: number;
+        text: string;
+        romanized: string;
+        english: string;
+        finalResult: string;
+    }; 
   sessionTitle: string;
 }
 const LS_KEY_COMPLETIONS = 'roleplay_completions';
 interface CompletionData {
-  isCompleted: boolean;
-  actualTime: number; // minutes 단위
+  isCompleted: boolean;
+  actualTime: number; 
 }
 
 type CompletedScenarios = { [scenarioId: number]: CompletionData };
@@ -46,13 +72,11 @@ const saveCompletionToLocalStorage = (scenarioId: number, elapsedMinutes: number
         const storedData = localStorage.getItem(LS_KEY_COMPLETIONS);
         const completions: CompletedScenarios = storedData ? JSON.parse(storedData) : {};
         
-        // 현재 시나리오 ID와 걸린 시간 업데이트
         completions[scenarioId] = {
             isCompleted: true,
             actualTime: elapsedMinutes, 
         };
         
-        // LocalStorage에 다시 저장
         localStorage.setItem(LS_KEY_COMPLETIONS, JSON.stringify(completions));
         console.log(`✅ Scenario ${scenarioId} completion saved to LocalStorage.`);
     } catch (e) {
@@ -60,11 +84,11 @@ const saveCompletionToLocalStorage = (scenarioId: number, elapsedMinutes: number
     }
 };
 
-// ... (API 함수들 생략) ...
+// --- API 함수들 ---
 const startRoleplaySession = async (scenarioId: number): Promise<DialogueData> => {
   try {
-    const response = await http.post('/roleplay/start', {}, { params: { scenarioId } });
-    return response.data.body;
+    const response = await http.post<StartRoleplayResponse>('/roleplay/start', {}, { params: { scenarioId } });
+    return response.data.body; 
   } catch (error) {
     console.error('Failed to start roleplay session:', error);
     throw error;
@@ -73,8 +97,8 @@ const startRoleplaySession = async (scenarioId: number): Promise<DialogueData> =
 
 const getNextDialogue = async (sessionId: number): Promise<DialogueData> => {
   try {
-    const response = await http.post('/roleplay/next', {}, { params: { sessionId } });
-    return response.data.body;
+    const response = await http.post<NextDialogueResponse>(`/roleplay/next`, {}, { params: { sessionId } }); 
+    return response.data.body; 
   } catch (error) {
     console.error('Failed to get next dialogue:', error);
     throw error;
@@ -109,8 +133,8 @@ interface SessionSummary {
 
 const completeRoleplaySession = async (sessionId: number): Promise<SessionSummary> => {
   try {
-    const response = await http.post('/roleplay/complete', {}, { params: { sessionId } });
-    return response.data.body;
+    const response = await http.post<CompleteRoleplayResponse>('/roleplay/complete', {}, { params: { sessionId } });
+    return response.data.body; 
   } catch (error) {
     console.error('❌ Failed to complete roleplay session:', error);
     throw error;
@@ -155,41 +179,36 @@ const RolePlay: React.FC = () => {
   const { roleId } = useParams<{ roleId: string }>(); 
   const scenarioId = roleId;
 
-  // 🔥 Location State에서 scenarioTitle을 받기 위한 인터페이스 (WordResult는 생략)
   interface LocationState {
       wordsToRetry?: any[];
       isRetryWrong?: boolean;
       baseResultId?: number;
-      scenarioTitle?: string; // 🔥 [수정] 필수: 제목
+      scenarioTitle?: string; 
   }
   
   const location = useLocation();
-  const state = location.state as LocationState; // State 정의 순서 맞춤
+  const state = location.state as LocationState; 
 
-  // 🔥 [수정] state에서 제목을 가져와 상태로 정의
   const initialTitle = state?.scenarioTitle || 'Role Play_At a Cafe'; 
   const [scenarioTitle, setScenarioTitle] = useState(initialTitle); 
 
-  // Variables derived from state
   const wordsToRetry = state?.wordsToRetry;
   const isRetryWrong = state?.isRetryWrong || false;
   const initialBaseResultId = state?.baseResultId || null;
 
-  // Refs
   const hasFetched = useRef(false); 
   const startTimeRef = useRef<number>(0);
-  const resultsRef = useRef<any[]>([]); // WordResult[]
+  const resultsRef = useRef<any[]>([]); 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const ttsPlayedRef = useRef<{ [key: string]: boolean }>({});
   const audioMimeTypeRef = useRef<string>('audio/wav');
   const sessionStartTimeRef = useRef<number>(Date.now());
 
-  // States
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [currentDialogue, setCurrentDialogue] = useState<DialogueData | null>(null);
-  const [turnHistory, setTurnHistory] = useState<any[]>([]);
-  const [practiceLineData, setPracticeLineData] = useState<any>(null);
+  const [turnHistory, setTurnHistory] = useState<DialogueData[]>([]); 
+  const [practiceLineData, setPracticeLineData] = useState<DialogueData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -201,10 +220,14 @@ const RolePlay: React.FC = () => {
   const [selectedChoiceId, setSelectedChoiceId] = useState<number | null>(null);
   const [ttsOptionId, setTtsOptionId] = useState<number | null>(null);
   const [isLoadingNextTurn, setIsLoadingNextTurn] = useState(false);
-  const [selectedChoiceData, setSelectedChoiceData] = useState<DialogueData | null>(null);
+  const [selectedChoiceData, setSelectedChoiceData] = useState<DialogueData | null>(null); 
   
   const timerRef = useRef<number | null>(null);
   const flowTimerRef = useRef<number | null>(null);
+
+  const handleBackClick = useCallback(() => {
+      navigate('/mainpage/roleList');
+  }, [navigate]);
 
   const speakKoreanText = useCallback((text: string, onFinish: ((success: boolean) => void) | null = null) => {
     if (!('speechSynthesis' in window)) { if (onFinish) onFinish(false); return; }
@@ -230,19 +253,26 @@ const RolePlay: React.FC = () => {
         setCurrentDialogue(initialDialogue);
         setError(null);
         
-        // 🔥 [수정] 초기 API 응답에서 제목을 가져와 상태로 저장
         if (initialDialogue.sessionTitle) {
             setScenarioTitle(initialDialogue.sessionTitle);
         }
       } catch (err: any) {
-        const errorMsg = err?.response?.data?.status?.message || err?.message || 'Unknown error';
+        const status = err?.response?.data?.status;
+        const errorMsg = status?.message || err?.message || 'Unknown error';
+
+        if (errorMsg.includes('Credit limit') || errorMsg === 'Credit limit standard') {
+            alert("크레딧이 부족합니다. 충전 페이지로 이동합니다.");
+            navigate('/payment/checkout');
+            return; 
+        }
+
         setError(`Failed to start roleplay: ${errorMsg}`);
       } finally {
         setIsLoading(false);
       }
     };
     initializeSession();
-  }, [scenarioId]);
+  }, [scenarioId, navigate]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -253,7 +283,7 @@ const RolePlay: React.FC = () => {
     return () => clearTimeout(timeout);
   }, [turnHistory, step, selectedChoiceId]);
 
-  const moveToNextTurn = useCallback(async () => {
+  const moveToNextTurn = useCallback(async (lastTurnAdded?: DialogueData) => {
     if (!sessionId) return;
     try {
       setIsLoadingNextTurn(true);
@@ -280,18 +310,19 @@ const RolePlay: React.FC = () => {
       if (err?.response?.data?.status?.statusCode === 'R016') {
         try {
           const sessionSummary = await completeRoleplaySession(sessionId);
-          const elapsedMs = Date.now() - sessionStartTimeRef.current;
-          const minutes = Math.floor(elapsedMs / 60000);
-          const seconds = Math.floor((elapsedMs % 60000) / 1000);
+          const elapsedMs = Date.now() - sessionStartTimeRef.current;
+          const minutes = Math.floor(elapsedMs / 60000);
+          const seconds = Math.floor((elapsedMs % 60000) / 1000);
           
-          // 🚩 LocalStorage에 완료 정보 저장
           const scenarioIntId = parseInt(scenarioId || '0');
           if (scenarioIntId > 0) {
               const elapsedMinutes = elapsedMs / 60000;
               saveCompletionToLocalStorage(scenarioIntId, elapsedMinutes);
           }
           
-          const timeTaken = `${minutes}m ${seconds}s`;
+          const timeTaken = `${minutes}m ${seconds}s`;
+
+          const finalTurnHistory = lastTurnAdded ? [...turnHistory, lastTurnAdded] : turnHistory;
 
           navigate('/mainpage/rolePlay/complete', {
             state: {
@@ -300,18 +331,19 @@ const RolePlay: React.FC = () => {
               sessionSummary,
               timeTaken,
               rolePlayName: scenarioTitle, 
-              turns: turnHistory
+              turns: finalTurnHistory 
             }
           });
         } catch (completeErr) {
           setError('세션 완료 처리 중 오류가 발생했습니다.');
           setStep(STEPS.DONE);
+          setIsLoadingNextTurn(false);
         }
       } else {
         setError('다음 대사를 불러올 수 없습니다.');
         setStep(STEPS.DONE);
+        setIsLoadingNextTurn(false);
       }
-      setIsLoadingNextTurn(false);
     }
   }, [sessionId, navigate, turnHistory, scenarioId, scenarioTitle]);
 
@@ -327,10 +359,10 @@ const RolePlay: React.FC = () => {
         const finalTurnData = {
           ...currentDialogue,
           result: resultDisplay,
-          userResponseData: { text: currentDialogue.korean, grade: resultDisplay }
+          userResponseData: { text: currentDialogue.korean, romanized: currentDialogue.romanized, english: currentDialogue.english, finalResult: resultDisplay, selectedId: 0 } 
         };
         setTurnHistory(prev => [...prev, finalTurnData]);
-        moveToNextTurn();
+        moveToNextTurn(finalTurnData);
       }
     }, 1500);
   }, [currentDialogue, moveToNextTurn]);
@@ -343,21 +375,31 @@ const RolePlay: React.FC = () => {
     setGradingResult(resultDisplay);
 
     setTimeout(() => {
-      if (selectedChoiceData && practiceLineData) { // practiceLineData는 정답 텍스트를 담고 있음
-        const finalTurn = {
-            ...selectedChoiceData, 
-            korean: practiceLineData.korean, 
-            romanized: practiceLineData.romanized,
-            english: practiceLineData.english,
-            result: gradingResult, 
+      let finalTurn: DialogueData | undefined = undefined;
+
+      if (practiceLineData && selectedChoiceData) { 
+        finalTurn = {
+          ...selectedChoiceData, 
+          ...practiceLineData, 
+          dialogueId: practiceLineData.dialogueId, 
+          result: resultDisplay, 
+          userResponseData: {
+              selectedId: selectedChoiceData.userResponseData?.selectedId || 0,
+              text: practiceLineData.korean,
+              romanized: practiceLineData.romanized,
+              english: practiceLineData.english,
+              finalResult: resultDisplay, 
+          },
+          speaker: 'USER'
         };
-        setTurnHistory(prev => [...prev, finalTurn]);
-        setSelectedChoiceData(null); 
-        setPracticeLineData(null); 
+        setTurnHistory(prev => [...prev, finalTurn!]);
       }
-      moveToNextTurn();
+      
+      setSelectedChoiceData(null); 
+      setPracticeLineData(null); 
+      moveToNextTurn(finalTurn);
     }, 1500);
-  }, [moveToNextTurn, selectedChoiceData, practiceLineData, gradingResult]);
+  }, [moveToNextTurn, selectedChoiceData, practiceLineData]); 
 
   const handleTtsPlaybackFinished = useCallback((success) => {
     setIsTtsPlaying(false);
@@ -397,11 +439,16 @@ const RolePlay: React.FC = () => {
   }, [step, isRecording, startTtsAndListen]);
 
   const handleListenTtsClick = useCallback(() => {
-    if ((step === STEPS.LISTEN || step === STEPS.PRACTICE_LISTEN) && !isTtsPlaying) {
+    // LISTEN, PRACTICE_LISTEN 외에도 SPEAK_SETUP(AI 녹음대기), PRACTICE_SPEAK(User 녹음대기) 상태 추가
+    const allowedSteps = [STEPS.LISTEN, STEPS.PRACTICE_LISTEN, STEPS.SPEAK_SETUP, STEPS.PRACTICE_SPEAK];
+
+    if (allowedSteps.includes(step) && !isTtsPlaying) {
       let textToSpeak = currentDialogue?.korean;
-      if (step === STEPS.PRACTICE_LISTEN && practiceLineData) {
+      
+      if ((step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK) && practiceLineData) {
         textToSpeak = practiceLineData.korean;
       }
+      
       if (textToSpeak) {
         if (flowTimerRef.current) clearTimeout(flowTimerRef.current);
         startTtsAndListen(textToSpeak);
@@ -425,6 +472,7 @@ const RolePlay: React.FC = () => {
     }
   }, [step, currentDialogue, practiceLineData, startTtsAndListen]);
 
+  // ⭐ [수정] handleChoiceSelect: 선택 확정 시 ttsOptionId를 초기화하여 카드 섹션 복귀 방지
   const handleChoiceSelect = useCallback(() => {
     if (selectedChoiceId === null || step !== STEPS.CHOICE_SETUP || !currentDialogue) return;
 
@@ -450,22 +498,23 @@ const RolePlay: React.FC = () => {
 
     window.speechSynthesis.cancel();
     setIsTtsPlaying(false);
+    setTtsOptionId(null); // ⭐ 이 부분 추가됨
     setStep(STEPS.CHOICE_FEEDBACK);
     setGradingResult(result);
 
     setTimeout(() => {
       if (correctOption) {
         setPracticeLineData({
+             sessionId: currentDialogue.sessionId, 
              dialogueId: currentDialogue.dialogueId, 
              korean: correctOption.korean,
              romanized: correctOption.romanized,
              english: correctOption.english,
-             speaker: 'USER' 
+             speaker: 'USER',
+             mismatchKorean: '', mismatchEnglish: '', mismatchRomanized: '', coreWord: currentDialogue.coreWord, role: currentDialogue.role, sessionTitle: currentDialogue.sessionTitle, 
         });
       }
       
-      setSelectedChoiceData(null); 
-
       setStep(STEPS.PRACTICE_LISTEN); 
       setSelectedChoiceId(null);
       setGradingResult(null);
@@ -544,13 +593,31 @@ const RolePlay: React.FC = () => {
     setIsRecording(false);
     recorder.onstop = async () => {
       try {
-        if (audioChunksRef.current.length === 0) return;
+        if (audioChunksRef.current.length === 0) {
+            alert("녹음된 내용이 없습니다. 다시 시도해주세요.");
+            if (currentDialogue?.speaker === 'AI') {
+                setStep(STEPS.SPEAK_SETUP);
+            } else {
+                setStep(STEPS.PRACTICE_SPEAK);
+            }
+            return;
+        }
+        
         const mimeType = audioMimeTypeRef.current;
         const fileExtension = mimeType.includes('wav') ? 'wav' : 'webm';
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         const audioFile = new File([audioBlob], `recording-${Date.now()}.${fileExtension}`, { type: mimeType });
 
-        if (audioFile.size === 0) return;
+        if (audioFile.size === 0) {
+            alert("녹음 파일 크기가 0입니다. 다시 시도해주세요.");
+            if (currentDialogue?.speaker === 'AI') {
+                setStep(STEPS.SPEAK_SETUP);
+            } else {
+                setStep(STEPS.PRACTICE_SPEAK);
+            }
+            return;
+        }
+        
         if (!sessionId || !currentDialogue) return;
 
         const evaluationResult = await evaluatePronunciation(
@@ -566,21 +633,38 @@ const RolePlay: React.FC = () => {
         } else {
           handlePracticeGrading(feedback);
         }
-        
-        recorder.stream.getTracks().forEach(track => track.stop());
       } catch (err: any) {
-         if (err?.response?.data?.status?.statusCode === 'R015') {
-             if (currentDialogue?.speaker === 'AI') {
-                 handleRecordingGrading('RETRY');
-             } else {
-                 handlePracticeGrading('RETRY');
-             }
+        console.error('Evaluation failed:', err);
+        const statusCode = err?.response?.data?.status?.statusCode;
+
+        if (statusCode === 'OA001') {
+            alert("일시적인 서버 지연으로 응답하지 못했습니다.\n토큰은 차감되지 않았습니다.\n목록으로 돌아갑니다.");
+            navigate('/mainpage/roleList');
+            return;
         }
-         recorder.stream.getTracks().forEach(track => track.stop());
+
+        if (statusCode === 'R015') {
+            if (currentDialogue?.speaker === 'AI') {
+                handleRecordingGrading('RETRY');
+            } else {
+                handlePracticeGrading('RETRY');
+            }
+        } else {
+            alert("녹음 인식에 실패했습니다. 다시 시도해주세요.");
+            if (currentDialogue?.speaker === 'AI') {
+                setStep(STEPS.SPEAK_SETUP);
+            } else {
+                setStep(STEPS.PRACTICE_SPEAK);
+            }
+        }
+      } finally {
+        if (recorder.stream) {
+            recorder.stream.getTracks().forEach(track => track.stop());
+        }
       }
     };
     recorder.stop();
-  }, [isRecording, handleRecordingGrading, handlePracticeGrading, currentDialogue, sessionId, scenarioId]);
+  }, [isRecording, handleRecordingGrading, handlePracticeGrading, currentDialogue, sessionId, scenarioId, navigate]);
 
   useEffect(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -600,45 +684,23 @@ const RolePlay: React.FC = () => {
     }
 
     if (step === STEPS.SPEAK_SETUP && currentDialogue?.speaker === 'AI') {
-      setRecordingCountdown(10);
       if (timerRef.current) clearInterval(timerRef.current);
-      timerRef.current = setInterval(() => {
-        setRecordingCountdown(prev => {
-          if (prev === 0) {
-            if (timerRef.current) clearInterval(timerRef.current);
-            if (!isRecording) handleRecordingGrading('INCORRECT');
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
     }
 
     if (step === STEPS.PRACTICE_LISTEN_DONE) {
-        flowTimerRef.current = setTimeout(() => {
-            setStep(STEPS.PRACTICE_SPEAK);
-        }, 0);
+      flowTimerRef.current = setTimeout(() => {
+        setStep(STEPS.PRACTICE_SPEAK);
+      }, 0);
     }
 
     if (step === STEPS.PRACTICE_SPEAK) {
-        setRecordingCountdown(10);
-        if (timerRef.current) clearInterval(timerRef.current);
-        timerRef.current = setInterval(() => {
-            setRecordingCountdown(prev => {
-                if (prev === 0) {
-                    if (timerRef.current) clearInterval(timerRef.current);
-                    if (!isRecording) handlePracticeGrading('INCORRECT');
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
+      if (timerRef.current) clearInterval(timerRef.current);
     }
 
     return () => {
-        if (timerRef.current) clearInterval(timerRef.current);
-        if (flowTimerRef.current) clearTimeout(flowTimerRef.current);
-        window.speechSynthesis.cancel();
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (flowTimerRef.current) clearTimeout(flowTimerRef.current);
+      window.speechSynthesis.cancel();
     };
   }, [step, isRecording, currentDialogue, handleRecordingGrading, handlePracticeGrading]);
 
@@ -661,24 +723,22 @@ const RolePlay: React.FC = () => {
 
   const TurnContentBox = ({ data }: { data: DialogueData }) => {
       const isRecordingTurn = data.speaker === 'AI';
-      const isChoiceTurn = data.speaker === 'USER';
       const romanizedClass = styles.correctRom; 
       const role = data.speaker;
-      const selectedData = isChoiceTurn ? data.userResponseData : {};
 
-      const mainKoreanText = isChoiceTurn ? selectedData?.text : data.korean;
-      const mainRomanizedText = isChoiceTurn ? selectedData?.romanized : data.romanized;
-      const mainEnglishText = isChoiceTurn ? selectedData?.english : data.english;
+      const mainKoreanText = data.korean; 
+      const mainRomanizedText = data.romanized;
+      const mainEnglishText = data.english;
 
       return (
           <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
               <div className={`${styles.textLine} ${styles.koreanLine}`}>
                   <span className={`${styles.koreanText} ${styles.historyKorean}`}>{mainKoreanText}</span>
                   {isRecordingTurn && <button className={`${styles.ttsButton} ${styles.active}`} onClick={() => startTtsAndListen(data.korean)} disabled={isTtsPlaying}>🔊</button>}
+                   <span className={`${styles.smallMicIcon} ${styles.active}`} style={{marginLeft:'5px'}}>🎤</span>
               </div>
               <div className={`${styles.textLine} ${styles.romanizedLine}`}>
                   <span className={`${styles.romanizedText} ${styles.historyRomanized} ${romanizedClass}`}>{mainRomanizedText}</span>
-                  {isRecordingTurn && <span className={`${styles.smallMicIcon} ${styles.active}`}>🎤</span>}
               </div>
               <span className={`${styles.englishText} ${styles.historyEnglish}`}>{mainEnglishText}</span>
               <div className={`${styles.roleContainer} ${styles.customer}`}><span className={styles.roleTag}>{role}</span></div>
@@ -688,17 +748,17 @@ const RolePlay: React.FC = () => {
 
   const renderActiveInput = () => {
       const isCurrentlySpeaking = window.speechSynthesis.speaking;
+
+      if (isLoadingNextTurn) {
+          return null;
+      }
       
-      if (selectedChoiceData && step !== STEPS.CHOICE_SETUP) {
+      if (selectedChoiceData && step !== STEPS.CHOICE_SETUP && !isPracticeFlow) {
           return <TurnContentBox data={selectedChoiceData} />;
       }
 
-      if (isLoadingNextTurn) {
-          return <div>Loading next...</div>;
-      }
-
       if (currentDialogue.speaker === 'AI' && !isPracticeFlow) {
-          const isTtsActionable = step === STEPS.LISTEN;
+          const isTtsActionable = step === STEPS.LISTEN || step === STEPS.SPEAK_SETUP;
           const isMicActionable = step === STEPS.SPEAK_SETUP || step === STEPS.RECORDING || step === STEPS.LISTEN_DONE;
           const mainMicButtonClass = isMicActionable ? (isRecording ? styles.on : styles.off) : `${styles.off} ${styles.disabled}`;
           const getRomClass = () => {
@@ -732,7 +792,7 @@ const RolePlay: React.FC = () => {
                                <span className={styles.mainMicIcon}>🎤<span className={styles.micStatusText}>{isRecording ? "ON" : "OFF"}</span></span>
                            </button>
                        </div>
-                  </div>
+                   </div>
               </div>
           );
       } 
@@ -780,15 +840,17 @@ const RolePlay: React.FC = () => {
           const practiceMainMicClass = practiceButtonActive ? (isRecording ? styles.on : styles.off) : `${styles.off} ${styles.disabled}`;
           const currentGradeClass = step === STEPS.PRACTICE_GRADING ? (gradingResult === 'CORRECT' ? styles.correctActive : styles.incorrectActive) : '';
 
+          const isTtsActionable = step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK;
+
           return (
                <div className={styles.activeTurnRecordingFlow}>
                    <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
                        <div className={`${styles.textLine} ${styles.koreanLine}`}>
                            <span className={`${styles.koreanText} ${currentGradeClass}`}>{practiceLineData.korean}</span>
                            <button 
-                               className={`${styles.ttsButton} ${step === STEPS.PRACTICE_LISTEN ? styles.active : ''}`} 
+                               className={`${styles.ttsButton} ${isTtsActionable ? styles.active : ''}`} 
                                onClick={handleListenTtsClick} 
-                               disabled={step !== STEPS.PRACTICE_LISTEN || isCurrentlySpeaking}
+                               disabled={!isTtsActionable || isCurrentlySpeaking}
                            >🔊</button>
                        </div>
                        <div className={`${styles.textLine} ${styles.romanizedLine}`}>
@@ -819,12 +881,12 @@ const RolePlay: React.FC = () => {
 
   return (
     <div className={`${styles.pageContainer} ${styles.appContainer}`}>
-        <Header hasBackButton />
+        <Header hasBackButton customBackAction={handleBackClick} />
         <Mascot image={characterImage} text={currentBubbleText} />
         <ContentSection color="blue">
             <div className={styles.cardTitleBar}>
                 <span className={styles.cardTitleText}>{scenarioTitle}</span>
-                <span className={styles.cardStepText}>{turnHistory.length + 1}/6</span>
+                <span className={styles.cardStepText}>{Math.min(turnHistory.length + 1, 6)}/6</span>
             </div>
             <div className={`${styles.turnHistoryArea} ${isScrollLocked ? styles.scrollLocked : ''}`} ref={scrollRef}>
                 {turnHistory.map((turn, index) => (
