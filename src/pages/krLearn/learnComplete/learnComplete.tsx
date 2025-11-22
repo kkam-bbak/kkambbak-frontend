@@ -9,15 +9,15 @@ import { http } from '../../../apis/http';
 
 // 유틸리티
 const formatDuration = (durationMs: number): string => {
-  const totalSeconds = Math.round(durationMs / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}m ${seconds}s`;
+  const totalSeconds = Math.round(durationMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}m ${seconds}s`;
 };
 
 const getFormattedCompletionDate = (): string => {
-  const now = new Date();
-  return now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const now = new Date();
+  return now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 };
 
 // 로컬 스토리지 타입 및 저장 로직
@@ -53,28 +53,28 @@ const saveLocalLearningTime = (sessionId: number, durationMs: number) => {
 
 // API 응답 타입
 interface Session {
-  id: number;
-  title: string;
-  categoryName: string;
-  vocabularyCount: number;
-  completed: boolean;
-  durationSeconds: number;
+  id: number;
+  title: string;
+  categoryName: string;
+  vocabularyCount: number;
+  completed: boolean;
+  durationSeconds: number;
 }
 interface NextLearningResponse {
-  status: { statusCode: string; message: string; description: string | null };
-  body: {
-    categoryName: string;
-    sessions: Session[];
-    nextCursor: number | null;
-    hasNext: boolean;
-  };
+  status: { statusCode: string; message: string; description: string | null };
+  body: {
+    categoryName: string;
+    sessions: Session[];
+    nextCursor: number | null;
+    hasNext: boolean;
+  };
 }
 
 const ResultRow = ({ icon: Icon, value }: { icon: React.ElementType; value: string }) => (
-  <div className={styles.resultRow}>
-    <Icon className={styles.resultIcon}/>
-    <span className={styles.resultValue}>{value}</span>
-  </div>
+  <div className={styles.resultRow}>
+    <Icon className={styles.resultIcon}/>
+    <span className={styles.resultValue}>{value}</span>
+  </div>
 );
 
 interface LocationState {

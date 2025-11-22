@@ -35,47 +35,41 @@ interface LearningStartBody {
     sessionTitle: string;
 }
 type LearningStartResponse = ApiResponseBody<LearningStartBody>;
-
 interface NextItem {
-  itemId: number;
-  korean: string;
-  romanization: string;
-  english: string;
-  imageUrl: string; 
+  itemId: number;
+  korean: string;
+  romanization: string;
+  english: string;
+  imageUrl: string; 
 }
-
 interface GradeData {
-  correct: boolean;
-  moved: boolean;
-  finished: boolean;
-  next: NextItem | null;
-  correctAnswer: string | null;
+  correct: boolean;
+  moved: boolean;
+  finished: boolean;
+  next: NextItem | null;
+  correctAnswer: string | null;
 }
 type GradeResponse = ApiResponseBody<GradeData>;
-
 interface LearningContent {
-  topicTitle: string;
-  itemId: number;
-  korean: string;
-  romanized: string;
-  translation: string;
-  imageUrl: string;
+  topicTitle: string;
+  itemId: number;
+  korean: string;
+  romanized: string;
+  translation: string;
+  imageUrl: string;
 }
-
 export interface WordResult {
-  romnized: string;
-  korean: string;
-  translation: string;
-  isCorrect: boolean;
+  romnized: string;
+  korean: string;
+  translation: string;
+  isCorrect: boolean;
 }
-
 interface LocationState {
-  wordsToRetry?: WordResult[];
-  isRetryWrong?: boolean;
-  baseResultId?: number;
-  categoryName?: string;
+  wordsToRetry?: WordResult[];
+  isRetryWrong?: boolean;
+  baseResultId?: number;
+  categoryName?: string;
 }
-
 type LearningStatus = 'initial' | 'listen' | 'countdown' | 'speak';
 type ResultStatus = 'none' | 'processing' | 'correct' | 'incorrect';
 type ResultDisplayStatus = 'none' | 'initial_feedback' | 'meaning_revealed';
@@ -154,7 +148,6 @@ const writeWavHeader = (sampleRate: number, dataLength: number) => {
     view.setUint32(40, dataLength, true);
     return buffer;
 };
-
 const convertToWav = async (webmBlob: Blob): Promise<File> => {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const arrayBuffer = await webmBlob.arrayBuffer();
