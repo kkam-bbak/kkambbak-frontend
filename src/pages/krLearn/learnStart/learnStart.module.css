@@ -364,3 +364,36 @@
     background-color: white; 
     color: black; /* 텍스트 색상 (선택 사항) */
 }
+
+
+/* learnStart.module.css 하단에 추가 */
+
+/* 이미지 컨테이너: 상대 위치를 잡아주어 O/X 표시가 위에 뜨도록 함 */
+.wordImagePlaceholder {
+  position: relative;
+  width: 160px; /* 적절한 크기 지정 */
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 실제 단어 이미지 */
+.wordImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 이미지 비율 유지 */
+  border-radius: 10px;
+}
+
+/* 정답/오답 피드백 링 (선택 사항) */
+.resultRing, .resultCross {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  pointer-events: none;
+}
+
