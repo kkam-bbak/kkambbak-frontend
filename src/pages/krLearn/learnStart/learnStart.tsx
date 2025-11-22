@@ -7,9 +7,12 @@ import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import CorrectImg from '@/assets/Correct.png';
 import InCorrectImg from '@/assets/InCorrect.png';
+import MicOn from '@/assets/MicOn.png'; 
+import MicOff from '@/assets/MicOff.png';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // --- 인터페이스 정의 ---
+// ... (FirstVocabulary 정의를 포함한 나머지 인터페이스 정의 유지) ...
 interface ApiResponseBody<T> {
   status: { statusCode: string; message: string; description: string | null };
   body: T;
@@ -75,6 +78,33 @@ interface LocationState {
 type LearningStatus = 'initial' | 'listen' | 'countdown' | 'speak';
 type ResultStatus = 'none' | 'processing' | 'correct' | 'incorrect';
 type ResultDisplayStatus = 'none' | 'initial_feedback' | 'meaning_revealed';
+
+// 🔥 [추가] Local Storage 키 및 타입 정의 (LearnList, LearnComplete와 동기화)
+const LS_LEARNING_TIMES_KEY = 'learning_completion_times';
+interface CompletionTime {
+    time: string; // 'Xm Ys' 형식
+    completedAt: number; // 타임스탬프
+}
+type LearningTimes = { [sessionId: number]: CompletionTime };
+
+// 🔥 [추가] 로컬 스토리지 완료 기록 삭제 함수
+const clearLocalLearningTime = (sessionId: number) => {
+    try {
+        const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
+        if (storedData) {
+            const times: LearningTimes = JSON.parse(storedData);
+            delete times[sessionId]; // 해당 세션 ID의 기록 삭제
+            // String(sessionId) 키도 삭제해야 합니다.
+            if (times[String(sessionId) as unknown as number]) {
+                delete times[String(sessionId) as unknown as number];
+            }
+            localStorage.setItem(LS_LEARNING_TIMES_KEY, JSON.stringify(times));
+        }
+    } catch (e) {
+        console.error('Failed to clear local learning time', e);
+    }
+};
+
 
 const emptyContent: LearningContent = {
   topicTitle: 'Loading...',
@@ -184,6 +214,10 @@ const LearnStart: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [countdownTime, setCountdownTime] = useState(0);
   const countdownRef = useRef<number | null>(null);
+  
+  // 🔥 [추가] 학습 중단 확인 모달 상태
+  const [showExitModal, setShowExitModal] = useState(false); 
+
 
   const isWordVisible = status !== 'initial';
   const isSpeakerActive = status !== 'initial';
@@ -193,17 +227,21 @@ const LearnStart: React.FC = () => {
   const isKoreanVisible = isInputTextVisible;
   const isTranslationVisible = isInputTextVisible;
   const isIncorrectView = resultStatus === 'incorrect';
+  
+  // 마이크가 녹음을 시작할 수 있는 기본적인 조건 (사용자가 버튼을 누를 수 있는 상태)
   const isMicActiveForRecording = (status === 'countdown' || status === 'speak') && resultStatus === 'none' && !isProcessing;
 
   const speakKoreanText = useCallback((text: string) => {
-    if (!('speechSynthesis' in window)) return;
+    // 🔥 [수정] 모달이 떠 있으면 TTS 재생 중단
+    if (!('speechSynthesis' in window) || showExitModal) return; 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'ko-KR';
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
-  }, []);
+  }, [showExitModal]);
 
-  // 데이터 처리 및 타이머 시작
+
+  // 데이터 처리 및 타이머 시작 (생략)
   const handleSessionData = (data: LearningStartBody) => {
       if (data.firstVocabulary) {
         setContent(firstVocabToContent(data.firstVocabulary, data.sessionTitle));
@@ -222,6 +260,7 @@ const LearnStart: React.FC = () => {
   };
 
   const fetchLearningData = useCallback(async () => {
+    // ... (API 호출 로직 유지) ...
     const numericSessionId = Number(sessionIdParam);
     if (!sessionIdParam || isNaN(numericSessionId)) {
       alert("잘못된 접근입니다.");
@@ -240,8 +279,6 @@ const LearnStart: React.FC = () => {
         bodyPayload.baseResultId = String(baseResultId);
       } 
       
-      console.log(`[LearnStart] POST Request: /sessions/${numericSessionId}/start`);
-
       const response = await http.post<LearningStartResponse>(
         `/learning/sessions/${numericSessionId}/start`,
         bodyPayload,
@@ -251,8 +288,7 @@ const LearnStart: React.FC = () => {
       handleSessionData(response.data.body);
 
     } catch (error: any) {
-      console.error('Failed to start session:', error);
-      // C001 등 에러 발생 시 안전하게 목록으로
+      
       alert("세션 시작 실패: " + (error.response?.data?.status?.message || "알 수 없는 오류"));
       navigate('/mainpage/learnList');
     } finally {
@@ -260,12 +296,12 @@ const LearnStart: React.FC = () => {
     }
   }, [sessionIdParam, navigate, wordsToRetry, isRetryWrong, baseResultId]);
 
-  // 🔥 채점 로직
+  // 채점 로직 (생략)
   const startGrading = useCallback(async (action: 'GRADE' | 'NEXT_AFTER_WRONG', audioFile: File | null = null) => {
+      // ... (채점 로직 유지) ...
       if (resultId === null) { console.error('Result ID is missing.'); return; }
       const numericSessionId = Number(sessionIdParam);
 
-      // 🔥 [중요] GRADE인데 파일이 없으면 멈춰야 L009 에러 안 남
       if (action === 'GRADE' && !audioFile) {
           console.error("❌ 녹음 파일이 생성되지 않았습니다. 채점 중단.");
           alert("녹음된 소리가 없습니다. 다시 시도해주세요.");
@@ -281,8 +317,6 @@ const LearnStart: React.FC = () => {
       formData.append('itemId', String(content.itemId));
       
       if (audioFile) {
-          // 🔥 파일이 실제로 존재하는지 확인 로그
-          console.log(`📁 Sending Audio: ${audioFile.name} (${audioFile.size} bytes)`);
           formData.append('audioFile', audioFile);
       }
 
@@ -294,13 +328,10 @@ const LearnStart: React.FC = () => {
         );
         const data = response.data.body;
         
-        console.log("✅ Server Response:", data.correct ? "CORRECT" : "WRONG");
-
         setResultStatus(data.correct ? 'correct' : 'incorrect');
         if (data.correct) setDisplayStatus('initial_feedback');
         else setDisplayStatus('none');
 
-        // 결과 저장 (정답 or Next)
         if (data.correct || action === 'NEXT_AFTER_WRONG') {
             resultsRef.current.push({
                 romnized: content.romanized, 
@@ -310,13 +341,11 @@ const LearnStart: React.FC = () => {
             });
         }
 
-        // 🔥 오답이면 멈춤 (Try Again 대기)
         if (!data.correct && action === 'GRADE') {
             setIsProcessing(false);
             return; 
         }
 
-        // 완료 처리
         if (data.finished) {
              const endTime = Date.now();
              const duration = endTime - startTimeRef.current;
@@ -339,7 +368,6 @@ const LearnStart: React.FC = () => {
              return;
         }
 
-        // 다음 문제
         if (data.next) {
             const nextContent = nextItemToContent(data.next, content.topicTitle);
             
@@ -361,15 +389,8 @@ const LearnStart: React.FC = () => {
         }
       } catch (error: any) {
         console.error('Grading failed:', error);
-        
-        // 에러 메시지 상세 확인
-        const serverMsg = error.response?.data?.status?.message || "Unknown Error";
-        const serverDesc = error.response?.data?.status?.description || "";
-        console.log(`❌ API Error: ${serverMsg} / ${serverDesc}`);
-
-        // L009 에러(파일 누락)가 아니면 오답 처리
         setResultStatus('incorrect'); 
-        alert(`채점 실패: ${serverDesc || "다시 시도해주세요."}`);
+        alert(`채점 실패: ${error.response?.data?.status?.description || "다시 시도해주세요."}`);
       } finally {
         setIsProcessing(false);
       }
@@ -381,10 +402,18 @@ const LearnStart: React.FC = () => {
     fetchLearningData();
   }, [fetchLearningData]);
 
-  // 타이머 로직 (기존 유지)
+  // 타이머 로직 (학습 흐름 제어)
   useEffect(() => {
     let timer: number | undefined;
-    if (isLoading || totalWords === 0) return; 
+    
+    // 🔥 [핵심 수정] 모달이 떠 있거나 로딩 중이면 타이머 로직 전체 중단
+    if (isLoading || totalWords === 0 || showExitModal) {
+        if (countdownRef.current !== null) clearInterval(countdownRef.current);
+        if (timer) clearTimeout(timer);
+        window.speechSynthesis.cancel(); // 혹시 TTS가 재생 중이라면 중단
+        return; 
+    }
+    
     if (status === 'initial') {
       setResultStatus('none');
       setDisplayStatus('none');
@@ -403,7 +432,6 @@ const LearnStart: React.FC = () => {
           if (newTime >= 10) {
             if (countdownRef.current !== null) clearInterval(countdownRef.current);
             setStatus('speak');
-            // 시간 초과 -> 오답 처리 (파일 없이 호출 -> startGrading에서 방어)
             startGrading('GRADE', null); 
             return 10;
           }
@@ -419,17 +447,18 @@ const LearnStart: React.FC = () => {
       if (timer) clearTimeout(timer);
       window.speechSynthesis.cancel();
     };
-  }, [status, resultStatus, displayStatus, content.korean, isLoading, totalWords, startGrading]);
+  }, [status, resultStatus, displayStatus, content.korean, isLoading, totalWords, startGrading, showExitModal]); // 🔥 showExitModal 의존성 추가
 
   const handleAction = async (action: 'tryAgain' | 'next') => {
     if (action === 'next') await startGrading('NEXT_AFTER_WRONG', null);
     else if (action === 'tryAgain') { setStatus('initial'); setResultStatus('none'); setDisplayStatus('none'); }
   };
 
-  // 녹음 로직 (WAV 변환 적용)
+  // 녹음 로직 (생략)
   const handleMicDown = async (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
-    if (!isMicActiveForRecording) return;
+    if (!isMicActiveForRecording || showExitModal) return; // 🔥 모달이 떠 있으면 막음
+    // ... (녹음 시작 로직 유지)
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const mediaRecorder = new MediaRecorder(stream);
@@ -446,32 +475,23 @@ const LearnStart: React.FC = () => {
     }
   };
 
-  // 🔥 [중요] WAV 변환 후 전송
+  // 🔥 [중요] WAV 변환 후 전송 (생략)
   const handleMicUp = () => {
-    if (!isMicActiveForRecording || !micOn || !mediaRecorderRef.current) return;
-
+    if (!isMicActiveForRecording || !micOn || !mediaRecorderRef.current || showExitModal) return; // 🔥 모달이 떠 있으면 막음
+    // ... (녹음 중단 및 전송 로직 유지)
     mediaRecorderRef.current.onstop = async () => {
         try {
             if (audioChunksRef.current.length === 0) {
                 console.error("❌ No audio data recorded.");
                 return;
             }
-
             const webmBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-            console.log(`🎙️ WebM Blob created. Size: ${webmBlob.size}`);
-
-            // WAV 변환
             const wavFile = await convertToWav(webmBlob);
-            console.log(`🎵 Converted to WAV. Size: ${wavFile.size}`);
-            
             if (wavFile.size === 0) {
                 alert("녹음 오류: 파일 크기가 0입니다.");
                 return;
             }
-
-            // 전송
             startGrading('GRADE', wavFile);
-
         } catch (error) {
             console.error("❌ WAV Conversion Error:", error);
             alert("오디오 처리 중 오류가 발생했습니다.");
@@ -481,14 +501,19 @@ const LearnStart: React.FC = () => {
             }
         }
     };
-
     mediaRecorderRef.current.stop();
     setMicOn(false);
   };
 
-  const handleSpeakerClick = () => { if (isSpeakerActive) { speakKoreanText(content.korean); } };
+  const handleSpeakerClick = () => { 
+    // 🔥 [수정] 모달이 떠 있으면 TTS 재생 중단
+    if (isSpeakerActive && !showExitModal) { 
+        speakKoreanText(content.korean); 
+    }
+  };
 
   const bubbleText = (() => {
+    if (showExitModal) return 'What was it? Tell me!'; // 모달이 떴을 때 말풍선
     if (isLoading) return 'Loading session data...';
     if (isProcessing) return 'Grading...';
     if (resultStatus === 'correct') {
@@ -504,6 +529,7 @@ const LearnStart: React.FC = () => {
 
   const getMascotImage = (): MascotImage => {
     if (isLoading || isProcessing) return 'basic';
+    if (showExitModal) return 'thinking'; // 모달이 떴을 때 마스코트 이미지
     if (status === 'initial') return 'smile';
     if (resultStatus === 'incorrect') return 'wrong';
     if (resultStatus === 'correct') return 'jump';
@@ -523,15 +549,65 @@ const LearnStart: React.FC = () => {
 
   // 🔥 [추가] 결과 피드백 이미지를 렌더링하는 함수
   const renderResultFeedbackImage = () => {
-    // 정답: 말풍선이 'good job!'일 때 (initial_feedback 상태)
     if (resultStatus === 'correct' && displayStatus === 'initial_feedback') {
       return <img src={CorrectImg} alt="Correct" className={styles.feedbackImage} />;
     }
-    // 오답: 말풍선이 'Should we try again?'일 때 (incorrect 상태)
     if (resultStatus === 'incorrect') {
       return <img src={InCorrectImg} alt="Incorrect" className={styles.feedbackImage} />;
     }
     return null;
+  };
+
+    // ⭐ [추가] 마이크 상태에 따라 이미지를 렌더링하는 함수
+    const renderMicIcon = () => {
+        let micImageSrc = MicOff; 
+        if (micOn) {
+            micImageSrc = MicOn; 
+        }
+        return (
+            <img 
+                src={micImageSrc} 
+                alt="Mic Status" 
+                className={styles.micStatusImage}
+            />
+        );
+    };
+
+    // 🔥 [추가] 마이크 버튼을 비활성화할 조건 정의
+    const isMicButtonDisabled = 
+        isLoading || 
+        isProcessing ||
+        status === 'initial' || 
+        status === 'listen' || 
+        (resultStatus !== 'none' && resultStatus !== 'processing') ||
+        !isMicActiveForRecording ||
+        showExitModal; // 🔥 [추가] 모달이 떠 있을 때도 비활성화
+
+
+  // 🔥 [추가] 뒤로 가기 버튼 클릭 핸들러
+  const handleBackButtonClick = () => {
+      // 녹음 중이거나 처리 중이면 막습니다.
+      if (micOn || isProcessing) return; 
+      
+      // 모달을 띄웁니다.
+      setShowExitModal(true);
+  };
+
+  // 🔥 [추가] 모달에서 'Yes' 클릭 시 (학습 중단 및 목록 이동)
+  const handleExitLearning = () => {
+      // 🔥 [수정] 로컬 완료 기록 삭제 (API 없음 가정)
+      if (sessionIdParam) {
+        clearLocalLearningTime(Number(sessionIdParam));
+      }
+      
+      setShowExitModal(false);
+      navigate('/mainpage/learnList'); 
+  };
+  
+  // 🔥 [추가] 모달에서 'No' 클릭 시 (학습 계속)
+  const handleContinueLearning = () => {
+      // 모달만 닫고 학습 상태를 유지합니다. (useEffect가 자동으로 타이머를 재개함)
+      setShowExitModal(false);
   };
 
 
@@ -546,12 +622,12 @@ const LearnStart: React.FC = () => {
 
   return (
     <div className={styles.learnStartContainer}>
-      <Header hasBackButton />
-      {/* 🔥 [수정] 피드백 이미지를 띄우기 위한 래퍼 추가 */}
-      <div className={styles.mascotWrapper}> 
-        {renderResultFeedbackImage()}
-        <Mascot image={getMascotImage()} text={bubbleText} />
-      </div>
+      <Header hasBackButton customBackAction={handleBackButtonClick} /> 
+      {/* 🔥 [수정] 피드백 이미지를 띄우기 위한 래퍼 추가 */}
+      <div className={styles.mascotWrapper}> 
+        {renderResultFeedbackImage()}
+        <Mascot image={getMascotImage()} text={bubbleText} />
+      </div>
       <div className={styles.learningCard}>
         <div className={styles.cardTitleBar}>
           <span className={styles.topicName}>{content.topicTitle}</span>
@@ -588,15 +664,32 @@ const LearnStart: React.FC = () => {
             <button className={styles.actionButton} onClick={() => handleAction('next')}>Next</button>
           </div>
         ) : (
-          <button className={`${styles.micButton} ${micOn ? styles.on : styles.off} ${!isMicActiveForRecording || isProcessing ? styles.disabled: ''}`}
+          <button className={`${styles.micButton} ${micOn ? styles.on : styles.off} ${isMicButtonDisabled ? styles.disabled : ''}`}
             onMouseDown={handleMicDown} onMouseUp={handleMicUp} onTouchStart={handleMicDown} onTouchEnd={handleMicUp}
-            disabled={resultStatus === 'correct' || !isMicActiveForRecording || isProcessing}
+            disabled={isMicButtonDisabled}
           >
-            <span className={styles.micIcon}>🎤</span>
-            {isProcessing ? 'PROCESSING' : micOn ? 'ON' : 'OFF'}
+            {renderMicIcon()}
           </button>
         )}
       </div>
+      
+      {/* 🔥 [수정] 학습 중단 확인 모달 */}
+      {showExitModal && (
+        <div className={styles.exitModalOverlay}>
+          <div className={styles.exitModalContent}>
+            {/* 오버레이 카드 */}
+            <div className={styles.exitModalCard}>
+                <div className={styles.exitModalQuestion}>
+                    Are you sure you want to quit <br /> Learning and go back?
+                </div>
+                <div className={styles.exitModalButtons}>
+                    <button onClick={handleContinueLearning} className={styles.exitButtonNo}>No</button>
+                    <button onClick={handleExitLearning} className={styles.exitButtonYes}>Yes</button>
+                </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

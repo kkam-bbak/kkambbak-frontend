@@ -31,8 +31,8 @@ const HAS_SEEN_INFO_KEY = 'hasSeenLearnInfo';
 // ⭐ [추가] 로컬 스토리지 타입 및 키 정의 (LearnComplete와 동일)
 const LS_LEARNING_TIMES_KEY = 'learning_completion_times';
 interface CompletionTime {
-    time: string; // 'Xm Ys' 형식
-    completedAt: number; // 타임스탬프
+    time: string; // 'Xm Ys' 형식
+    completedAt: number; // 타임스탬프
 }
 type LearningTimes = { [sessionId: number]: CompletionTime };
 
@@ -45,44 +45,50 @@ const formatDuration = (durationSeconds: number): string => {
 
 // ⭐ [추가] 로컬 스토리지에서 시간 데이터를 가져오는 함수
 const getLocalLearningTime = (sessionId: number): CompletionTime | undefined => {
-    try {
-        const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
-        if (storedData) {
-            const times: LearningTimes = JSON.parse(storedData);
-            // 숫자형 ID를 문자열 키로 변환하여 접근해야 할 수도 있습니다.
-            return times[sessionId] || times[String(sessionId) as unknown as number];
-        }
-    } catch (e) {
-        console.error('Failed to read local learning times', e);
-    }
-    return undefined;
+    try {
+        const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
+        if (storedData) {
+            const times: LearningTimes = JSON.parse(storedData);
+            // 숫자형 ID를 문자열 키로 변환하여 접근해야 할 수도 있습니다.
+            return times[sessionId] || times[String(sessionId) as unknown as number];
+        }
+    } catch (e) {
+        console.error('Failed to read local learning times', e);
+    }
+    return undefined;
 };
 
 
-// ⭐ [수정] sessionToTopic 함수에서 로컬 스토리지 시간을 확인하고 사용합니다.
+// ⭐ [수정] sessionToTopic 함수: 로컬 기록이 없으면 completed 상태를 오버라이드합니다.
 const sessionToTopic = (session: Session): Topic => {
-    let durationString = formatDuration(session.durationSeconds);
-    
-    // API에서 받은 시간이 0이거나 완료된 세션일 경우 로컬 스토리지 확인
-    if (session.completed && session.durationSeconds === 0) {
-        const localTimeData = getLocalLearningTime(session.id);
-        if (localTimeData) {
-            durationString = localTimeData.time;
-        }
-    }
-    
-    // 시간 텍스트 설정: API 시간, 로컬 시간, 또는 기본 메시지
-    const timeText = durationString === '0m 0s' 
-        ? (session.completed ? 'Completed' : 'Est. Time N/A') 
-        : durationString;
+    let durationString = formatDuration(session.durationSeconds);
+    
+    let finalCompleted = session.completed; 
 
-    return {
-        id: session.id,
-        title: session.title,
-        vocabularies: session.vocabularyCount,
-        time: timeText, 
-        completed: session.completed,
-    };
+    if (session.completed) {
+        const localTimeData = getLocalLearningTime(session.id);
+        
+        if (localTimeData) {
+            // Case 1: 로컬에 완료 기록이 있으면 (정상 완료) 시간을 사용
+            durationString = localTimeData.time;
+        } else {
+            // 🔥 [핵심 수정] Case 2: API가 완료(true)를 보냈지만 로컬 기록이 없다면 (중단으로 간주)
+            finalCompleted = false; // completed를 false로 오버라이드하여 'Start' 버튼을 강제합니다.
+        }
+    }
+    
+    // 시간 텍스트 설정: 오버라이드된 finalCompleted 상태에 따라 텍스트 조정
+    const timeText = durationString === '0m 0s' 
+        ? (finalCompleted ? 'Completed' : 'Est. Time N/A') 
+        : durationString;
+
+    return {
+        id: session.id,
+        title: session.title,
+        vocabularies: session.vocabularyCount,
+        time: timeText, 
+        completed: finalCompleted, // 🔥 오버라이드된 상태 사용
+    };
 };
 
 // TopicCard 컴포넌트 정의는 유지
@@ -148,6 +154,7 @@ const TopicCard: React.FC<TopicCardProps> = ({
           <div className={styles.timeIcon}>🕒</div>
         </span>
       </div>
+      
     </div>
   );
 };
@@ -325,6 +332,11 @@ const LearnList: React.FC = () => {
     }
   };
   
+  // 🔥 [추가] 커스텀 뒤로가기 핸들러: /mainpage로 이동
+  const handleGoBackToMain = useCallback(() => {
+      navigate('/mainpage');
+  }, [navigate]);
+
   const activeBubbleText =
     activeTab === 'topik'
       ? 'Should I help you prepare\nfor the exam?'
@@ -335,7 +347,8 @@ const LearnList: React.FC = () => {
       
       {!isInfoModalOpen && (
         <>
-          <Header hasBackButton />
+          {/* 🔥 [수정] customBackAction prop 전달 */}
+          <Header hasBackButton customBackAction={handleGoBackToMain} />
           <Mascot image="basic" text={activeBubbleText} />
         </>
       )}
