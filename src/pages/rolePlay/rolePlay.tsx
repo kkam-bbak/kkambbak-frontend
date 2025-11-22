@@ -12,13 +12,9 @@ interface ApiResponseBody<T> {
   body: T;
 }
 
-// 다음 턴 API 응답 타입 정의
+// ... (나머지 인터페이스 정의 동일) ...
 type NextDialogueResponse = ApiResponseBody<DialogueData>;
-
-// 시작 API 응답 타입 정의 (startRoleplaySession 함수용)
 type StartRoleplayResponse = ApiResponseBody<DialogueData>;
-
-// 완료 API 응답 타입 정의 (completeRoleplaySession 함수용)
 interface SessionSummary {
   sessionId: number;
   totalSentence: number;
@@ -66,17 +62,12 @@ interface CompletionData {
 
 type CompletedScenarios = { [scenarioId: number]: CompletionData };
 
-// --- LocalStorage 저장 함수 ---
+// ... (localStorage, API 함수들 동일) ...
 const saveCompletionToLocalStorage = (scenarioId: number, elapsedMinutes: number) => {
     try {
         const storedData = localStorage.getItem(LS_KEY_COMPLETIONS);
         const completions: CompletedScenarios = storedData ? JSON.parse(storedData) : {};
-        
-        completions[scenarioId] = {
-            isCompleted: true,
-            actualTime: elapsedMinutes, 
-        };
-        
+        completions[scenarioId] = { isCompleted: true, actualTime: elapsedMinutes };
         localStorage.setItem(LS_KEY_COMPLETIONS, JSON.stringify(completions));
         console.log(`✅ Scenario ${scenarioId} completion saved to LocalStorage.`);
     } catch (e) {
@@ -84,7 +75,6 @@ const saveCompletionToLocalStorage = (scenarioId: number, elapsedMinutes: number
     }
 };
 
-// --- API 함수들 ---
 const startRoleplaySession = async (scenarioId: number): Promise<DialogueData> => {
   try {
     const response = await http.post<StartRoleplayResponse>('/roleplay/start', {}, { params: { scenarioId } });
@@ -123,13 +113,6 @@ const evaluatePronunciation = async (audioFile: File, sessionId: number, dialogu
     throw error;
   }
 };
-
-interface SessionSummary {
-  sessionId: number;
-  totalSentence: number;
-  correctSentence: number;
-  completedAt: string;
-}
 
 const completeRoleplaySession = async (sessionId: number): Promise<SessionSummary> => {
   try {
@@ -179,6 +162,7 @@ const RolePlay: React.FC = () => {
   const { roleId } = useParams<{ roleId: string }>(); 
   const scenarioId = roleId;
 
+  // ... (LocationState 인터페이스 등 동일) ...
   interface LocationState {
       wordsToRetry?: any[];
       isRetryWrong?: boolean;
@@ -192,10 +176,7 @@ const RolePlay: React.FC = () => {
   const initialTitle = state?.scenarioTitle || 'Role Play_At a Cafe'; 
   const [scenarioTitle, setScenarioTitle] = useState(initialTitle); 
 
-  const wordsToRetry = state?.wordsToRetry;
-  const isRetryWrong = state?.isRetryWrong || false;
-  const initialBaseResultId = state?.baseResultId || null;
-
+  // ... (Refs 동일) ...
   const hasFetched = useRef(false); 
   const startTimeRef = useRef<number>(0);
   const resultsRef = useRef<any[]>([]); 
@@ -205,6 +186,7 @@ const RolePlay: React.FC = () => {
   const audioMimeTypeRef = useRef<string>('audio/wav');
   const sessionStartTimeRef = useRef<number>(Date.now());
 
+  // ... (States 동일) ...
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [currentDialogue, setCurrentDialogue] = useState<DialogueData | null>(null);
   const [turnHistory, setTurnHistory] = useState<DialogueData[]>([]); 
@@ -225,10 +207,27 @@ const RolePlay: React.FC = () => {
   const timerRef = useRef<number | null>(null);
   const flowTimerRef = useRef<number | null>(null);
 
+  // ⭐ [추가] 모달 상태
+  const [showExitModal, setShowExitModal] = useState(false);
+
+  // ⭐ [수정] 뒤로 가기 핸들러: 모달 띄우기
   const handleBackClick = useCallback(() => {
+      setShowExitModal(true);
+  }, []);
+
+  // ⭐ [추가] 모달 Yes 핸들러: 목록으로 이동
+  const handleExitConfirm = useCallback(() => {
+      setShowExitModal(false);
       navigate('/mainpage/roleList');
   }, [navigate]);
 
+  // ⭐ [추가] 모달 No 핸들러: 모달 닫기 (계속 진행)
+  const handleExitCancel = useCallback(() => {
+      setShowExitModal(false);
+  }, []);
+
+
+  // ... (speakKoreanText, initializeSession 등 기존 함수 동일) ...
   const speakKoreanText = useCallback((text: string, onFinish: ((success: boolean) => void) | null = null) => {
     if (!('speechSynthesis' in window)) { if (onFinish) onFinish(false); return; }
     if (window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); setTimeout(() => speakKoreanText(text, onFinish), 50); return; }
@@ -321,7 +320,6 @@ const RolePlay: React.FC = () => {
           }
           
           const timeTaken = `${minutes}m ${seconds}s`;
-
           const finalTurnHistory = lastTurnAdded ? [...turnHistory, lastTurnAdded] : turnHistory;
 
           navigate('/mainpage/rolePlay/complete', {
@@ -347,6 +345,7 @@ const RolePlay: React.FC = () => {
     }
   }, [sessionId, navigate, turnHistory, scenarioId, scenarioTitle]);
 
+  // ... (handleRecordingGrading, handlePracticeGrading, handleTtsPlaybackFinished 등 기존 함수 동일) ...
   const handleRecordingGrading = useCallback((feedback: string) => {
     if (timerRef.current) clearInterval(timerRef.current);
     setIsRecording(false);
@@ -439,16 +438,12 @@ const RolePlay: React.FC = () => {
   }, [step, isRecording, startTtsAndListen]);
 
   const handleListenTtsClick = useCallback(() => {
-    // LISTEN, PRACTICE_LISTEN 외에도 SPEAK_SETUP(AI 녹음대기), PRACTICE_SPEAK(User 녹음대기) 상태 추가
     const allowedSteps = [STEPS.LISTEN, STEPS.PRACTICE_LISTEN, STEPS.SPEAK_SETUP, STEPS.PRACTICE_SPEAK];
-
     if (allowedSteps.includes(step) && !isTtsPlaying) {
       let textToSpeak = currentDialogue?.korean;
-      
       if ((step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK) && practiceLineData) {
         textToSpeak = practiceLineData.korean;
       }
-      
       if (textToSpeak) {
         if (flowTimerRef.current) clearTimeout(flowTimerRef.current);
         startTtsAndListen(textToSpeak);
@@ -472,14 +467,11 @@ const RolePlay: React.FC = () => {
     }
   }, [step, currentDialogue, practiceLineData, startTtsAndListen]);
 
-  // ⭐ [수정] handleChoiceSelect: 선택 확정 시 ttsOptionId를 초기화하여 카드 섹션 복귀 방지
   const handleChoiceSelect = useCallback(() => {
     if (selectedChoiceId === null || step !== STEPS.CHOICE_SETUP || !currentDialogue) return;
-
     const selectedOption = currentDialogue.choices?.find(c => c.id === selectedChoiceId);
     const isCorrect = selectedOption && selectedOption.isCorrect;
     const result = isCorrect ? 'CORRECT' : 'INCORRECT';
-    
     const correctOption = currentDialogue.choices?.find(c => c.isCorrect) || currentDialogue.choices?.[0];
 
     if (selectedOption) {
@@ -498,7 +490,7 @@ const RolePlay: React.FC = () => {
 
     window.speechSynthesis.cancel();
     setIsTtsPlaying(false);
-    setTtsOptionId(null); // ⭐ 이 부분 추가됨
+    setTtsOptionId(null); 
     setStep(STEPS.CHOICE_FEEDBACK);
     setGradingResult(result);
 
@@ -524,16 +516,12 @@ const RolePlay: React.FC = () => {
   const handleMicPress = useCallback(() => {
     const isAiTurn = currentDialogue?.speaker === 'AI';
     const isUserTurn = currentDialogue?.speaker === 'USER';
-
     if (isAiTurn && isTtsPlaying) return;
-
     const isActionable = isAiTurn || step === STEPS.PRACTICE_SPEAK;
     const isReady = step === STEPS.SPEAK_SETUP || step === STEPS.LISTEN_DONE ||
                     (isUserTurn && (step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_LISTEN_DONE)) ||
                     step === STEPS.PRACTICE_SPEAK;
-
     if (!isActionable || !isReady) return;
-
     if (step === STEPS.SPEAK_SETUP || step === STEPS.LISTEN_DONE) {
       setStep(STEPS.RECORDING);
     } else if (step === STEPS.PRACTICE_LISTEN_DONE) {
@@ -555,14 +543,12 @@ const RolePlay: React.FC = () => {
         audioMimeTypeRef.current = mimeType || 'audio/wav';
         const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
         audioChunksRef.current = [];
-
         recorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
             audioChunksRef.current.push(event.data);
           }
         };
         recorder.onerror = (event) => console.error('Recording error:', event);
-
         mediaRecorderRef.current = recorder;
         recorder.start();
         console.log('🎤 Recording started');
@@ -584,12 +570,10 @@ const RolePlay: React.FC = () => {
   const handleMicRelease = useCallback(() => {
     if (!isRecording || !mediaRecorderRef.current) return;
     const recorder = mediaRecorderRef.current;
-
     if (recorder.state !== 'recording') {
       setIsRecording(false);
       return;
     }
-
     setIsRecording(false);
     recorder.onstop = async () => {
       try {
@@ -602,12 +586,10 @@ const RolePlay: React.FC = () => {
             }
             return;
         }
-        
         const mimeType = audioMimeTypeRef.current;
         const fileExtension = mimeType.includes('wav') ? 'wav' : 'webm';
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         const audioFile = new File([audioBlob], `recording-${Date.now()}.${fileExtension}`, { type: mimeType });
-
         if (audioFile.size === 0) {
             alert("녹음 파일 크기가 0입니다. 다시 시도해주세요.");
             if (currentDialogue?.speaker === 'AI') {
@@ -617,17 +599,13 @@ const RolePlay: React.FC = () => {
             }
             return;
         }
-        
         if (!sessionId || !currentDialogue) return;
-
         const evaluationResult = await evaluatePronunciation(
           audioFile,
           sessionId,
           currentDialogue.dialogueId
         );
-
         const feedback = evaluationResult.feedback;
-
         if (currentDialogue?.speaker === 'AI') {
           handleRecordingGrading(feedback);
         } else {
@@ -636,13 +614,11 @@ const RolePlay: React.FC = () => {
       } catch (err: any) {
         console.error('Evaluation failed:', err);
         const statusCode = err?.response?.data?.status?.statusCode;
-
         if (statusCode === 'OA001') {
             alert("일시적인 서버 지연으로 응답하지 못했습니다.\n토큰은 차감되지 않았습니다.\n목록으로 돌아갑니다.");
             navigate('/mainpage/roleList');
             return;
         }
-
         if (statusCode === 'R015') {
             if (currentDialogue?.speaker === 'AI') {
                 handleRecordingGrading('RETRY');
@@ -669,34 +645,28 @@ const RolePlay: React.FC = () => {
   useEffect(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     if (flowTimerRef.current) clearTimeout(flowTimerRef.current);
-
     if (step === STEPS.START && currentDialogue) {
       flowTimerRef.current = setTimeout(() => {
         const nextStep = currentDialogue.speaker === 'AI' ? STEPS.LISTEN : STEPS.CHOICE_SETUP;
         setStep(nextStep);
       }, 1500);
     }
-
     if (step === STEPS.LISTEN_DONE) {
       flowTimerRef.current = setTimeout(() => {
         setStep(STEPS.SPEAK_SETUP);
       }, 0);
     }
-
     if (step === STEPS.SPEAK_SETUP && currentDialogue?.speaker === 'AI') {
       if (timerRef.current) clearInterval(timerRef.current);
     }
-
     if (step === STEPS.PRACTICE_LISTEN_DONE) {
       flowTimerRef.current = setTimeout(() => {
         setStep(STEPS.PRACTICE_SPEAK);
       }, 0);
     }
-
     if (step === STEPS.PRACTICE_SPEAK) {
       if (timerRef.current) clearInterval(timerRef.current);
     }
-
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (flowTimerRef.current) clearTimeout(flowTimerRef.current);
@@ -725,7 +695,6 @@ const RolePlay: React.FC = () => {
       const isRecordingTurn = data.speaker === 'AI';
       const romanizedClass = styles.correctRom; 
       const role = data.speaker;
-
       const mainKoreanText = data.korean; 
       const mainRomanizedText = data.romanized;
       const mainEnglishText = data.english;
@@ -748,15 +717,12 @@ const RolePlay: React.FC = () => {
 
   const renderActiveInput = () => {
       const isCurrentlySpeaking = window.speechSynthesis.speaking;
-
       if (isLoadingNextTurn) {
           return null;
       }
-      
       if (selectedChoiceData && step !== STEPS.CHOICE_SETUP && !isPracticeFlow) {
           return <TurnContentBox data={selectedChoiceData} />;
       }
-
       if (currentDialogue.speaker === 'AI' && !isPracticeFlow) {
           const isTtsActionable = step === STEPS.LISTEN || step === STEPS.SPEAK_SETUP;
           const isMicActionable = step === STEPS.SPEAK_SETUP || step === STEPS.RECORDING || step === STEPS.LISTEN_DONE;
@@ -768,7 +734,6 @@ const RolePlay: React.FC = () => {
                return '';
           };
           const currentGradeClass = getRomClass();
-
           return (
               <div className={styles.activeTurnRecordingFlow}>
                   <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
@@ -799,15 +764,12 @@ const RolePlay: React.FC = () => {
       else if (currentDialogue.speaker === 'USER' && !isPracticeFlow) {
           const customerData = currentDialogue.choices;
           if (!customerData || customerData.length === 0) return <div>No choices</div>;
-
           const isDisabled = step === STEPS.CHOICE_FEEDBACK || isCurrentlySpeaking;
           const isSubmitActive = selectedChoiceId !== null;
           const submitButtonClass = isSubmitActive ? styles.on : `${styles.off} ${styles.disabled}`;
-          
           let displayOption = customerData.find(c => c.id === selectedChoiceId);
           if (!displayOption && step === STEPS.CHOICE_SETUP) displayOption = customerData[0];
           else if (step === STEPS.CHOICE_FEEDBACK) displayOption = undefined; 
-
           return (
               <>
                   {displayOption && step === STEPS.CHOICE_SETUP && (
@@ -839,9 +801,7 @@ const RolePlay: React.FC = () => {
           const practiceButtonActive = step === STEPS.PRACTICE_SPEAK || step === STEPS.PRACTICE_LISTEN_DONE;
           const practiceMainMicClass = practiceButtonActive ? (isRecording ? styles.on : styles.off) : `${styles.off} ${styles.disabled}`;
           const currentGradeClass = step === STEPS.PRACTICE_GRADING ? (gradingResult === 'CORRECT' ? styles.correctActive : styles.incorrectActive) : '';
-
           const isTtsActionable = step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK;
-
           return (
                <div className={styles.activeTurnRecordingFlow}>
                    <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
@@ -862,7 +822,6 @@ const RolePlay: React.FC = () => {
                            <span className={styles.roleTag}>{practiceLineData.speaker}</span>
                        </div>
                    </div>
-
                    <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
                        <div className={styles.micButtonWrapper}>
                            <button className={`${styles.mainMicButton} ${practiceMainMicClass}`}
@@ -881,6 +840,7 @@ const RolePlay: React.FC = () => {
 
   return (
     <div className={`${styles.pageContainer} ${styles.appContainer}`}>
+        {/* ⭐ Header에 customBackAction 전달 */}
         <Header hasBackButton customBackAction={handleBackClick} />
         <Mascot image={characterImage} text={currentBubbleText} />
         <ContentSection color="blue">
@@ -895,6 +855,24 @@ const RolePlay: React.FC = () => {
                 {renderActiveInput()}
             </div>
         </ContentSection>
+
+        {/* ⭐ 모달 오버레이 (하단 고정 카드) */}
+        {showExitModal && (
+          <div className={styles.exitModalOverlay}>
+             {/* 뒷배경을 클릭해도 닫히지 않게 하려면 onClick 제거하거나 stopPropagation 사용 */}
+             <div className={styles.exitModalContent}>
+                <div className={styles.exitModalCard}>
+                   <div className={styles.exitModalQuestion}>
+                      Are you sure you want to quit<br />Role Play and go back?
+                   </div>
+                   <div className={styles.exitModalButtons}>
+                      <button onClick={handleExitCancel} className={styles.exitButtonNo}>No</button>
+                      <button onClick={handleExitConfirm} className={styles.exitButtonYes}>Yes</button>
+                   </div>
+                </div>
+             </div>
+          </div>
+        )}
     </div>
   );
 };

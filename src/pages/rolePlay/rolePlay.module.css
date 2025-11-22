@@ -356,3 +356,105 @@
     background-color: #1a1a1a; 
     color: white; 
 }
+
+
+/* --- 학습 중단 확인 모달 (하단 고정) --- */
+
+/* 1. 전체 화면을 덮는 어두운 배경 */
+.exitModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* 반투명 검은 배경 */
+  z-index: 9999; /* 가장 위에 표시 */
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* 내용을 하단으로 정렬 */
+}
+
+/* 2. 모달 콘텐츠 래퍼 (가로 폭 제한 등) */
+.exitModalContent {
+  width: 100%;
+  max-width: 400px; /* 모바일 앱 너비 제한 */
+  padding: 0 20px 40px 20px; /* 좌우 여백 및 하단 여백 */
+  box-sizing: border-box;
+  animation: slideUp 0.3s ease-out; /* 밑에서 올라오는 애니메이션 효과 */
+}
+
+/* 3. 모달 카드 (파란색 박스) */
+.exitModalCard {
+  background-color:#007CFF; 
+  height: 230px;
+  border-radius: 24px;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  color: black;
+}
+
+/* 4. 질문 텍스트 */
+.exitModalQuestion {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-top: 20px;
+  margin-bottom: 70px;
+  white-space: pre-wrap; /* 줄바꿈 적용 */
+}
+
+/* 5. 버튼 영역 */
+.exitModalButtons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* 6. 버튼 공통 스타일 */
+.exitButtonNo,
+.exitButtonYes {
+  flex: 1; /* 버튼 크기 1:1 비율 */
+  padding: 16px 0;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  height: 40px;
+  transition: transform 0.1s, opacity 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* No 버튼 (흰색) */
+.exitButtonNo {
+  background-color: white;
+  color: black;
+}
+
+/* Yes 버튼 (흰색) */
+.exitButtonYes {
+  background-color: white;
+  color: black; 
+}
+
+/* 버튼 눌림 효과 */
+.exitButtonNo:active,
+.exitButtonYes:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 애니메이션 정의 */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
