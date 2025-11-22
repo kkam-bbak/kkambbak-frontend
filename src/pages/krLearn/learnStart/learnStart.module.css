@@ -2,6 +2,7 @@
 
 .learnStartContainer {
   width: 100%;
+
 }
 
 .start-bubble {
@@ -242,4 +243,25 @@
   color: #e3e3e3;
   cursor: not-allowed;
   background-color: white;
+}
+
+
+
+
+
+.mascotWrapper {
+    position: relative; /* 자식인 feedbackImage의 절대 위치 기준 */
+    width: fit-content; /* 마스코트 크기에 맞춤 */
+    margin: 0 auto; /* 중앙 정렬 */
+}
+
+.feedbackImage {
+    position: absolute;
+    /* 마스코트 위치에 따라 이 값들을 조정하여 캐릭터 머리 위에 위치시킵니다. */
+    top: 350px;       
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92px; /* 크기 조정 */
+    height: 84px; /* 크기 조정 */
+    z-index: 100; /* 마스코트 위에 표시 */
 }
