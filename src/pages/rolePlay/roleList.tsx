@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // useCallback 추가
 import { useNavigate } from 'react-router-dom';
-import { Clock } from 'lucide-react';
+import { Clock } from 'lucide-react'; 
 import { http } from '@/apis/http';
 import styles from './roleList.module.css';
 import Header from '@/components/layout/Header/Header';
@@ -50,7 +50,6 @@ const formatMinutesToDisplay = (minutes: number | null | undefined): string => {
 // --- API 함수 ---
 const getRoleplayScenarios = async (): Promise<RoleplayScenario[]> => {
   try {
-    // body가 RoleplayScenario 배열임
     const response = await http.get<ApiResponseBody<RoleplayScenario[]>>('/roleplay/all');
     return response.data.body;
   } catch (error) {
@@ -68,6 +67,11 @@ const RoleList: React.FC = () => {
   const [completedMap, setCompletedMap] = useState<CompletedScenarios>({});
 
   const speechBubbleText = 'Choose a place to talk';
+
+  // ⭐ [추가] 뒤로 가기 핸들러: 메인 페이지로 이동
+  const handleBackClick = useCallback(() => {
+      navigate('/mainpage');
+  }, [navigate]);
 
   // 1. LocalStorage 데이터 로드
   useEffect(() => {
@@ -88,7 +92,6 @@ const RoleList: React.FC = () => {
         setIsLoading(true);
         const data = await getRoleplayScenarios();
 
-        // ⭐ [핵심] API 데이터(scenario)를 화면용 데이터(RolePlayItem)로 매핑
         const formatted: RolePlayItem[] = data.map((scenario) => {
             const completionInfo = completedMap[scenario.id];
             const isCompleted = completionInfo?.isCompleted || false;
@@ -99,7 +102,7 @@ const RoleList: React.FC = () => {
 
           return {
             id: scenario.id,
-            title: scenario.title, // ✅ API에서 온 title ("At a Cafe" 등)을 그대로 사용
+            title: scenario.title,
             time: formatMinutesToDisplay(minutesToDisplay),
             isSubscribed: true,
             isCompleted: isCompleted,
@@ -125,15 +128,12 @@ const RoleList: React.FC = () => {
 
   // 3. 학습 시작 핸들러
   const handleStart = (roleId: number) => {
-    // 현재 목록(scenarios)에서 선택된 항목을 찾음
     const selectedScenario = scenarios.find(s => s.id === roleId);
     
     if (!selectedScenario) return;
 
     console.log(`Starting role play: ${selectedScenario.title} (ID: ${roleId})`);
     
-    // ✅ 선택된 시나리오의 title을 state로 넘겨줍니다.
-    // RolePlay.tsx에서는 location.state.scenarioTitle로 이 값을 받습니다.
     navigate(`/mainpage/rolePlay/${roleId}`, {
         state: {
             scenarioTitle: selectedScenario.title 
@@ -151,7 +151,8 @@ const RoleList: React.FC = () => {
 
   if (isLoading) return (
     <div className={styles.roleListContainer}>
-        <Header hasBackButton />
+        {/* ⭐ customBackAction 추가 */}
+        <Header hasBackButton customBackAction={handleBackClick} />
         <Mascot image="thinking" text="로딩 중..." />
         <ContentSection color="blue">
             <div className={styles.roleListContentHeader}>
@@ -166,7 +167,8 @@ const RoleList: React.FC = () => {
 
   if (error) return (
       <div className={styles.roleListContainer}>
-        <Header hasBackButton />
+        {/* ⭐ customBackAction 추가 */}
+        <Header hasBackButton customBackAction={handleBackClick} />
         <Mascot image="gloomy" text="문제가 발생했어요" />
         <ContentSection color="blue">
             <div className={styles.roleListContentHeader}>
@@ -184,7 +186,8 @@ const RoleList: React.FC = () => {
 
   return (
     <div className={styles.roleListContainer}>
-      <Header hasBackButton />
+      {/* ⭐ customBackAction 추가 */}
+      <Header hasBackButton customBackAction={handleBackClick} />
       <Mascot image="basic" text={speechBubbleText} />
 
       <ContentSection color="blue">
@@ -208,7 +211,6 @@ const RoleList: React.FC = () => {
                 onClick={() => handleRoleSelect(role.id)}
               >
                 <div className={styles.roleItemHeader}>
-                  {/* ✅ API에서 받아온 title 표시 */}
                   <span className={styles.roleItemTitle}>{role.title}</span>
 
                   {isStartVisible && (
