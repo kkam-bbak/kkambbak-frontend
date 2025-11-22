@@ -1,15 +1,13 @@
 import React, { useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; 
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
-// 🔥 [수정] WordResult 타입을 정확히 import 합니다.
-import type { WordResult } from '../krLearn/learnStart/learnStart'; 
 import styles from './rolePlayComplete.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 import { http } from '../../apis/http';
 
-// 유틸리티 (기존 유지)
+// 유틸리티
 const formatDuration = (durationMs: number): string => {
   const totalSeconds = Math.round(durationMs / 1000);
   const minutes = Math.floor(totalSeconds / 60);
@@ -17,229 +15,237 @@ const formatDuration = (durationMs: number): string => {
   return `${minutes}m ${seconds}s`;
 };
 
-const getFormattedCompletionDate = (dateString: string): string => { // 🔥 dateString 받도록 수정
+const getFormattedCompletionDate = (dateString: string): string => { 
   const now = new Date(dateString);
   return now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 };
 
-// API 응답 타입
-interface Session {
+// ⭐ [수정] RolePlay 시나리오 타입 정의 (RoleList와 동일하게 맞춤)
+interface RoleplayScenario {
   id: number;
   title: string;
-  categoryName: string;
-  vocabularyCount: number;
-  completed: boolean;
-  durationSeconds: number;
+  description: string;
+  estimated_minutes: number;
+  // completed 여부는 로컬 스토리지나 별도 로직으로 판단해야 할 수 있음 (API가 안 준다면)
 }
-interface NextLearningResponse {
+
+// API 응답 래퍼
+interface ApiResponseBody<T> {
   status: { statusCode: string; message: string; description: string | null };
-  body: {
-    categoryName: string;
-    sessions: Session[];
-    nextCursor: number | null;
-    hasNext: boolean;
-  };
+  body: T;
 }
 
-const ResultRow = ({ icon: Icon, value }: { icon: React.ElementType; value: string }) => (
-  <div className={styles.resultRow}>
-    <Icon className={styles.resultIcon}/>
-    <span className={styles.resultValue}>{value}</span>
-  </div>
-);
-
-// 전달받을 데이터 타입 (scenarioId와 categoryName 추가)
+// 전달받을 데이터 타입 (categoryName 제거)
 interface LocationState {
   sessionId?: number;
   resultId?: number;
-  results?: WordResult[];
   topicName?: string;
   learningDuration?: number; 
-  scenarioId?: number; // 🔥 [수정 1] scenarioId 추가
+  scenarioId?: number; 
   sessionSummary?: { correctSentence: number; totalSentence: number; completedAt: string; };
   timeTaken?: string;
   rolePlayName?: string;
-  turns?: any[]; // TurnData 배열 (임시)
-  categoryName?: string; // 🔥 [수정 2] categoryName 추가
+  turns?: any[]; // TurnData 배열
+  // categoryName?: string; // ❌ 제거됨
 }
 
-// TurnDisplay 컴포넌트 (기존 유지)
+// TurnDisplay 컴포넌트
 interface TurnData {
-    speaker: string;
-    korean: string;
-    romanized: string;
-    english: string;
-    result: 'CORRECT' | 'INCORRECT' | string;
+  speaker: string;
+  korean: string;
+  romanized: string;
+  english: string;
+  result: 'CORRECT' | 'INCORRECT' | string;
 }
 
-const TurnDisplay: React.FC<{ data: TurnData, index: number }> = ({ data, index }) => {
-    const isUserTurn = data.speaker === 'USER';
-    const romanizedClass = data.result === 'CORRECT' ? styles.correct : data.result === 'INCORRECT' ? styles.incorrect : '';
+const TurnDisplay: React.FC<{ data: TurnData, index: number }> = ({ data }) => {
+  const isUserTurn = data.speaker === 'USER';
+  const romanizedClass = data.result === 'CORRECT' ? styles.correct : data.result === 'INCORRECT' ? styles.incorrect : '';
 
-    return (
-        <div className={styles.turnDisplayBox}>
-            <div className={styles.contentBox}>
-                <div className={styles.koreanLine}>
-                    <span className={styles.completeKoreanText}>{data.korean}</span>
-                    <button className={`${styles.ttsButton} ${styles.active}`}>🔊</button>
-                </div>
-                <div className={styles.romanizedLine}>
-                    <span className={`${styles.completeRomanizedText} ${romanizedClass}`}>{data.romanized}</span>
-                    {isUserTurn && <span className={`${styles.smallMicIcon} ${styles.active}`}>🎤</span>}
-                </div>
-                <span className={styles.completeEnglishText}>{data.english}</span>
-            </div>
-            <div className={`${styles.roleTagContainer} ${isUserTurn ? styles.customerTag : styles.staffTag}`}>
-                <span className={styles.roleTag}>{data.speaker}</span>
-            </div>
+  return (
+    <div className={styles.turnDisplayBox}>
+      <div className={styles.contentBox}>
+        <div className={styles.koreanLine}>
+          <span className={styles.completeKoreanText}>{data.korean}</span>
+          <button className={`${styles.ttsButton} ${styles.active}`}>🔊</button>
         </div>
-    );
+        <div className={styles.romanizedLine}>
+          <span className={`${styles.completeRomanizedText} ${romanizedClass}`}>{data.romanized}</span>
+          {isUserTurn && <span className={`${styles.smallMicIcon} ${styles.active}`}>🎤</span>}
+        </div>
+        <span className={styles.completeEnglishText}>{data.english}</span>
+      </div>
+      <div className={`${styles.roleTagContainer} ${isUserTurn ? styles.customerTag : styles.staffTag}`}>
+        <span className={styles.roleTag}>{data.speaker}</span>
+      </div>
+    </div>
+  );
 };
 
 
+// --- LocalStorage 키 (완료 여부 확인용) ---
+const LS_KEY_COMPLETIONS = 'roleplay_completions';
+interface CompletionData {
+  isCompleted: boolean;
+  actualTime: number;
+}
+type CompletedScenarios = { [scenarioId: number]: CompletionData };
+
+
 const RolePlayComplete: React.FC = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const state = location.state as LocationState;
-    const turnsHistory = state?.turns || [];
-    // 데이터 추출
-    const summary = state?.sessionSummary;
-    const correctCount = summary?.correctSentence || 0;
-    const totalCount = summary?.totalSentence || 0;
-    const rolePlayName = state?.rolePlayName || 'Role Play Result';
-    const timeTaken = state?.timeTaken || '0m 0s';
-    
-    // 🔥 [수정 3] categoryName 추출 (없으면 TOPIK으로 가정)
-    const categoryName = state?.categoryName || 'TOPIK'; 
-    const currentScenarioId = state?.scenarioId; // 재시작용 ID 확보
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as LocationState;
+  const turnsHistory = state?.turns || [];
+  
+  const summary = state?.sessionSummary;
+  const correctCount = summary?.correctSentence || 0;
+  const totalCount = summary?.totalSentence || 0;
+  const rolePlayName = state?.rolePlayName || 'Role Play Result';
+  const timeTaken = state?.timeTaken || '0m 0s';
+  
+  const currentScenarioId = state?.scenarioId || 0; 
 
-    // 시간 및 날짜 포맷팅
-    const completionDate = useMemo(() => getFormattedCompletionDate(summary?.completedAt || new Date().toISOString()), [summary?.completedAt]);
-    const learningDurationMs = state?.learningDuration || 0;
-    const learningTime = useMemo(() => formatDuration(learningDurationMs), [learningDurationMs]);
+  const completionDate = useMemo(() => getFormattedCompletionDate(summary?.completedAt || new Date().toISOString()), [summary?.completedAt]);
+  
+  const { speechBubbleText, mascotImage: characterImageSrc } = useMemo(() => {
+    let text = '';
+    let mascot: MascotImage;
+    const correctRatio = totalCount > 0 ? correctCount / totalCount : 0;
 
-    // 마스코트 및 말풍선 결정 로직 (기존 유지)
-    const { speechBubbleText, mascotImage: characterImageSrc } = useMemo(() => {
-        let text = '';
-        let mascot: MascotImage;
-        const correctRatio = totalCount > 0 ? correctCount / totalCount : 0;
+    if (totalCount === 0) { text = 'No data available.'; mascot = 'thinking'; } 
+    else if (correctCount === totalCount) { text = 'Perfect!!'; mascot = 'shining'; } 
+    else if (correctRatio >= 2 / 3) { text = "It's not bad~"; mascot = 'smile'; } 
+    else if (correctRatio >= 1 / 2) { text = 'So so~'; mascot = 'thinking'; } 
+    else { text = "I'm sorry.."; mascot = 'gloomy'; }
+    return { speechBubbleText: text, mascotImage: mascot };
+  }, [correctCount, totalCount]);
 
-        if (totalCount === 0) { text = 'No data available.'; mascot = 'thinking'; } 
-        else if (correctCount === totalCount) { text = 'Perfect!!'; mascot = 'shining'; } 
-        else if (correctRatio >= 2 / 3) { text = "It's not bad~"; mascot = 'smile'; } 
-        else if (correctRatio >= 1 / 2) { text = 'So so~'; mascot = 'thinking'; } 
-        else { text = "I'm sorry.."; mascot = mascot = 'gloomy'; }
-        return { speechBubbleText: text, mascotImage: mascot };
-    }, [correctCount, totalCount]);
+  const handleBackClick = useCallback(() => {
+    navigate('/mainpage/roleList');
+  }, [navigate]);
 
-    // --- 핸들러 ---
-    const handleReview = useCallback(() => {
-        // [수정] Review 페이지로 이동할 때 필요한 모든 정보를 전달
-        // (Review 페이지는 Session ID를 받으면 됨)
-        // 현재는 turns data를 사용하므로 turns를 전달
-        navigate('/mainpage/learn/review', {
-            state: {
-                // sessionId: currentScenarioId, // 리뷰 페이지가 필요하다면 전달
-                results: state?.turns, // 턴 히스토리를 결과로 전달
-                topicName: rolePlayName,
-                learningTime: timeTaken,
+  const handleTryAgain = useCallback(() => {
+    if (currentScenarioId) {
+      navigate(`/mainpage/rolePlay/${currentScenarioId}`, {
+        state: { scenarioTitle: rolePlayName } // categoryName 제거
+      });
+    } else {
+      navigate('/mainpage/roleList');
+    }
+  }, [navigate, currentScenarioId, rolePlayName]);
+
+  // ⭐ [수정] Role Play 목록을 불러와 다음 단계 찾기
+  const handleNextLearning = useCallback(async () => {
+    try {
+      console.log(`[Next Learning] Fetching RolePlay list...`);
+      
+      // 1. RolePlay 목록 API 호출 (RoleList와 동일)
+      const response = await http.get<ApiResponseBody<RoleplayScenario[]>>('/roleplay/all');
+      const sessions = response.data.body;
+
+      // 2. 로컬 스토리지에서 완료 정보 가져오기 (API가 completed 정보를 안 준다면)
+      let completedMap: CompletedScenarios = {};
+      try {
+          const storedData = localStorage.getItem(LS_KEY_COMPLETIONS);
+          if (storedData) {
+              completedMap = JSON.parse(storedData);
+          }
+      } catch (e) { console.error(e); }
+
+      if (sessions && sessions.length > 0) {
+        // 3. ID 순 정렬
+        const sortedSessions = [...sessions].sort((a, b) => a.id - b.id);
+
+        // 4. 현재 세션 인덱스 찾기
+        const currentIndex = sortedSessions.findIndex(s => s.id === currentScenarioId);
+
+        // 5. 다음 안 푼 세션 찾기 로직
+        // (API 응답에는 completed가 없을 수 있으므로 로컬 스토리지나 로직으로 판단)
+        
+        // 우선순위 1: 현재 다음 것부터 끝까지 중에서 안 푼 것
+        let nextSession = sortedSessions.slice(currentIndex + 1).find(s => !completedMap[s.id]?.isCompleted);
+
+        // 우선순위 2: 처음부터 현재까지 중에서 안 푼 것 (순환)
+        if (!nextSession) {
+            nextSession = sortedSessions.slice(0, currentIndex).find(s => !completedMap[s.id]?.isCompleted);
+        }
+
+        // 우선순위 3: 다 풀었다면? 그냥 바로 다음 인덱스 (반복 학습)
+        if (!nextSession) {
+             const nextIndex = (currentIndex + 1) % sortedSessions.length;
+             // 세션이 1개뿐이면 이동 안함
+             if (sortedSessions.length > 1 || (sortedSessions.length === 1 && sortedSessions[0].id !== currentScenarioId)) {
+                 nextSession = sortedSessions[nextIndex];
+             }
+        }
+
+        if (nextSession) {
+          // ⭐ [중요] 다음 세션으로 이동 (제목 전달)
+          navigate(`/mainpage/roleplay/${nextSession.id}`, {
+            state: { 
+              scenarioTitle: nextSession.title 
             }
-        });
-    }, [navigate, state, rolePlayName, timeTaken]);
-
-
-    const handleTryAgain = useCallback(() => {
-        if (currentScenarioId) {
-            // ✅ Try Again 시, 현재 시나리오 ID로 돌아가고 카테고리 정보 유지
-            navigate(`/mainpage/rolePlay/${currentScenarioId}`, {
-                state: { categoryName: categoryName } // 카테고리 정보 전달
-            });
+          });
         } else {
-            navigate('/mainpage/roleList');
+          alert("모든 학습을 완료했습니다! 🎉 목록으로 이동합니다.");
+          navigate('/mainpage/roleList');
         }
-    }, [navigate, currentScenarioId, categoryName]);
+      } else {
+        alert("학습 가능한 세션이 없습니다.");
+        navigate('/mainpage/roleList');
+      }
 
-    const handleNextLearning = useCallback(async () => {
-        try {
-            console.log(`[Next Learning] Fetching list for category: ${categoryName}`);
-            
-            // 🔥 [수정 4] API 호출 시 category 파라미터 전달 (C007 에러 해결)
-            const response = await http.get<NextLearningResponse>('/learning/sessions', {
-                params: { limit: 20, category: categoryName }
-            });
+    } catch (error) {
+      console.error("Failed to fetch next roleplay session:", error);
+      navigate('/mainpage/roleList');
+    }
+  }, [navigate, currentScenarioId]);
 
-            const sessions = response.data.body.sessions;
+  return (
+    <div className={`${styles.pageContainer} ${styles.appContainer}`}>
+      <Header hasBackButton customBackAction={handleBackClick} />
+      <Mascot image={characterImageSrc} text={speechBubbleText} />
 
-            if (sessions && sessions.length > 0) {
-                // 현재 ID보다 큰 ID를 찾거나, 완료 안 된 것 중 다음을 찾는 로직
-                let nextSession = sessions.find(s => !s.completed && s.id !== currentScenarioId);
-                
-                if (!nextSession) {
-                    nextSession = sessions.find(s => s.id > (currentScenarioId || 0));
-                }
-
-                if (nextSession) {
-                    // 🔥 다음 학습으로 이동할 때 카테고리 정보 유지
-                    navigate(`/mainpage/roleplay/${nextSession.id}`, {
-                        state: { categoryName: categoryName }
-                    });
-                } else {
-                    alert("더 이상 진행할 학습이 없습니다.");
-                    navigate('/mainpage/roleList');
-                }
-            } else {
-                alert("학습 가능한 세션이 없습니다.");
-                navigate('/mainpage/roleList');
-            }
-
-        } catch (error) {
-            console.error("Failed to fetch next learning session:", error);
-            navigate('/mainpage/roleList');
-        }
-    }, [navigate, currentScenarioId, categoryName]);
-
-    return (
-        <div className={`${styles.pageContainer} ${styles.appContainer}`}>
-            <Header hasBackButton />
-            <Mascot image={characterImageSrc} text={speechBubbleText} />
-
-            <ContentSection color="blue">
-                <h2 className={styles.summaryTitle}>Session Complete!</h2>
-
-                <div className={styles.summaryDetails}>
-                    <span className={styles.detailItem}>{rolePlayName}</span>
-                    <div className={`${styles.detailItem} ${styles.stat}`}>
-                        <CheckCircle className={styles.statIcon} />
-                        <span className={styles.statLabel}>{correctCount}/{totalCount} sentences correct</span>
-                    </div>
-                    <div className={`${styles.detailItem} ${styles.stat}`}>
-                        <Clock className={styles.statIcon} />
-                        <span className={styles.statLabel}>{timeTaken}</span>
-                    </div>
-                    <div className={`${styles.detailItem} ${styles.stat}`}>
-                        <Calendar className={styles.statIcon} />
-                        <span className={styles.statLabel}>{completionDate}</span>
-                    </div>
-                </div>
-
-                {/* 대화 기록 리스트 */}
-                <div className={styles.completeHistoryArea}>
-                    {turnsHistory.map((turn, index) => (
-                        <TurnDisplay key={index} data={turn} index={index} />
-                    ))}
-                </div>
-
-                <div className={styles.buttonsContainer}>
-                    <button className={`${styles.actionButton} ${styles.tryAgain}`} onClick={handleTryAgain}>
-                        Try again
-                    </button>
-                    <button className={`${styles.actionButton} ${styles.nextLearning}`} onClick={handleNextLearning}>
-                        Next learning
-                    </button>
-                </div>
-            </ContentSection>
+      <ContentSection color="blue">
+        <div className={styles.cardTitleBar}>
+          <span className={styles.cardTitleText}>Session Complete!</span>
         </div>
-    );
+
+        <div className={styles.summaryDetails}>
+          <span className={styles.detailItem}>{rolePlayName}</span>
+          <div className={`${styles.detailItem} ${styles.stat}`}>
+            <CheckCircle className={styles.statIcon} />
+            <span className={styles.statLabel}>{correctCount}/{totalCount} sentences correct</span>
+          </div>
+          <div className={`${styles.detailItem} ${styles.stat}`}>
+            <Clock className={styles.statIcon} />
+            <span className={styles.statLabel}>{timeTaken}</span>
+          </div>
+          <div className={`${styles.detailItem} ${styles.stat}`}>
+            <Calendar className={styles.statIcon} />
+            <span className={styles.statLabel}>{completionDate}</span>
+          </div>
+        </div>
+
+        {/* 대화 기록 리스트 */}
+        <div className={styles.completeHistoryArea}>
+          {turnsHistory.map((turn, index) => (
+            <TurnDisplay key={index} data={turn} index={index} />
+          ))}
+        </div>
+
+        <div className={styles.buttonsContainer}>
+          <button className={`${styles.actionButton} ${styles.tryAgain}`} onClick={handleTryAgain}>
+            Try again
+          </button>
+          <button className={`${styles.actionButton} ${styles.nextLearning}`} onClick={handleNextLearning}>
+            Next learning
+          </button>
+        </div>
+      </ContentSection>
+    </div>
+  );
 };
 
 export default RolePlayComplete;
