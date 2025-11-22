@@ -19,7 +19,7 @@ interface LearnInfoProps {
   topic: Topic;
   tab: 'topik' | 'casual';
   isOpen: boolean;
-  onClose: () => void;
+  onClose: () => void; // 이 함수는 상위 컴포넌트에서 navigate('/mainpage/learnList')를 포함해야 합니다.
   onConfirmStart: () => void;
 }
 
@@ -53,9 +53,14 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
   }`;
 
   useEffect(() => {
-    if (!isOpen) return;
-
     let timer: number | undefined;
+    
+    // ⭐ [수정] 모달이 닫히면 타이머 진행을 즉시 중단하고 상태를 초기화합니다.
+    if (!isOpen) { 
+      setCurrentStep(0); 
+      return;
+    }
+
     const totalSteps = INFO_STEPS_TEXT.length;
     const isMicControlStep = currentStep >= 3 && currentStep <= 5;
 
@@ -111,26 +116,26 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
     return styles.disabledInfo;
   };
 
-    // ⭐ [추가] 마이크 상태에 따라 이미지를 렌더링하는 함수
-    const renderMicIcon = () => {
-        const stateClass = getMicButtonState();
-        let micImageSrc = MicOff; // 기본값: off (흰색 배경)
-        
-        // styles.on 클래스가 검은색 배경이라고 가정합니다.
-        if (stateClass === styles.on) {
-            micImageSrc = MicOn; 
-        }
-        
-        // styles.off 또는 disabled 상태는 흰색 배경 (MicOff)을 사용합니다.
-        
-        return (
-            <img 
-                src={micImageSrc} 
-                alt="Mic Status" 
-                className={styles.micStatusImage} // CSS로 크기 및 위치 제어
-            />
-        );
-    };
+    // ⭐ [추가] 마이크 상태에 따라 이미지를 렌더링하는 함수
+    const renderMicIcon = () => {
+        const stateClass = getMicButtonState();
+        let micImageSrc = MicOff; // 기본값: off (흰색 배경)
+        
+        // styles.on 클래스가 검은색 배경이라고 가정합니다.
+        if (stateClass === styles.on) {
+            micImageSrc = MicOn; 
+        }
+        
+        // styles.off 또는 disabled 상태는 흰색 배경 (MicOff)을 사용합니다.
+        
+        return (
+            <img 
+                src={micImageSrc} 
+                alt="Mic Status" 
+                className={styles.micStatusImage} // CSS로 크기 및 위치 제어
+            />
+        );
+    };
 
   const getCardClass = () => {
     if (currentStep >= 3 && currentStep <= 8) {
@@ -175,7 +180,8 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
 
   return (
     <div className={modalClassName}>
-      <Header hasBackButton />
+      {/* ⭐ [핵심 수정]: customBackAction에 onClose 연결 */}
+      <Header hasBackButton customBackAction={onClose} />
 
       {/* 🔥 styles.mascotWrapper 적용 */}
       <div className={styles.mascotWrapper}>
@@ -251,8 +257,7 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
               onTouchEnd={handleMicUp}
               disabled={currentStep !== 3 && currentStep !== 4}
             >
-              {/* ⭐ [수정] 마이크 이모티콘 대신 이미지 렌더링 */}
-                {renderMicIcon()}
+              {renderMicIcon()}
             </button>
           </div>
         </ContentSection>

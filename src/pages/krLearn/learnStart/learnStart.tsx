@@ -9,13 +9,18 @@ import CorrectImg from '@/assets/Correct.png';
 import InCorrectImg from '@/assets/InCorrect.png';
 import MicOn from '@/assets/MicOn.png'; 
 import MicOff from '@/assets/MicOff.png';
-import ContentSection from '@/components/layout/ContentSection/ContentSection';
 
 // --- 인터페이스 정의 ---
-// ... (FirstVocabulary 정의를 포함한 나머지 인터페이스 정의 유지) ...
 interface ApiResponseBody<T> {
   status: { statusCode: string; message: string; description: string | null };
   body: T;
+}
+interface FirstVocabulary {
+  vocabularyId: number;
+  korean: string;
+  romanization: string;
+  english: string;
+  imageId: string;
 }
 interface LearningStartBody {
     sessionId: string | number;
@@ -26,15 +31,7 @@ interface LearningStartBody {
     firstVocabulary: FirstVocabulary | null;
     sessionTitle: string;
 }
-interface FirstVocabulary {
-  vocabularyId: number;
-  korean: string;
-  romanization: string;
-  english: string;
-  imageId: string;
-}
 type LearningStartResponse = ApiResponseBody<LearningStartBody>;
-
 interface NextItem {
   itemId: number;
   korean: string;
@@ -42,7 +39,6 @@ interface NextItem {
   english: string;
   imageUrl: string; 
 }
-
 interface GradeData {
   correct: boolean;
   moved: boolean;
@@ -51,7 +47,6 @@ interface GradeData {
   correctAnswer: string | null;
 }
 type GradeResponse = ApiResponseBody<GradeData>;
-
 interface LearningContent {
   topicTitle: string;
   itemId: number;
@@ -60,41 +55,39 @@ interface LearningContent {
   translation: string;
   imageUrl: string;
 }
-
 export interface WordResult {
   romnized: string;
   korean: string;
   translation: string;
   isCorrect: boolean;
 }
-
 interface LocationState {
   wordsToRetry?: WordResult[];
   isRetryWrong?: boolean;
   baseResultId?: number;
   categoryName?: string;
 }
-
 type LearningStatus = 'initial' | 'listen' | 'countdown' | 'speak';
 type ResultStatus = 'none' | 'processing' | 'correct' | 'incorrect';
 type ResultDisplayStatus = 'none' | 'initial_feedback' | 'meaning_revealed';
 
-// 🔥 [추가] Local Storage 키 및 타입 정의 (LearnList, LearnComplete와 동기화)
 const LS_LEARNING_TIMES_KEY = 'learning_completion_times';
-interface CompletionTime {
-    time: string; // 'Xm Ys' 형식
-    completedAt: number; // 타임스탬프
-}
-type LearningTimes = { [sessionId: number]: CompletionTime };
+// ... (clearLocalLearningTime, emptyContent, firstVocabToContent, nextItemToContent, WAV util functions 유지) ...
+
+const formatDuration = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}m ${seconds}s`;
+};
 
 // 🔥 [추가] 로컬 스토리지 완료 기록 삭제 함수
 const clearLocalLearningTime = (sessionId: number) => {
     try {
         const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
         if (storedData) {
-            const times: LearningTimes = JSON.parse(storedData);
-            delete times[sessionId]; // 해당 세션 ID의 기록 삭제
-            // String(sessionId) 키도 삭제해야 합니다.
+            const times: any = JSON.parse(storedData);
+            delete times[sessionId]; 
             if (times[String(sessionId) as unknown as number]) {
                 delete times[String(sessionId) as unknown as number];
             }
@@ -105,78 +98,70 @@ const clearLocalLearningTime = (sessionId: number) => {
     }
 };
 
-
 const emptyContent: LearningContent = {
-  topicTitle: 'Loading...',
-  itemId: 0,
-  korean: '',
-  romanized: '',
-  translation: '',
-  imageUrl: 'https://placehold.co/100x100/CCCCCC/000000?text=Wait',
+    topicTitle: 'Loading...',
+    itemId: 0,
+    korean: '',
+    romanized: '',
+    translation: '',
+    imageUrl: 'https://placehold.co/100x100/CCCCCC/000000?text=Wait',
 };
 
 const firstVocabToContent = (vocab: FirstVocabulary, title: string): LearningContent => ({
-  topicTitle: title,
-  itemId: vocab.vocabularyId,
-  korean: vocab.korean,
-  romanized: vocab.romanization,
-  translation: vocab.english,
-  imageUrl: vocab.imageId, 
+    topicTitle: title,
+    itemId: vocab.vocabularyId,
+    korean: vocab.korean,
+    romanized: vocab.romanization,
+    translation: vocab.english,
+    imageUrl: vocab.imageId, 
 });
 
 const nextItemToContent = (item: NextItem, topicTitle: string): LearningContent => ({
-  topicTitle,
-  itemId: item.itemId,
-  korean: item.korean,
-  romanized: item.romanization,
-  translation: item.english,
-  imageUrl: item.imageUrl || 'https://placehold.co/100x100/E64A19/FFFFFF?text=' + item.korean,
+    topicTitle,
+    itemId: item.itemId,
+    korean: item.korean,
+    romanized: item.romanization,
+    translation: item.english,
+    imageUrl: item.imageUrl || 'https://placehold.co/100x100/E64A19/FFFFFF?text=' + item.korean,
 });
 
-// 🔥 [필수] WAV 변환 유틸리티 (서버가 WebM을 못 읽는 경우 대비)
+// ... (WAV util functions 유지: writeWavHeader, convertToWav) ...
 const writeWavHeader = (sampleRate: number, dataLength: number) => {
-  const buffer = new ArrayBuffer(44);
-  const view = new DataView(buffer);
-
-  const writeString = (view: DataView, offset: number, string: string) => {
-    for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
-  };
-
-  writeString(view, 0, 'RIFF');
-  view.setUint32(4, 36 + dataLength, true);
-  writeString(view, 8, 'WAVE');
-  writeString(view, 12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true); 
-  view.setUint16(22, 1, true); 
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * 2, true);
-  view.setUint16(32, 2, true);
-  view.setUint16(34, 16, true); 
-  writeString(view, 36, 'data');
-  view.setUint32(40, dataLength, true);
-
-  return buffer;
+    const buffer = new ArrayBuffer(44);
+    const view = new DataView(buffer);
+    const writeString = (view: DataView, offset: number, string: string) => {
+        for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+    };
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + dataLength, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); 
+    view.setUint16(22, 1, true); 
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true); 
+    writeString(view, 36, 'data');
+    view.setUint32(40, dataLength, true);
+    return buffer;
 };
-
 const convertToWav = async (webmBlob: Blob): Promise<File> => {
-  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-  const arrayBuffer = await webmBlob.arrayBuffer();
-  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-  const channelData = audioBuffer.getChannelData(0); // Mono
-  const dataLength = channelData.length * 2; 
-  const buffer = new ArrayBuffer(dataLength);
-  const view = new DataView(buffer);
-
-  for (let i = 0; i < channelData.length; i++) {
-    const sample = Math.max(-1, Math.min(1, channelData[i]));
-    view.setInt16(i * 2, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-  }
-
-  const header = writeWavHeader(audioBuffer.sampleRate, dataLength);
-  const wavBlob = new Blob([header, buffer], { type: 'audio/wav' });
-  return new File([wavBlob], "recording.wav", { type: "audio/wav" });
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const arrayBuffer = await webmBlob.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    const channelData = audioBuffer.getChannelData(0); // Mono
+    const dataLength = channelData.length * 2; 
+    const buffer = new ArrayBuffer(dataLength);
+    const view = new DataView(buffer);
+    for (let i = 0; i < channelData.length; i++) {
+        const sample = Math.max(-1, Math.min(1, channelData[i]));
+        view.setInt16(i * 2, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+    }
+    const header = writeWavHeader(audioBuffer.sampleRate, dataLength);
+    const wavBlob = new Blob([header, buffer], { type: 'audio/wav' });
+    return new File([wavBlob], "recording.wav", { type: "audio/wav" });
 };
 
 
@@ -215,7 +200,6 @@ const LearnStart: React.FC = () => {
   const [countdownTime, setCountdownTime] = useState(0);
   const countdownRef = useRef<number | null>(null);
   
-  // 🔥 [추가] 학습 중단 확인 모달 상태
   const [showExitModal, setShowExitModal] = useState(false); 
 
 
@@ -228,11 +212,9 @@ const LearnStart: React.FC = () => {
   const isTranslationVisible = isInputTextVisible;
   const isIncorrectView = resultStatus === 'incorrect';
   
-  // 마이크가 녹음을 시작할 수 있는 기본적인 조건 (사용자가 버튼을 누를 수 있는 상태)
   const isMicActiveForRecording = (status === 'countdown' || status === 'speak') && resultStatus === 'none' && !isProcessing;
 
   const speakKoreanText = useCallback((text: string) => {
-    // 🔥 [수정] 모달이 떠 있으면 TTS 재생 중단
     if (!('speechSynthesis' in window) || showExitModal) return; 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'ko-KR';
@@ -260,7 +242,6 @@ const LearnStart: React.FC = () => {
   };
 
   const fetchLearningData = useCallback(async () => {
-    // ... (API 호출 로직 유지) ...
     const numericSessionId = Number(sessionIdParam);
     if (!sessionIdParam || isNaN(numericSessionId)) {
       alert("잘못된 접근입니다.");
@@ -296,9 +277,8 @@ const LearnStart: React.FC = () => {
     }
   }, [sessionIdParam, navigate, wordsToRetry, isRetryWrong, baseResultId]);
 
-  // 채점 로직 (생략)
+  // 채점 로직 (수정)
   const startGrading = useCallback(async (action: 'GRADE' | 'NEXT_AFTER_WRONG', audioFile: File | null = null) => {
-      // ... (채점 로직 유지) ...
       if (resultId === null) { console.error('Result ID is missing.'); return; }
       const numericSessionId = Number(sessionIdParam);
 
@@ -347,11 +327,19 @@ const LearnStart: React.FC = () => {
         }
 
         if (data.finished) {
-             const endTime = Date.now();
-             const duration = endTime - startTimeRef.current;
-             setTimeout(() => {
+            const endTime = Date.now();
+            const duration = endTime - startTimeRef.current;
+            
+            setTimeout(() => {
                 if (isRetryWrong) {
-                    navigate(`/mainpage/review/${content.topicTitle}`, { state: { baseResultId } });
+                    // ⭐ [수정] 재도전 결과가 서버에 자동 업데이트되었다고 가정하고,
+                    // 세션 ID만 가지고 Review 페이지로 이동하여 API로 최신 결과를 조회
+                    navigate('/mainpage/learn/review', {
+                        state: {
+                            sessionId: numericSessionId,
+                            isUpdateComplete: true, // 업데이트된 결과 조회 플래그
+                        }
+                    });
                 } else {
                     navigate('/mainpage/learn/complete', { 
                         state: { 

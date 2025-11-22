@@ -149,15 +149,15 @@ const LearnComplete: React.FC = () => {
     }
   };
 
-  const handleNextLearning = async () => {
+ const handleNextLearning = async () => {
     try {
       console.log(`[Next Learning] Fetching list for category: ${categoryName}`);
       
-      // 🔥 [수정 3] API 호출 시 category 파라미터 추가 (C007 에러 해결)
+      // 🔥 [수정 3] API 호출 시 category 파라미터 추가
       const response = await http.get<NextLearningResponse>('/learning/sessions', {
         params: { 
             limit: 20,
-            category: categoryName // 🔥 필수!
+            category: categoryName
         }
       });
 
