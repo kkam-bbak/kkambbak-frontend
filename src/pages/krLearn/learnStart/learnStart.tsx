@@ -282,7 +282,7 @@ const LearnStart: React.FC = () => {
       if (action === 'GRADE' && !audioFile) {
           if (isProcessingRef.current) return; 
 
-          console.warn("⚠️ 오디오 파일 없음: 시간 초과 또는 녹음 실패로 간주 -> 오답 처리");
+          console.warn("오디오 파일 없음: 시간 초과 또는 녹음 실패로 간주 -> 오답 처리");
           setResultStatus('incorrect'); 
           return;
       }
@@ -545,7 +545,7 @@ const LearnStart: React.FC = () => {
     if (isProcessing) return 'Grading...';
 
     if (status === 'initial') return 'Start!';
-    if (status === 'countdown' || status === 'speak') return 'What was it? Tell me';
+    if (status === 'countdown' || status === 'speak') return 'What was it? speak now!';
     return 'Listen carefully';
   })();
 
