@@ -7,6 +7,7 @@ import CharacterWrong from '../../assets/Character-Wrong.png';
 import CharacterGloomy from '../../assets/Character-Gloomy.png';
 import ArrowBack from '../../assets/Arrow-back.png';
 import styles from './VerifyEmail.module.css';
+import Button from '@/components/Button/Button';
 
 type ErrorCode =
   | 'AT004'
@@ -299,15 +300,15 @@ export default function VerifyEmail() {
           {/* 버튼 그룹 */}
           <div className={styles.buttonGroup}>
             {!isExpired && !isRateLimitExceeded && (
-              <button
+              <Button
                 className={`${styles.verifyButton} ${styles.confirmBtn}`}
                 onClick={handleVerifyOtp}
                 disabled={isLoading || otp.length === 0}
               >
                 {isLoading ? 'Verifying...' : 'Confirm'}
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               className={`${styles.verifyButton} ${styles.resendBtn}`}
               onClick={
                 isRateLimitExceeded
@@ -321,7 +322,7 @@ export default function VerifyEmail() {
                 : isLoading
                 ? 'Sending...'
                 : 'Resend email'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
