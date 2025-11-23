@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react'; // useCallback 추가
 import { useNavigate } from 'react-router-dom';
-import { Clock } from 'lucide-react'; 
+//import { Clock } from 'lucide-react'; 
 import { http } from '@/apis/http';
 import styles from './roleList.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
+import Clock from '@/assets/Clock.png';
 
 // --- LocalStorage 타입 정의 ---
 const LS_KEY_COMPLETIONS = 'roleplay_completions';
@@ -226,11 +227,14 @@ const RoleList: React.FC = () => {
                   )}
                 </div>
 
+                <hr className={styles.divider}/>
+
                 <div className={styles.roleItemInfo}>
                   <span className={styles.roleTime}>
-                        {role.time}
-                    </span>
-                  <Clock className={styles.roleTimeIcon} />
+                    {role.time}
+                  </span>
+                
+                  <img src={Clock} alt="time" className={styles.roleTimeIcon} />
                 </div>
               </div>
             );
