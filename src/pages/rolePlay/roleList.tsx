@@ -160,7 +160,7 @@ const RoleList: React.FC = () => {
                 <h2 className={styles.roleListTitle}>Role Play</h2>
             </div>
             <div className={styles.roleListItemsContainer}>
-                <p style={{textAlign: 'center', color: 'white'}}>시나리오를 불러오는 중입니다...</p>
+                <p style={{textAlign: 'center', color: 'white'}}>시나리오 목록을 불러오는 중입니다...</p>
             </div>
         </ContentSection>
     </div>
@@ -202,8 +202,8 @@ const RoleList: React.FC = () => {
         <div className={styles.roleListItemsContainer}>
           {scenarios.map((role) => {
             const isSelected = role.id === selectedRole;
-            const isStartVisible = isSelected && role.isSubscribed;
-            const buttonText = role.isCompleted ? 'Learn Again' : 'Start';
+            // const isStartVisible = isSelected && role.isSubscribed;
+            // const buttonText = role.isCompleted ? 'Learn Again' : 'Start';
 
             return (
               <div
@@ -214,16 +214,31 @@ const RoleList: React.FC = () => {
                 <div className={styles.roleItemHeader}>
                   <span className={styles.roleItemTitle}>{role.title}</span>
 
-                  {isStartVisible && (
+                  {/* ⭐ [수정] 버튼 렌더링 로직 변경 */}
+                  {role.isCompleted ? (
+                    /* Case 1: 학습 완료됨 -> 선택 여부 상관없이 항상 'Learn Again' 표시 */
                     <button
-                      className={styles.roleStartButton}
+                      className={styles.learnAgainButton} // 새로 만든 스타일 적용
                       onClick={(e) => {
                         e.stopPropagation();
                         handleStart(role.id);
                       }}
                     >
-                      {buttonText}
+                      Learn Again
                     </button>
+                  ) : (
+                    /* Case 2: 학습 미완료 -> 선택되었을 때(isSelected)만 'Start' 표시 */
+                    isSelected && (
+                      <button
+                        className={styles.roleStartButton} // 기존 흰색 버튼 스타일
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStart(role.id);
+                        }}
+                      >
+                        Start
+                      </button>
+                    )
                   )}
                 </div>
 

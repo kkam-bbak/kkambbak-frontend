@@ -5,6 +5,12 @@ import { http } from '../../apis/http';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
+import SoundImg from '@/assets/soundButton.png';
+import MicOn from '@/assets/MicOn.png';
+import MicOff from '@/assets/MicOff.png';
+import MicBase from '@/assets/MicBase.png';
+import TailAI from '@/assets/TailAI.png';
+import TailUser from '@/assets/TailUser.png';
 
 // --- 인터페이스 정의 ---
 interface ApiResponseBody<T> {
@@ -12,7 +18,6 @@ interface ApiResponseBody<T> {
   body: T;
 }
 
-// ... (나머지 인터페이스 정의 동일) ...
 type NextDialogueResponse = ApiResponseBody<DialogueData>;
 type StartRoleplayResponse = ApiResponseBody<DialogueData>;
 interface SessionSummary {
@@ -44,41 +49,40 @@ interface DialogueData {
   coreWord: string;
   role: string;
   choices?: ChoiceOption[];
-  result?: string; 
-  userResponseData?: { 
-        selectedId: number;
-        text: string;
-        romanized: string;
-        english: string;
-        finalResult: string;
-    }; 
+  result?: string;
+  userResponseData?: {
+    selectedId: number;
+    text: string;
+    romanized: string;
+    english: string;
+    finalResult: string;
+  };
   sessionTitle: string;
 }
 const LS_KEY_COMPLETIONS = 'roleplay_completions';
 interface CompletionData {
   isCompleted: boolean;
-  actualTime: number; 
+  actualTime: number;
 }
 
 type CompletedScenarios = { [scenarioId: number]: CompletionData };
 
-// ... (localStorage, API 함수들 동일) ...
 const saveCompletionToLocalStorage = (scenarioId: number, elapsedMinutes: number) => {
-    try {
-        const storedData = localStorage.getItem(LS_KEY_COMPLETIONS);
-        const completions: CompletedScenarios = storedData ? JSON.parse(storedData) : {};
-        completions[scenarioId] = { isCompleted: true, actualTime: elapsedMinutes };
-        localStorage.setItem(LS_KEY_COMPLETIONS, JSON.stringify(completions));
-        console.log(`✅ Scenario ${scenarioId} completion saved to LocalStorage.`);
-    } catch (e) {
-        console.error('Failed to save completion to LocalStorage', e);
-    }
+  try {
+    const storedData = localStorage.getItem(LS_KEY_COMPLETIONS);
+    const completions: CompletedScenarios = storedData ? JSON.parse(storedData) : {};
+    completions[scenarioId] = { isCompleted: true, actualTime: elapsedMinutes };
+    localStorage.setItem(LS_KEY_COMPLETIONS, JSON.stringify(completions));
+    console.log(`✅ Scenario ${scenarioId} completion saved to LocalStorage.`);
+  } catch (e) {
+    console.error('Failed to save completion to LocalStorage', e);
+  }
 };
 
 const startRoleplaySession = async (scenarioId: number): Promise<DialogueData> => {
   try {
     const response = await http.post<StartRoleplayResponse>('/roleplay/start', {}, { params: { scenarioId } });
-    return response.data.body; 
+    return response.data.body;
   } catch (error) {
     console.error('Failed to start roleplay session:', error);
     throw error;
@@ -87,8 +91,8 @@ const startRoleplaySession = async (scenarioId: number): Promise<DialogueData> =
 
 const getNextDialogue = async (sessionId: number): Promise<DialogueData> => {
   try {
-    const response = await http.post<NextDialogueResponse>(`/roleplay/next`, {}, { params: { sessionId } }); 
-    return response.data.body; 
+    const response = await http.post<NextDialogueResponse>(`/roleplay/next`, {}, { params: { sessionId } });
+    return response.data.body;
   } catch (error) {
     console.error('Failed to get next dialogue:', error);
     throw error;
@@ -117,7 +121,7 @@ const evaluatePronunciation = async (audioFile: File, sessionId: number, dialogu
 const completeRoleplaySession = async (sessionId: number): Promise<SessionSummary> => {
   try {
     const response = await http.post<CompleteRoleplayResponse>('/roleplay/complete', {}, { params: { sessionId } });
-    return response.data.body; 
+    return response.data.body;
   } catch (error) {
     console.error('❌ Failed to complete roleplay session:', error);
     throw error;
@@ -156,40 +160,100 @@ const getCharacterImage = (step: string, gradingResult: string | null): MascotIm
   return 'basic';
 };
 
+interface TurnContentBoxProps {
+    data: DialogueData;
+    isTtsPlaying: boolean;
+    startTtsAndListen: (text: string) => void;
+}
+
+const TurnContentBox = React.memo(({ data, isTtsPlaying, startTtsAndListen }: TurnContentBoxProps) => {
+    const isRecordingTurn = data.speaker === 'AI';
+    const isUser = data.speaker === 'USER'; 
+    const romanizedClass = styles.correctRom; 
+    const role = data.speaker;
+    
+    const textAlignmentClass = isUser ? styles.textRight : '';
+    const rowDirectionClass = isUser ? styles.rowReverse : '';
+    const rolePositionClass = isUser ? styles.userRole : styles.aiRole;
+
+    return (
+        <div className={styles.turnWrapper}>
+            <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
+                <div className={`${styles.textLine} ${styles.koreanLine} ${rowDirectionClass}`}>
+                    <span className={`${styles.koreanText} ${styles.historyKorean} ${textAlignmentClass}`}>
+                        {data.korean}
+                    </span>
+                    
+                    {(isRecordingTurn || isUser) && (
+                        <button className={`${styles.ttsButton} ${styles.active}`} onClick={() => startTtsAndListen(data.korean)} disabled={isTtsPlaying}>
+                             <img src={SoundImg} alt="TTS" style={{ width: '20px', height: '20px', verticalAlign: 'middle' }} />
+                        </button>
+                    )}
+                </div>
+
+                <hr className={styles.divider}/>
+
+                <div className={`${styles.textLine} ${styles.romanizedLine} ${rowDirectionClass}`}>
+                    <span className={`${styles.romanizedText} ${styles.historyRomanized} ${romanizedClass} ${textAlignmentClass}`}>
+                        {data.romanized}
+                    </span>
+                    <span className={`${styles.smallMicIcon} ${styles.active}`} style={{ marginLeft: '5px', marginRight: '5px' }}>
+                        <img src={MicBase} alt="Mic" style={{ width: '20px', height: '20px', verticalAlign: 'middle' }} />
+                    </span>
+                </div>
+
+                <hr className={styles.divider}/>
+
+                <span className={`${styles.englishText} ${styles.historyEnglish} ${textAlignmentClass}`}>
+                    {data.english}
+                </span>
+
+                <img 
+                    src={isUser ? TailUser : TailAI} 
+                    className={`${styles.tailIcon} ${isUser ? styles.tailUser : styles.tailAI}`} 
+                    alt="tail" 
+                />
+            </div>
+
+            <div className={`${styles.roleContainer} ${styles.costomer} ${rolePositionClass}`}>
+                <span className={styles.roleTag}>{role}</span>
+            </div>
+        </div>
+    );
+});
+
+
 const RolePlay: React.FC = () => {
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { roleId } = useParams<{ roleId: string }>(); 
+  const { roleId } = useParams<{ roleId: string }>();
   const scenarioId = roleId;
 
-  // ... (LocationState 인터페이스 등 동일) ...
   interface LocationState {
-      wordsToRetry?: any[];
-      isRetryWrong?: boolean;
-      baseResultId?: number;
-      scenarioTitle?: string; 
+    wordsToRetry?: any[];
+    isRetryWrong?: boolean;
+    baseResultId?: number;
+    scenarioTitle?: string;
   }
-  
+
   const location = useLocation();
-  const state = location.state as LocationState; 
+  const state = location.state as LocationState;
 
-  const initialTitle = state?.scenarioTitle || 'Role Play_At a Cafe'; 
-  const [scenarioTitle, setScenarioTitle] = useState(initialTitle); 
+  const initialTitle = state?.scenarioTitle || 'Role Play_At a Cafe';
+  const [scenarioTitle, setScenarioTitle] = useState(initialTitle);
 
-  // ... (Refs 동일) ...
-  const hasFetched = useRef(false); 
+  const hasFetched = useRef(false);
   const startTimeRef = useRef<number>(0);
-  const resultsRef = useRef<any[]>([]); 
+  const resultsRef = useRef<any[]>([]);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const ttsPlayedRef = useRef<{ [key: string]: boolean }>({});
   const audioMimeTypeRef = useRef<string>('audio/wav');
   const sessionStartTimeRef = useRef<number>(Date.now());
 
-  // ... (States 동일) ...
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [currentDialogue, setCurrentDialogue] = useState<DialogueData | null>(null);
-  const [turnHistory, setTurnHistory] = useState<DialogueData[]>([]); 
+  const [turnHistory, setTurnHistory] = useState<DialogueData[]>([]);
   const [practiceLineData, setPracticeLineData] = useState<DialogueData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -202,32 +266,28 @@ const RolePlay: React.FC = () => {
   const [selectedChoiceId, setSelectedChoiceId] = useState<number | null>(null);
   const [ttsOptionId, setTtsOptionId] = useState<number | null>(null);
   const [isLoadingNextTurn, setIsLoadingNextTurn] = useState(false);
-  const [selectedChoiceData, setSelectedChoiceData] = useState<DialogueData | null>(null); 
+  const [selectedChoiceData, setSelectedChoiceData] = useState<DialogueData | null>(null);
   
+  const [showLoadingMessage, setShowLoadingMessage] = useState(false);
+
   const timerRef = useRef<number | null>(null);
   const flowTimerRef = useRef<number | null>(null);
 
-  // ⭐ [추가] 모달 상태
   const [showExitModal, setShowExitModal] = useState(false);
 
-  // ⭐ [수정] 뒤로 가기 핸들러: 모달 띄우기
   const handleBackClick = useCallback(() => {
-      setShowExitModal(true);
+    setShowExitModal(true);
   }, []);
 
-  // ⭐ [추가] 모달 Yes 핸들러: 목록으로 이동
   const handleExitConfirm = useCallback(() => {
-      setShowExitModal(false);
-      navigate('/mainpage/roleList');
+    setShowExitModal(false);
+    navigate('/mainpage/roleList');
   }, [navigate]);
 
-  // ⭐ [추가] 모달 No 핸들러: 모달 닫기 (계속 진행)
   const handleExitCancel = useCallback(() => {
-      setShowExitModal(false);
+    setShowExitModal(false);
   }, []);
 
-
-  // ... (speakKoreanText, initializeSession 등 기존 함수 동일) ...
   const speakKoreanText = useCallback((text: string, onFinish: ((success: boolean) => void) | null = null) => {
     if (!('speechSynthesis' in window)) { if (onFinish) onFinish(false); return; }
     if (window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); setTimeout(() => speakKoreanText(text, onFinish), 50); return; }
@@ -251,18 +311,18 @@ const RolePlay: React.FC = () => {
         setSessionId(initialDialogue.sessionId);
         setCurrentDialogue(initialDialogue);
         setError(null);
-        
+
         if (initialDialogue.sessionTitle) {
-            setScenarioTitle(initialDialogue.sessionTitle);
+          setScenarioTitle(initialDialogue.sessionTitle);
         }
       } catch (err: any) {
         const status = err?.response?.data?.status;
         const errorMsg = status?.message || err?.message || 'Unknown error';
 
         if (errorMsg.includes('Credit limit') || errorMsg === 'Credit limit standard') {
-            alert("크레딧이 부족합니다. 충전 페이지로 이동합니다.");
-            navigate('/payment/checkout');
-            return; 
+          alert("크레딧이 부족합니다. 충전 페이지로 이동합니다.");
+          navigate('/payment/checkout');
+          return;
         }
 
         setError(`Failed to start roleplay: ${errorMsg}`);
@@ -276,11 +336,25 @@ const RolePlay: React.FC = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (scrollRef.current) {
+        // ⭐ [수정] 애니메이션 없이 즉시 이동
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
-    }, 0);
+    }, 100);
     return () => clearTimeout(timeout);
-  }, [turnHistory, step, selectedChoiceId]);
+  }, [turnHistory, step, selectedChoiceId, showLoadingMessage]);
+
+  useEffect(() => {
+    // ⭐ [수정] NodeJS.Timeout 제거 -> ReturnType<typeof setTimeout> 사용 (또는 타입 추론)
+    let loadingTimer: ReturnType<typeof setTimeout>;
+    if (isLoadingNextTurn) {
+        loadingTimer = setTimeout(() => {
+            setShowLoadingMessage(true);
+        }, 2000);
+    } else {
+        setShowLoadingMessage(false);
+    }
+    return () => clearTimeout(loadingTimer);
+  }, [isLoadingNextTurn]);
 
   const moveToNextTurn = useCallback(async (lastTurnAdded?: DialogueData) => {
     if (!sessionId) return;
@@ -312,13 +386,13 @@ const RolePlay: React.FC = () => {
           const elapsedMs = Date.now() - sessionStartTimeRef.current;
           const minutes = Math.floor(elapsedMs / 60000);
           const seconds = Math.floor((elapsedMs % 60000) / 1000);
-          
+
           const scenarioIntId = parseInt(scenarioId || '0');
           if (scenarioIntId > 0) {
-              const elapsedMinutes = elapsedMs / 60000;
-              saveCompletionToLocalStorage(scenarioIntId, elapsedMinutes);
+            const elapsedMinutes = elapsedMs / 60000;
+            saveCompletionToLocalStorage(scenarioIntId, elapsedMinutes);
           }
-          
+
           const timeTaken = `${minutes}m ${seconds}s`;
           const finalTurnHistory = lastTurnAdded ? [...turnHistory, lastTurnAdded] : turnHistory;
 
@@ -328,8 +402,8 @@ const RolePlay: React.FC = () => {
               scenarioId: parseInt(scenarioId || '0'),
               sessionSummary,
               timeTaken,
-              rolePlayName: scenarioTitle, 
-              turns: finalTurnHistory 
+              rolePlayName: scenarioTitle,
+              turns: finalTurnHistory
             }
           });
         } catch (completeErr) {
@@ -345,7 +419,6 @@ const RolePlay: React.FC = () => {
     }
   }, [sessionId, navigate, turnHistory, scenarioId, scenarioTitle]);
 
-  // ... (handleRecordingGrading, handlePracticeGrading, handleTtsPlaybackFinished 등 기존 함수 동일) ...
   const handleRecordingGrading = useCallback((feedback: string) => {
     if (timerRef.current) clearInterval(timerRef.current);
     setIsRecording(false);
@@ -358,7 +431,7 @@ const RolePlay: React.FC = () => {
         const finalTurnData = {
           ...currentDialogue,
           result: resultDisplay,
-          userResponseData: { text: currentDialogue.korean, romanized: currentDialogue.romanized, english: currentDialogue.english, finalResult: resultDisplay, selectedId: 0 } 
+          userResponseData: { text: currentDialogue.korean, romanized: currentDialogue.romanized, english: currentDialogue.english, finalResult: resultDisplay, selectedId: 0 }
         };
         setTurnHistory(prev => [...prev, finalTurnData]);
         moveToNextTurn(finalTurnData);
@@ -376,29 +449,29 @@ const RolePlay: React.FC = () => {
     setTimeout(() => {
       let finalTurn: DialogueData | undefined = undefined;
 
-      if (practiceLineData && selectedChoiceData) { 
+      if (practiceLineData && selectedChoiceData) {
         finalTurn = {
-          ...selectedChoiceData, 
-          ...practiceLineData, 
-          dialogueId: practiceLineData.dialogueId, 
-          result: resultDisplay, 
+          ...selectedChoiceData,
+          ...practiceLineData,
+          dialogueId: practiceLineData.dialogueId,
+          result: resultDisplay,
           userResponseData: {
-              selectedId: selectedChoiceData.userResponseData?.selectedId || 0,
-              text: practiceLineData.korean,
-              romanized: practiceLineData.romanized,
-              english: practiceLineData.english,
-              finalResult: resultDisplay, 
+            selectedId: selectedChoiceData.userResponseData?.selectedId || 0,
+            text: practiceLineData.korean,
+            romanized: practiceLineData.romanized,
+            english: practiceLineData.english,
+            finalResult: resultDisplay,
           },
           speaker: 'USER'
         };
         setTurnHistory(prev => [...prev, finalTurn!]);
       }
-      
-      setSelectedChoiceData(null); 
-      setPracticeLineData(null); 
+
+      setSelectedChoiceData(null);
+      setPracticeLineData(null);
       moveToNextTurn(finalTurn);
     }, 1500);
-  }, [moveToNextTurn, selectedChoiceData, practiceLineData]); 
+  }, [moveToNextTurn, selectedChoiceData, practiceLineData]);
 
   const handleTtsPlaybackFinished = useCallback((success) => {
     setIsTtsPlaying(false);
@@ -652,17 +725,13 @@ const RolePlay: React.FC = () => {
       }, 1500);
     }
     if (step === STEPS.LISTEN_DONE) {
-      flowTimerRef.current = setTimeout(() => {
         setStep(STEPS.SPEAK_SETUP);
-      }, 0);
     }
     if (step === STEPS.SPEAK_SETUP && currentDialogue?.speaker === 'AI') {
       if (timerRef.current) clearInterval(timerRef.current);
     }
     if (step === STEPS.PRACTICE_LISTEN_DONE) {
-      flowTimerRef.current = setTimeout(() => {
         setStep(STEPS.PRACTICE_SPEAK);
-      }, 0);
     }
     if (step === STEPS.PRACTICE_SPEAK) {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -691,175 +760,238 @@ const RolePlay: React.FC = () => {
   const isPracticeFlow = step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK || step === STEPS.PRACTICE_GRADING || step === STEPS.PRACTICE_LISTEN_DONE;
   const isScrollLocked = step === STEPS.CHOICE_SETUP || step === STEPS.CHOICE_FEEDBACK;
 
-  const TurnContentBox = ({ data }: { data: DialogueData }) => {
-      const isRecordingTurn = data.speaker === 'AI';
-      const romanizedClass = styles.correctRom; 
-      const role = data.speaker;
-      const mainKoreanText = data.korean; 
-      const mainRomanizedText = data.romanized;
-      const mainEnglishText = data.english;
-
-      return (
-          <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
-              <div className={`${styles.textLine} ${styles.koreanLine}`}>
-                  <span className={`${styles.koreanText} ${styles.historyKorean}`}>{mainKoreanText}</span>
-                  {isRecordingTurn && <button className={`${styles.ttsButton} ${styles.active}`} onClick={() => startTtsAndListen(data.korean)} disabled={isTtsPlaying}>🔊</button>}
-                   <span className={`${styles.smallMicIcon} ${styles.active}`} style={{marginLeft:'5px'}}>🎤</span>
-              </div>
-              <div className={`${styles.textLine} ${styles.romanizedLine}`}>
-                  <span className={`${styles.romanizedText} ${styles.historyRomanized} ${romanizedClass}`}>{mainRomanizedText}</span>
-              </div>
-              <span className={`${styles.englishText} ${styles.historyEnglish}`}>{mainEnglishText}</span>
-              <div className={`${styles.roleContainer} ${styles.customer}`}><span className={styles.roleTag}>{role}</span></div>
-          </div>
-      );
-  };
-
   const renderActiveInput = () => {
-      const isCurrentlySpeaking = window.speechSynthesis.speaking;
-      if (isLoadingNextTurn) {
-          return null;
-      }
-      if (selectedChoiceData && step !== STEPS.CHOICE_SETUP && !isPracticeFlow) {
-          return <TurnContentBox data={selectedChoiceData} />;
-      }
-      if (currentDialogue.speaker === 'AI' && !isPracticeFlow) {
-          const isTtsActionable = step === STEPS.LISTEN || step === STEPS.SPEAK_SETUP;
-          const isMicActionable = step === STEPS.SPEAK_SETUP || step === STEPS.RECORDING || step === STEPS.LISTEN_DONE;
-          const mainMicButtonClass = isMicActionable ? (isRecording ? styles.on : styles.off) : `${styles.off} ${styles.disabled}`;
-          const getRomClass = () => {
-               if (step === STEPS.GRADING) {
-                   return gradingResult === 'CORRECT' ? styles.correctActive : (gradingResult === 'INCORRECT' || gradingResult === 'OOS' ? styles.incorrectActive : '');
-               }
-               return '';
-          };
-          const currentGradeClass = getRomClass();
-          return (
-              <div className={styles.activeTurnRecordingFlow}>
-                  <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
-                      <div className={`${styles.textLine} ${styles.koreanLine}`}>
-                          <span className={`${styles.koreanText} ${currentGradeClass}`}>{currentDialogue.korean}</span>
-                          <button className={`${styles.ttsButton} ${isTtsActionable ? styles.active : ''}`} onClick={handleListenTtsClick} disabled={!isTtsActionable || isCurrentlySpeaking}>🔊</button>
-                      </div>
-                      <div className={`${styles.textLine} ${styles.romanizedLine}`}>
-                          <span className={`${styles.romanizedText} ${currentGradeClass}`}>{currentDialogue.romanized}</span>
-                          <span className={`${styles.smallMicIcon}${isRecording || isMicActionable ? styles.active : ''}`}>🎤</span>
-                      </div>
-                      <span className={`${styles.englishText} ${currentGradeClass}`}>{currentDialogue.english}</span>
-                      <div className={`${styles.roleContainer} ${styles.costomer}`}><span className={styles.roleTag}>{currentDialogue.speaker}</span></div>
-                  </div>
-                  <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
-                       <div className={styles.micButtonWrapper}>
-                           <button className={`${styles.mainMicButton} ${mainMicButtonClass}`}
-                               onMouseDown={handleMicPress} onMouseUp={handleMicRelease}
-                               onTouchStart={handleMicPress} onTouchEnd={handleMicRelease}
-                               disabled={!isMicActionable || isCurrentlySpeaking}>
-                               <span className={styles.mainMicIcon}>🎤<span className={styles.micStatusText}>{isRecording ? "ON" : "OFF"}</span></span>
-                           </button>
-                       </div>
-                   </div>
-              </div>
-          );
-      } 
-      else if (currentDialogue.speaker === 'USER' && !isPracticeFlow) {
-          const customerData = currentDialogue.choices;
-          if (!customerData || customerData.length === 0) return <div>No choices</div>;
-          const isDisabled = step === STEPS.CHOICE_FEEDBACK || isCurrentlySpeaking;
-          const isSubmitActive = selectedChoiceId !== null;
-          const submitButtonClass = isSubmitActive ? styles.on : `${styles.off} ${styles.disabled}`;
-          let displayOption = customerData.find(c => c.id === selectedChoiceId);
-          if (!displayOption && step === STEPS.CHOICE_SETUP) displayOption = customerData[0];
-          else if (step === STEPS.CHOICE_FEEDBACK) displayOption = undefined; 
-          return (
-              <>
-                  {displayOption && step === STEPS.CHOICE_SETUP && (
-                      <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
-                          <div className={`${styles.textLine} ${styles.koreanLine}`}>
-                              <span className={styles.koreanText}>{displayOption.korean}</span>
-                              <button className={`${styles.ttsButton} ${isCurrentlySpeaking && ttsOptionId === displayOption.id ? styles.active : styles.choiceTtsInactive}`}
-                                  onClick={() => handleChoiceOptionClick(displayOption.id, displayOption.korean)} disabled={isDisabled}>🔊</button>
-                          </div>
-                          <div className={`${styles.textLine} ${styles.romanizedLine}`}><span className={styles.romanizedText}>{displayOption.romanized}</span></div>
-                          <span className={styles.englishText}>{displayOption.english}</span>
-                          <div className={`${styles.roleContainer} ${styles.costomer}`}><span className={styles.roleTag}>{currentDialogue.speaker}</span></div>
-                      </div>
-                  )}
-                  <div className={`${styles.micArea} ${styles.choiceButton}`}>
-                      {customerData.map(option => (
-                          <button key={option.id} className={`${styles.choiceButtonAction} ${option.id === selectedChoiceId ? styles.selected : ''}`}
-                              onClick={() => handleChoiceOptionClick(option.id, option.korean)} disabled={isDisabled}>{option.id}</button>
-                      ))}
-                      <button className={`${styles.mainMicButton} ${styles.selectSubmitButton} ${step === STEPS.CHOICE_FEEDBACK ? (gradingResult === 'CORRECT' ? styles.correctSubmit : styles.incorrectSubmit) : ''} ${submitButtonClass}`}
-                          onClick={handleChoiceSelect} disabled={!isSubmitActive}>
-                          <span className={styles.selectSubmitText}>Select</span>
-                      </button>
-                  </div>
-              </>
-          );
-      }
-      else if (isPracticeFlow && practiceLineData) {
-          const practiceButtonActive = step === STEPS.PRACTICE_SPEAK || step === STEPS.PRACTICE_LISTEN_DONE;
-          const practiceMainMicClass = practiceButtonActive ? (isRecording ? styles.on : styles.off) : `${styles.off} ${styles.disabled}`;
-          const currentGradeClass = step === STEPS.PRACTICE_GRADING ? (gradingResult === 'CORRECT' ? styles.correctActive : styles.incorrectActive) : '';
-          const isTtsActionable = step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK;
-          return (
-               <div className={styles.activeTurnRecordingFlow}>
-                   <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
-                       <div className={`${styles.textLine} ${styles.koreanLine}`}>
-                           <span className={`${styles.koreanText} ${currentGradeClass}`}>{practiceLineData.korean}</span>
-                           <button 
-                               className={`${styles.ttsButton} ${isTtsActionable ? styles.active : ''}`} 
-                               onClick={handleListenTtsClick} 
-                               disabled={!isTtsActionable || isCurrentlySpeaking}
-                           >🔊</button>
-                       </div>
-                       <div className={`${styles.textLine} ${styles.romanizedLine}`}>
-                           <span className={`${styles.romanizedText} ${currentGradeClass}`}>{practiceLineData.romanized}</span>
-                           <span className={`${styles.smallMicIcon} ${isRecording || practiceButtonActive ? styles.active : ''}`}>🎤</span>
-                       </div>
-                       <span className={`${styles.englishText} ${currentGradeClass}`}>{practiceLineData.english}</span>
-                       <div className={`${styles.roleContainer} ${styles.customer}`}>
-                           <span className={styles.roleTag}>{practiceLineData.speaker}</span>
-                       </div>
-                   </div>
-                   <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
-                       <div className={styles.micButtonWrapper}>
-                           <button className={`${styles.mainMicButton} ${practiceMainMicClass}`}
-                               onMouseDown={handleMicPress} onMouseUp={handleMicRelease}
-                               onTouchStart={handleMicPress} onTouchEnd={handleMicRelease}
-                               disabled={!practiceButtonActive || isCurrentlySpeaking}>
-                               <span className={styles.mainMicIcon}>🎤<span className={styles.micStatusText}>{isRecording ? "ON" : "OFF"}</span></span>
-                           </button>
-                       </div>
-                   </div>
-               </div>
-          );
-      }
-      return <></>;
+    const isCurrentlySpeaking = window.speechSynthesis.speaking;
+    
+    // 로딩 처리 (기존 코드 유지)
+    if (isLoadingNextTurn) {
+        if (showLoadingMessage) {
+             return (
+                <div className={styles.activeTurnRecordingFlow}>
+                    <div className={styles.turnWrapper}>
+                        <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
+                            <div style={{padding: '20px 15px', display: 'flex', justifyContent: 'center'}}>
+                                <span className={styles.koreanText}>Loading...</span>
+                            </div>
+                            <img src={TailAI} className={`${styles.tailIcon} ${styles.tailAI}`} alt="tail" />
+                        </div>
+                        <div className={`${styles.roleContainer} ${styles.costomer} ${styles.aiRole}`}>
+                            <span className={styles.roleTag}>AI</span>
+                        </div>
+                    </div>
+                </div>
+             );
+        }
+        return null;
+    }
+
+    // ⭐ [수정] step이 CHOICE_FEEDBACK일 때는 TurnContentBox(기록용)로 렌더링하지 않고
+    // 아래의 CASE 2(선택지 UI)로 넘겨서 화면을 유지하게 합니다.
+    if (
+      selectedChoiceData && 
+      step !== STEPS.CHOICE_SETUP && 
+      step !== STEPS.CHOICE_FEEDBACK && // 👈 이 조건 추가!
+      !isPracticeFlow
+    ) {
+        return <TurnContentBox data={selectedChoiceData} isTtsPlaying={isTtsPlaying} startTtsAndListen={startTtsAndListen} />;
+    }
+    
+    // CASE 1: AI Speaker (Active)
+    if (currentDialogue.speaker === 'AI' && !isPracticeFlow) {
+        const isTtsActionable = step === STEPS.LISTEN || step === STEPS.SPEAK_SETUP;
+        const isMicActionable = step === STEPS.SPEAK_SETUP || step === STEPS.RECORDING || step === STEPS.LISTEN_DONE;
+        const mainMicButtonClass = isMicActionable ? (isRecording ? styles.on : styles.off) : `${styles.off} ${styles.disabled}`;
+        
+        const getRomClass = () => {
+             if (step === STEPS.GRADING) {
+                 return gradingResult === 'CORRECT' ? styles.correctActive : (gradingResult === 'INCORRECT' || gradingResult === 'OOS' ? styles.incorrectActive : '');
+             }
+             return '';
+        };
+        const currentGradeClass = getRomClass();
+
+        return (
+            <div className={styles.activeTurnRecordingFlow}>
+                <div className={styles.turnWrapper}>
+                    <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
+                        <div className={`${styles.textLine} ${styles.koreanLine}`}>
+                            <span className={`${styles.koreanText} ${currentGradeClass}`}>{currentDialogue.korean}</span>
+                            <button className={`${styles.ttsButton} ${isTtsActionable ? styles.active : ''}`} onClick={handleListenTtsClick} disabled={!isTtsActionable || isCurrentlySpeaking}>
+                                <img src={SoundImg} alt="TTS" style={{ width: '20px', height: '20px' }} />
+                            </button>
+                        </div>
+                        <hr className={styles.divider}/>
+                        <div className={`${styles.textLine} ${styles.romanizedLine}`}>
+                            <span className={`${styles.romanizedText} ${currentGradeClass}`}>{currentDialogue.romanized}</span>
+                            <span className={`${styles.smallMicIcon}${isRecording || isMicActionable ? styles.active : ''}`}>
+                                <img src={MicBase} alt="Mic Indicator" style={{ width: '20px', height: '20px' }} />
+                            </span>
+                        </div>
+                        <hr className={styles.divider}/>
+                        <span className={`${styles.englishText} ${currentGradeClass}`}>{currentDialogue.english}</span>
+                        
+                        <img src={TailAI} className={`${styles.tailIcon} ${styles.tailAI}`} alt="tail" />
+                    </div>
+                    <div className={`${styles.roleContainer} ${styles.costomer} ${styles.aiRole}`}>
+                        <span className={styles.roleTag}>{currentDialogue.speaker}</span>
+                    </div>
+                </div>
+
+                <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
+                    <div className={styles.micButtonWrapper}>
+                        <button className={`${styles.mainMicButton} ${mainMicButtonClass}`}
+                            onMouseDown={handleMicPress} onMouseUp={handleMicRelease}
+                            onTouchStart={handleMicPress} onTouchEnd={handleMicRelease}
+                            disabled={!isMicActionable || isCurrentlySpeaking}>
+                            <span className={styles.mainMicIcon}>
+                                <img src={isRecording ? MicOn : MicOff} alt={isRecording ? "On" : "Off"} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    } 
+    // CASE 2: User Speaker (Active - Choice)
+    else if (currentDialogue.speaker === 'USER' && !isPracticeFlow) {
+        const customerData = currentDialogue.choices;
+        if (!customerData || customerData.length === 0) return <div>No choices</div>;
+        const isDisabled = step === STEPS.CHOICE_FEEDBACK || isCurrentlySpeaking;
+        const isSubmitActive = selectedChoiceId !== null;
+        const submitButtonClass = isSubmitActive ? styles.on : `${styles.off} ${styles.disabled}`;
+        
+        let displayOption = customerData.find(c => c.id === selectedChoiceId);
+        if (!displayOption && step === STEPS.CHOICE_SETUP) displayOption = customerData[0];
+        
+        return (
+            <>
+                {displayOption && (step === STEPS.CHOICE_SETUP || step === STEPS.CHOICE_FEEDBACK) && (
+                    <div className={styles.turnWrapper}>
+                        <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
+                            <div className={`${styles.textLine} ${styles.koreanLine} ${styles.rowReverse}`}>
+                                <span className={`${styles.koreanText} ${styles.textRight}`}>{displayOption.korean}</span>
+                                <button className={`${styles.ttsButton} ${isCurrentlySpeaking && ttsOptionId === displayOption.id ? styles.active : styles.choiceTtsInactive}`}
+                                    onClick={() => handleChoiceOptionClick(displayOption.id, displayOption.korean)} disabled={isDisabled}>
+                                    <img src={SoundImg} alt="TTS" style={{ width: '20px', height: '20px' }} />
+                                </button>
+                            </div>
+                            
+                            <hr className={styles.divider}/>
+
+                            <div className={`${styles.textLine} ${styles.romanizedLine} ${styles.rowReverse}`}>
+                                <span className={`${styles.romanizedText} ${styles.textRight}`}>{displayOption.romanized}</span>
+                                <span className={`${styles.smallMicIcon} ${styles.active}`} style={{ marginLeft: '5px', marginRight: '5px' }}>
+                                    <img src={MicBase} alt="Mic" style={{ width: '20px', height: '20px', verticalAlign: 'middle' }} />
+                                </span>
+                            </div>
+
+                            <hr className={styles.divider}/>
+                            
+                            <span className={`${styles.englishText} ${styles.textRight}`}>{displayOption.english}</span>
+
+                            <img src={TailUser} className={`${styles.tailIcon} ${styles.tailUser}`} alt="tail" />
+                        </div>
+                        <div className={`${styles.roleContainer} ${styles.costomer} ${styles.userRole}`}>
+                            <span className={styles.roleTag}>{currentDialogue.speaker}</span>
+                        </div>
+                    </div>
+                )}
+                <div className={`${styles.micArea} ${styles.choiceButton}`}>
+                    {customerData.map(option => (
+                        <button key={option.id} className={`${styles.choiceButtonAction} ${option.id === selectedChoiceId ? styles.selected : ''}`}
+                            onClick={() => handleChoiceOptionClick(option.id, option.korean)} disabled={isDisabled}>{option.id}</button>
+                    ))}
+                    <button className={`${styles.mainMicButton} ${styles.selectSubmitButton} ${step === STEPS.CHOICE_FEEDBACK ? (gradingResult === 'CORRECT' ? styles.correctSubmit : styles.incorrectSubmit) : ''} ${submitButtonClass}`}
+                        onClick={handleChoiceSelect} disabled={!isSubmitActive}>
+                        <span className={styles.selectSubmitText}>Select</span>
+                    </button>
+                </div>
+            </>
+        );
+    }
+    // CASE 3: Practice Flow (Practice)
+    else if (isPracticeFlow && practiceLineData) {
+        const practiceButtonActive = step === STEPS.PRACTICE_SPEAK || step === STEPS.PRACTICE_LISTEN_DONE;
+        const practiceMainMicClass = practiceButtonActive ? (isRecording ? styles.on : styles.off) : `${styles.off} ${styles.disabled}`;
+        const currentGradeClass = step === STEPS.PRACTICE_GRADING ? (gradingResult === 'CORRECT' ? styles.correctActive : styles.incorrectActive) : '';
+        const isTtsActionable = step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK;
+        
+        const isPracticeUser = practiceLineData.speaker === 'USER';
+        const practiceAlign = isPracticeUser ? styles.textRight : '';
+        const practiceRow = isPracticeUser ? styles.rowReverse : '';
+        const practiceRole = isPracticeUser ? styles.userRole : styles.aiRole;
+
+        return (
+            <div className={styles.activeTurnRecordingFlow}>
+                <div className={styles.turnWrapper}>
+                    <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
+                        <div className={`${styles.textLine} ${styles.koreanLine} ${practiceRow}`}>
+                            <span className={`${styles.koreanText} ${currentGradeClass} ${practiceAlign}`}>{practiceLineData.korean}</span>
+                            <button className={`${styles.ttsButton} ${isTtsActionable ? styles.active : ''}`} 
+                                onClick={handleListenTtsClick} disabled={!isTtsActionable || isCurrentlySpeaking}>
+                                <img src={SoundImg} alt="TTS" style={{ width: '20px', height: '20px' }} />
+                            </button>
+                        </div>
+                        <hr className={styles.divider}/>
+                        <div className={`${styles.textLine} ${styles.romanizedLine} ${practiceRow}`}>
+                            <span className={`${styles.romanizedText} ${currentGradeClass} ${practiceAlign}`}>{practiceLineData.romanized}</span>
+                            <span className={`${styles.smallMicIcon} ${isRecording || practiceButtonActive ? styles.active : ''}`} style={{margin:'0 5px'}}>
+                                <img src={MicBase} alt="Mic" style={{ width: '20px', height: '20px' }} />
+                            </span>
+                        </div>
+                        <hr className={styles.divider}/>
+                        <span className={`${styles.englishText} ${currentGradeClass} ${practiceAlign}`}>{practiceLineData.english}</span>
+
+                        <img 
+                            src={isPracticeUser ? TailUser : TailAI} 
+                            className={`${styles.tailIcon} ${isPracticeUser ? styles.tailUser : styles.tailAI}`} 
+                            alt="tail" 
+                        />
+                    </div>
+                    <div className={`${styles.roleContainer} ${styles.customer} ${practiceRole}`}>
+                        <span className={styles.roleTag}>{practiceLineData.speaker}</span>
+                    </div>
+                </div>
+                
+                <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
+                    <div className={styles.micButtonWrapper}>
+                        <button className={`${styles.mainMicButton} ${practiceMainMicClass}`}
+                            onMouseDown={handleMicPress} onMouseUp={handleMicRelease}
+                            onTouchStart={handleMicPress} onTouchEnd={handleMicRelease}
+                            disabled={!practiceButtonActive || isCurrentlySpeaking}>
+                            <span className={styles.mainMicIcon}>
+                                <img src={isRecording ? MicOn : MicOff} alt={isRecording ? "On" : "Off"} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    return <></>;
   };
 
   return (
     <div className={`${styles.pageContainer} ${styles.appContainer}`}>
-        {/* ⭐ Header에 customBackAction 전달 */}
         <Header hasBackButton customBackAction={handleBackClick} />
         <Mascot image={characterImage} text={currentBubbleText} />
         <ContentSection color="blue">
             <div className={styles.cardTitleBar}>
                 <span className={styles.cardTitleText}>{scenarioTitle}</span>
-                <span className={styles.cardStepText}>{Math.min(turnHistory.length + 1, 6)}/6</span>
+                <span className={styles.cardStepText}>
+                  {String(Math.min(turnHistory.length + 1, 6)).padStart(2, '0')}/06
+              </span>
             </div>
             <div className={`${styles.turnHistoryArea} ${isScrollLocked ? styles.scrollLocked : ''}`} ref={scrollRef}>
                 {turnHistory.map((turn, index) => (
-                    <TurnContentBox key={index} data={turn} />
+                    <TurnContentBox key={index} data={turn} isTtsPlaying={isTtsPlaying} startTtsAndListen={startTtsAndListen} />
                 ))}
                 {renderActiveInput()}
             </div>
         </ContentSection>
 
-        {/* ⭐ 모달 오버레이 (하단 고정 카드) */}
         {showExitModal && (
           <div className={styles.exitModalOverlay}>
-             {/* 뒷배경을 클릭해도 닫히지 않게 하려면 onClick 제거하거나 stopPropagation 사용 */}
              <div className={styles.exitModalContent}>
                 <div className={styles.exitModalCard}>
                    <div className={styles.exitModalQuestion}>
