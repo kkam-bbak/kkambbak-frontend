@@ -1,159 +1,253 @@
+/* -------------------- 1. 페이지 레이아웃 -------------------- */
+.contentWrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;       
+    overflow: hidden;   
+}
 
-/* -------------------- 3. 요약 카드 (Session Complete!) -------------------- */
-.summaryTitle {
-    /* JSX: className={styles.summaryTitle} */
+/* -------------------- 2. 요약 카드 -------------------- */
+.cardTitleBar {
+    padding-bottom: 10px;
     font-size: 18px;
     font-weight: 500;
-    margin-bottom: 15px;
     color: black;
-    margin-left: 20px;
+    flex-shrink: 0; /* 크기 고정 */
 }
 
 .summaryDetails {
-    /* JSX: className={styles.summaryDetails} */
-    top: 56px;
+    flex-shrink: 0; /* 크기 고정 */
     height: 131px;
     border-radius: 10px;
     color: white;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-left: 15px;
-    margin-right: 15px;
-    background-color: black;
-    margin-bottom: 5px;
+    justify-content: center;
+    gap: 5px;
+    background-color: #101010;
+    margin-bottom: 20px;
+    position: relative;
 }
-.detailItem {
-    /* JSX: className={styles.detailItem} */
-    font-size: 12px;
-    font-weight: 500;
-    padding-left: 10px;
+
+/* 요약 카드 내부의 구분선 (말풍선 구분선과 분리) */
+.summaryDivider {
+    width: 94%;
+    margin: 0 auto;
+    border: 0;
+    border-top: 1.5px solid black;
+    padding: 0;
 }
+
 .roleName {
-    /* JSX: className={styles.roleName} */
     padding-top: 5px;
     font-weight: 500;
     font-size: 18px;
     padding-bottom: 5px;
+    padding-left: 15px;
 }
 
-/* -------------------- 4. 히스토리 영역 -------------------- */
+.detailItem {
+    font-size: 12px;
+    font-weight: 500;
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.statLabel {
+    margin-left: 10px;
+}
+
+/* -------------------- 3. 히스토리 영역 (RolePlay 스타일 이식) -------------------- */
 
 .completeHistoryArea {
-    /* JSX: className={styles.completeHistoryArea} */
-    /* 스크롤 영역 */
-    padding-top: 10px;
-    max-height: 160px;
+    /* ⭐ 핵심: 남은 공간 모두 차지 */
+    flex: 1; 
+    min-height: 160px; 
     overflow-y: auto;
-    margin-left: 15px;
-    margin-right: 15px;
+    padding-bottom: 20px;
+
+    /* 스크롤바 숨김 */
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+.completeHistoryArea::-webkit-scrollbar {
+    display: none;
+}
 
-.turnDisplayBox {
-    /* JSX: className={styles.turnDisplayBox} */
+/* 턴 래퍼 */
+.turnWrapper {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    height: 120px;
+    margin-bottom: 20px;
+}
+
+/* 말풍선 박스 */
+.textDisplayBox {
+    width: 100%;
+    min-height: 120px; 
+    height: auto;      
     background-color: #101010;
     border-radius: 10px;
-    margin-bottom: 45px;
     position: relative;
-}
-
-.contentBox {
-    /* JSX: className={styles.contentBox} */
-    padding-top: 5px;
-}
-
-/* 역할 태그 */
-.roleTagContainer {
-    /* JSX: className={styles.roleTagContainer} */
-    width: 68px;
-    height: 20px;
-    border-radius: 5px;
-    font-size: 12px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    background-color: white;
-    color: black;
-    font-weight: 600;
-    margin-top: 20px;
+    padding-bottom: 5px;
 }
 
-/* 텍스트 줄: 하이픈 클래스명을 카멜 케이스로 변경 */
+/* USER일 때 내부 반전 및 정렬 */
+.rowReverse {
+    flex-direction: row-reverse;
+}
+
+.textRight {
+    text-align: right;
+}
+
+/* 말풍선 내부 구분선 */
+.divider {
+    width: auto;
+    border: 0;
+    border-top: 1px solid black;
+    margin: 5px 15px;
+}
+
+/* 텍스트 라인 */
 .textLine {
-    /* JSX: className={styles.textLine} */
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    gap: 3px;
 }
-.completeKoreanText {
-    /* JSX: className={styles.completeKoreanText} */
+
+/* 텍스트 스타일 */
+.koreanText {
+    font-size: 13px;
+    color: #757575;
+    font-weight: 500;
+
+    word-break: keep-all;
+    flex: 1;
+    min-width: 0;
+}
+
+.romanizedText {
     font-size: 13px;
     font-weight: 500;
     color: #757575;
-}
-.completeRomanizedText {
-    /* JSX: className={styles.completeRomanizedText} */
-    font-size: 13px;
-    font-weight: 500;
-    color: #757575;
+    flex: 1;
+    min-width: 0;
 }
 
-
-/* TurnDisplay에서 사용되는 다른 클래스들 */
-.completeEnglishText {
-    /* JSX: className={styles.completeEnglishText} */
+.englishText {
     color: #007CFF;
     font-size: 13px;
     font-weight: 500;
-    margin-left: 15px;
-    margin-top: 10px;
-    display: block;
-}
-.smallMicIcon.active {
-    /* JSX: className={`${styles.smallMicIcon} ${styles.active}`} */
-    color: white;
-    font-size: 14px;
+    display: block; 
+    margin-left: 10px;
+    padding-bottom: 10px;
 }
 
-/* -------------------- 5. 하단 액션 버튼 -------------------- */
-
-.buttonsContainer {
-    /* JSX: className={styles.buttonsContainer} */
-    position: relative;
-    display: flex;
-    justify-content: center; 
-    gap: 15px;
-    padding: 10px 0; 
-    margin-left: 15px;
+/* USER 턴일 때 영어 텍스트 왼쪽으로 이동 */
+.englishText.textRight {
+    margin-left: 0;
     margin-right: 15px;
 }
 
-/* 하이픈 클래스명을 카멜 케이스로 변경 */
+/* 아이콘 스타일 */
+.ttsButton {
+    width: 24px; height: 24px;
+    border: none; background: none; cursor: pointer; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+
+.smallMicIcon {
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Role 태그 */
+.roleContainer {
+    width: auto;
+    min-width: 44px;
+    height: 20px;
+    background-color: white;
+    color: black;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    padding: 0 8px;
+}
+
+.aiRole {
+    align-self: flex-start;
+
+}
+
+.userRole {
+    align-self: flex-end;
+}
+
+/* 말풍선 꼬리 */
+.tailIcon {
+    position: absolute;
+    bottom: -14px;
+    width: 22px;
+    height: auto;
+    z-index: 1;
+}
+.tailAI { left: 20px; }
+.tailUser { right: 20px; }
+
+/* -------------------- 4. 하단 버튼 -------------------- */
+.buttonsContainer {
+    flex-shrink: 0; /* 크기 고정 */
+    width: 100%;
+    height: 72px;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+    padding-bottom: 20px;
+}
+
 .actionButton {
-    /* JSX: className={styles.actionButton} */
     height: 40px;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tryAgain {
-    /* JSX: className={styles.tryAgain} */
-    composes: actionButton; /* actionButton 스타일 상속 */
+    composes: actionButton;
     background-color: white;
     color: black;
-    width: 159px;
+    flex: 1;
+    max-width: 159px;
 }
+
 .nextLearning {
-    /* JSX: className={styles.nextLearning} */
-    composes: actionButton; /* actionButton 스타일 상속 */
+    composes: actionButton;
     background-color: white;
     color: black;
-    width: 153px;
+    flex: 1;
+    max-width: 153px;
 }

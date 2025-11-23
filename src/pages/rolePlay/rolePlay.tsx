@@ -139,11 +139,11 @@ const STEPS = {
 
 const BUBBLE_TEXT = {
   [STEPS.START]: "Okay, Let's go!",
-  [STEPS.LISTEN]: "Listen carefully.",
-  [STEPS.SPEAK_SETUP]: "Speak!",
-  [STEPS.RECORDING]: "Speak!",
+  [STEPS.LISTEN]: "Listen carefully",
+  [STEPS.SPEAK_SETUP]: "Speak Now!",
+  [STEPS.RECORDING]: "Speak Now!",
   [STEPS.PRACTICE_LISTEN]: "Listen carefully.",
-  [STEPS.PRACTICE_SPEAK]: "Speak!",
+  [STEPS.PRACTICE_SPEAK]: "Speak Now!",
   [STEPS.CHOICE_SETUP]: "Which is correct?",
   CORRECT: "Good job!",
   INCORRECT: "It's a waste.",
