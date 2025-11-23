@@ -4,6 +4,7 @@ import Textarea from '@/components/Textarea/Textarea';
 import { useUser } from '@/stores/user';
 import styles from './ProfileSection.module.css';
 import { Link } from 'react-router-dom';
+import { LEARN } from '../../mainPage';
 
 type ProfileSectionProps = {
   onMenuToggle: (e: React.MouseEvent, menu: 'learn') => void;
@@ -15,7 +16,7 @@ function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
   if (!user)
     return (
       <>
-        <Button isFull onClick={(e) => onMenuToggle(e, 'learn')}>
+        <Button isFull onClick={(e) => onMenuToggle(e, LEARN)}>
           Done
         </Button>
       </>
