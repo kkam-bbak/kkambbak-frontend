@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { LEARN } from '../../mainPage';
 
 type ProfileSectionProps = {
-  onMenuToggle: (e: React.MouseEvent, menu: 'learn') => void;
+  onMenuToggle: (e: React.MouseEvent, menu: typeof LEARN) => void;
 };
 
 function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
@@ -66,7 +66,7 @@ function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
           </div>
         )}
 
-        <Button isFull onClick={(e) => onMenuToggle(e, 'learn')}>
+        <Button isFull onClick={(e) => onMenuToggle(e, LEARN)}>
           Done
         </Button>
       </div>
