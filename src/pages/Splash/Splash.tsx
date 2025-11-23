@@ -22,15 +22,15 @@ export default function Splash() {
   }, [user, navigate]);
 
   return (
-    <div className={styles.contentImageBox}>
-        <video
-          src={SplashVideo}
-          className={styles.videoElement} // CSS 스타일링용 클래스
-          autoPlay
-          loop
-          muted        // 소리 끔 (필수: 없으면 자동재생 안됨)
-          playsInline  // 모바일 전체화면 방지 (필수)
-        />
-      </div>
+    <div className={styles.container}>
+      <video
+        src={SplashVideo}
+        className={styles.video} // CSS 스타일링용 클래스
+        autoPlay
+        loop
+        muted // 소리 끔 (필수: 없으면 자동재생 안됨)
+        playsInline // 모바일 전체화면 방지 (필수)
+      />
+    </div>
   );
 }
