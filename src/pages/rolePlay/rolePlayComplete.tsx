@@ -31,6 +31,14 @@ interface ApiResponseBody<T> {
   body: T;
 }
 
+// ⭐ [수정] TurnData 인터페이스 명확화
+interface TurnData {
+  speaker: string;
+  korean: string;
+  romanized: string;
+  english: string;
+}
+
 interface LocationState {
   sessionId?: number;
   resultId?: number;
@@ -40,11 +48,11 @@ interface LocationState {
   sessionSummary?: { correctSentence: number; totalSentence: number; completedAt: string; };
   timeTaken?: string;
   rolePlayName?: string;
-  turns?: any[];
+  turns?: TurnData[]; // ⭐ any[] 대신 TurnData[] 사용
 }
 
-// ⭐ [수정] TurnDisplay 컴포넌트 (RolePlay와 동일한 디자인 적용)
-const TurnDisplay = ({ data, index }: { data: any; index?: number }) => { 
+// ⭐ [수정] TurnDisplay 컴포넌트 (Props 타입 명시)
+const TurnDisplay = ({ data }: { data: TurnData }) => { 
     const isUserTurn = data.speaker === 'USER';
     
     // 정렬 및 스타일 클래스
@@ -97,28 +105,9 @@ const TurnDisplay = ({ data, index }: { data: any; index?: number }) => {
                 <span className={styles.roleTag}>{data.speaker}</span>
             </div>
         </div>
-        <div className={styles.romanizedLine}>
-          <span className={`${styles.completeRomanizedText} ${romanizedClass}`}>{data.romanized}</span>
-          {isUserTurn && <span className={`${styles.smallMicIcon} ${styles.active}`}>🎤</span>}
-        </div>
-        <span className={styles.completeEnglishText}>{data.english}</span>
-      </div>
-      <div className={`${styles.roleTagContainer} ${isUserTurn ? styles.customerTag : styles.staffTag}`}>
-        <span className={styles.roleTag}>{data.speaker}</span>
-      </div>
-    </div>
-  );
+    );
 };
 
-const LS_KEY_COMPLETIONS = 'roleplay_completions';
-interface CompletionData {
-  isCompleted: boolean;
-  actualTime: number;
-}
-type CompletedScenarios = { [scenarioId: number]: CompletionData };
-
-
-// --- LocalStorage 키 (완료 여부 확인용) ---
 const LS_KEY_COMPLETIONS = 'roleplay_completions';
 interface CompletionData {
   isCompleted: boolean;
@@ -277,8 +266,9 @@ const RolePlayComplete: React.FC = () => {
 
             {/* 히스토리 영역 */}
             <div className={styles.completeHistoryArea}>
+              {/* ⭐ [수정] index prop 제거 (TurnDisplay에서도 안쓰도록 수정함) */}
               {turnsHistory.map((turn, index) => (
-                <TurnDisplay key={index} data={turn} index={index} />
+                <TurnDisplay key={index} data={turn} />
               ))}
             </div>
 
