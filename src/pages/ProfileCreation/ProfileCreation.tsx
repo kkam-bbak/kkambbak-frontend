@@ -14,7 +14,7 @@ import PersonalityContent from './components/PersonalityContent/PersonalityConte
 import KoreanContent from './components/KoreanContent/KoreanContent';
 
 const COUNTRIES = [
-  'Direct input',
+  'Select',
   'South Korea',
   'China',
   'Vietnam',
@@ -136,7 +136,7 @@ export default function ProfileCreation() {
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
-                <option value="">Direct input</option>
+                <option value="">Select</option>
                 <option value="MALE">MALE</option>
                 <option value="FEMALE">FEMALE</option>
               </Select>
@@ -149,7 +149,7 @@ export default function ProfileCreation() {
                 onChange={(e) => setCountry(e.target.value)}
               >
                 {COUNTRIES.map((c) => (
-                  <option key={c} value={c === 'Direct input' ? '' : c}>
+                  <option key={c} value={c === 'Select' ? '' : c}>
                     {c}
                   </option>
                 ))}
