@@ -238,16 +238,10 @@
   color: white;
   border: 2px solid #ff5000;
 }
-.on .micIcon {
-  color: white;
-}
 
 .off {
   background-color: white;
   color: black;
-}
-.off .micIcon {
-  color: #ff5000;
 }
 
 .disabledInfo {
@@ -255,9 +249,7 @@
   color: rgba(0, 0, 0, 0.4);
   cursor: not-allowed;
 }
-.disabledInfo .micIcon {
-  color: rgba(0, 0, 0, 0.4);
-}
+
 
 /* 마스코트 래퍼 */
 .mascotWrapper {
@@ -269,3 +261,12 @@
   display: flex;
   justify-content: center;
 }
+
+.micStatusImage {
+    width: 54px;   /* 요청하신 너비 */
+    height: 40px;  /* 요청하신 높이 */
+    object-fit: contain; /* 이미지 비율 유지 */
+    display: block; /* 중앙 정렬을 위해 블록 요소로 */
+}
+
+

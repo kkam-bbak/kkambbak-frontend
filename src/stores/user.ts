@@ -9,6 +9,7 @@ export type Profile = {
   countryOfOrigin: string | null;
   personalityOrImage: string | null;
   profileImage: string;
+  remainingNameAttempts: number;
 };
 
 export type Auth = {

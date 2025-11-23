@@ -1,245 +1,289 @@
 import React, { useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; 
-import { CheckCircle, Clock, Calendar } from 'lucide-react';
-// 🔥 [수정] WordResult 타입을 정확히 import 합니다.
-import type { WordResult } from '../krLearn/learnStart/learnStart'; 
 import styles from './rolePlayComplete.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 import { http } from '../../apis/http';
+import sentenceCrt from '@/assets/sentenceCrt.png';
+import date from '@/assets/Calendar.png';
+import clock from '@/assets/Clock.png';
+import TailAI from '@/assets/TailAI.png';
+import TailUser from '@/assets/TailUser.png';
+import SoundImg from '@/assets/soundButton.png';
+import MicBase from '@/assets/MicBase.png';
 
-// 유틸리티 (기존 유지)
-const formatDuration = (durationMs: number): string => {
-  const totalSeconds = Math.round(durationMs / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}m ${seconds}s`;
-};
-
-const getFormattedCompletionDate = (dateString: string): string => { // 🔥 dateString 받도록 수정
+// 유틸리티
+const getFormattedCompletionDate = (dateString: string): string => { 
   const now = new Date(dateString);
   return now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 };
 
-// API 응답 타입
-interface Session {
+interface RoleplayScenario {
   id: number;
   title: string;
-  categoryName: string;
-  vocabularyCount: number;
-  completed: boolean;
-  durationSeconds: number;
+  description: string;
+  estimated_minutes: number;
 }
-interface NextLearningResponse {
+
+interface ApiResponseBody<T> {
   status: { statusCode: string; message: string; description: string | null };
-  body: {
-    categoryName: string;
-    sessions: Session[];
-    nextCursor: number | null;
-    hasNext: boolean;
-  };
+  body: T;
 }
 
-const ResultRow = ({ icon: Icon, value }: { icon: React.ElementType; value: string }) => (
-  <div className={styles.resultRow}>
-    <Icon className={styles.resultIcon}/>
-    <span className={styles.resultValue}>{value}</span>
-  </div>
-);
+// ⭐ [수정] TurnData 인터페이스 명확화
+interface TurnData {
+  speaker: string;
+  korean: string;
+  romanized: string;
+  english: string;
+}
 
-// 전달받을 데이터 타입 (scenarioId와 categoryName 추가)
 interface LocationState {
   sessionId?: number;
   resultId?: number;
-  results?: WordResult[];
   topicName?: string;
   learningDuration?: number; 
-  scenarioId?: number; // 🔥 [수정 1] scenarioId 추가
+  scenarioId?: number; 
   sessionSummary?: { correctSentence: number; totalSentence: number; completedAt: string; };
   timeTaken?: string;
   rolePlayName?: string;
-  turns?: any[]; // TurnData 배열 (임시)
-  categoryName?: string; // 🔥 [수정 2] categoryName 추가
+  turns?: TurnData[]; // ⭐ any[] 대신 TurnData[] 사용
 }
 
-// TurnDisplay 컴포넌트 (기존 유지)
-interface TurnData {
-    speaker: string;
-    korean: string;
-    romanized: string;
-    english: string;
-    result: 'CORRECT' | 'INCORRECT' | string;
-}
-
-const TurnDisplay: React.FC<{ data: TurnData, index: number }> = ({ data, index }) => {
+// ⭐ [수정] TurnDisplay 컴포넌트 (Props 타입 명시)
+const TurnDisplay = ({ data }: { data: TurnData }) => { 
     const isUserTurn = data.speaker === 'USER';
-    const romanizedClass = data.result === 'CORRECT' ? styles.correct : data.result === 'INCORRECT' ? styles.incorrect : '';
+    
+    // 정렬 및 스타일 클래스
+    const textAlignmentClass = isUserTurn ? styles.textRight : '';
+    const rowDirectionClass = isUserTurn ? styles.rowReverse : '';
+    const rolePositionClass = isUserTurn ? styles.userRole : styles.aiRole;
 
     return (
-        <div className={styles.turnDisplayBox}>
-            <div className={styles.contentBox}>
-                <div className={styles.koreanLine}>
-                    <span className={styles.completeKoreanText}>{data.korean}</span>
-                    <button className={`${styles.ttsButton} ${styles.active}`}>🔊</button>
+        <div className={styles.turnWrapper}>
+            <div className={styles.textDisplayBox}>
+                {/* 1. Korean Line */}
+                <div className={`${styles.textLine} ${rowDirectionClass}`}>
+                    <span className={`${styles.koreanText} ${textAlignmentClass}`}>
+                        {data.korean}
+                    </span>
+                    <button className={styles.ttsButton}>
+                        <img src={SoundImg} alt="TTS" style={{ width: '20px', height: '20px' }} />
+                    </button>
                 </div>
-                <div className={styles.romanizedLine}>
-                    <span className={`${styles.completeRomanizedText} ${romanizedClass}`}>{data.romanized}</span>
-                    {isUserTurn && <span className={`${styles.smallMicIcon} ${styles.active}`}>🎤</span>}
+
+                <hr className={styles.divider}/>
+
+                {/* 2. Romanized Line */}
+                <div className={`${styles.textLine} ${rowDirectionClass}`}>
+                    <span className={`${styles.romanizedText} ${textAlignmentClass}`}>
+                        {data.romanized}
+                    </span>
+                    <span className={styles.smallMicIcon} style={{ marginLeft: '5px', marginRight: '5px' }}>
+                        <img src={MicBase} alt="Mic" style={{ width: '20px', height: '20px' }} />
+                    </span>
                 </div>
-                <span className={styles.completeEnglishText}>{data.english}</span>
+
+                <hr className={styles.divider}/>
+
+                {/* 3. English Line */}
+                <span className={`${styles.englishText} ${textAlignmentClass}`}>
+                    {data.english}
+                </span>
+
+                {/* 꼬리 이미지 */}
+                <img 
+                    src={isUserTurn ? TailUser : TailAI} 
+                    className={`${styles.tailIcon} ${isUserTurn ? styles.tailUser : styles.tailAI}`} 
+                    alt="tail" 
+                />
             </div>
-            <div className={`${styles.roleTagContainer} ${isUserTurn ? styles.customerTag : styles.staffTag}`}>
+
+            {/* Role Tag */}
+            <div className={`${styles.roleContainer} ${rolePositionClass}`}>
                 <span className={styles.roleTag}>{data.speaker}</span>
             </div>
         </div>
     );
 };
 
+const LS_KEY_COMPLETIONS = 'roleplay_completions';
+interface CompletionData {
+  isCompleted: boolean;
+  actualTime: number;
+}
+type CompletedScenarios = { [scenarioId: number]: CompletionData };
+
 
 const RolePlayComplete: React.FC = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const state = location.state as LocationState;
-    const turnsHistory = state?.turns || [];
-    // 데이터 추출
-    const summary = state?.sessionSummary;
-    const correctCount = summary?.correctSentence || 0;
-    const totalCount = summary?.totalSentence || 0;
-    const rolePlayName = state?.rolePlayName || 'Role Play Result';
-    const timeTaken = state?.timeTaken || '0m 0s';
-    
-    // 🔥 [수정 3] categoryName 추출 (없으면 TOPIK으로 가정)
-    const categoryName = state?.categoryName || 'TOPIK'; 
-    const currentScenarioId = state?.scenarioId; // 재시작용 ID 확보
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as LocationState;
+  const turnsHistory = state?.turns || [];
+  
+  const summary = state?.sessionSummary;
+  const correctCount = summary?.correctSentence || 0;
+  const totalCount = summary?.totalSentence || 0;
+  const rolePlayName = state?.rolePlayName || 'Role Play Result';
+  const timeTaken = state?.timeTaken || '0m 0s';
+  
+  const currentScenarioId = state?.scenarioId || 0; 
 
-    // 시간 및 날짜 포맷팅
-    const completionDate = useMemo(() => getFormattedCompletionDate(summary?.completedAt || new Date().toISOString()), [summary?.completedAt]);
-    const learningDurationMs = state?.learningDuration || 0;
-    const learningTime = useMemo(() => formatDuration(learningDurationMs), [learningDurationMs]);
+  const completionDate = useMemo(() => getFormattedCompletionDate(summary?.completedAt || new Date().toISOString()), [summary?.completedAt]);
+  
+  const { speechBubbleText, mascotImage: characterImageSrc } = useMemo(() => {
+    let text = '';
+    let mascot: MascotImage;
+    const correctRatio = totalCount > 0 ? correctCount / totalCount : 0;
 
-    // 마스코트 및 말풍선 결정 로직 (기존 유지)
-    const { speechBubbleText, mascotImage: characterImageSrc } = useMemo(() => {
-        let text = '';
-        let mascot: MascotImage;
-        const correctRatio = totalCount > 0 ? correctCount / totalCount : 0;
+    if (totalCount === 0) { text = 'No data available.'; mascot = 'thinking'; } 
+    else if (correctCount === totalCount) { text = 'Perfect!!'; mascot = 'shining'; } 
+    else if (correctRatio >= 2 / 3) { text = "It's not bad~"; mascot = 'smile'; } 
+    else if (correctRatio >= 1 / 2) { text = 'So so~'; mascot = 'thinking'; } 
+    else { text = "I'm sorry.."; mascot = 'gloomy'; }
+    return { speechBubbleText: text, mascotImage: mascot };
+  }, [correctCount, totalCount]);
 
-        if (totalCount === 0) { text = 'No data available.'; mascot = 'thinking'; } 
-        else if (correctCount === totalCount) { text = 'Perfect!!'; mascot = 'shining'; } 
-        else if (correctRatio >= 2 / 3) { text = "It's not bad~"; mascot = 'smile'; } 
-        else if (correctRatio >= 1 / 2) { text = 'So so~'; mascot = 'thinking'; } 
-        else { text = "I'm sorry.."; mascot = mascot = 'gloomy'; }
-        return { speechBubbleText: text, mascotImage: mascot };
-    }, [correctCount, totalCount]);
+  const handleBackClick = useCallback(() => {
+    navigate('/mainpage/roleList');
+  }, [navigate]);
 
-    // --- 핸들러 ---
-    const handleReview = useCallback(() => {
-        // [수정] Review 페이지로 이동할 때 필요한 모든 정보를 전달
-        // (Review 페이지는 Session ID를 받으면 됨)
-        // 현재는 turns data를 사용하므로 turns를 전달
-        navigate('/mainpage/learn/review', {
-            state: {
-                // sessionId: currentScenarioId, // 리뷰 페이지가 필요하다면 전달
-                results: state?.turns, // 턴 히스토리를 결과로 전달
-                topicName: rolePlayName,
-                learningTime: timeTaken,
+  const handleTryAgain = useCallback(() => {
+    if (currentScenarioId) {
+      navigate(`/mainpage/rolePlay/${currentScenarioId}`, {
+        state: { scenarioTitle: rolePlayName }
+      });
+    } else {
+      navigate('/mainpage/roleList');
+    }
+  }, [navigate, currentScenarioId, rolePlayName]);
+
+  const handleNextLearning = useCallback(async () => {
+    try {
+      const response = await http.get<ApiResponseBody<RoleplayScenario[]>>('/roleplay/all');
+      const sessions = response.data.body;
+
+      let completedMap: CompletedScenarios = {};
+      try {
+          const storedData = localStorage.getItem(LS_KEY_COMPLETIONS);
+          if (storedData) {
+              completedMap = JSON.parse(storedData);
+          }
+      } catch (e) { console.error(e); }
+
+      if (sessions && sessions.length > 0) {
+        const sortedSessions = [...sessions].sort((a, b) => a.id - b.id);
+        const currentIndex = sortedSessions.findIndex(s => s.id === currentScenarioId);
+
+        let nextSession = sortedSessions.slice(currentIndex + 1).find(s => !completedMap[s.id]?.isCompleted);
+
+        if (!nextSession) {
+            nextSession = sortedSessions.slice(0, currentIndex).find(s => !completedMap[s.id]?.isCompleted);
+        }
+
+        if (!nextSession) {
+             const nextIndex = (currentIndex + 1) % sortedSessions.length;
+             if (sortedSessions.length > 1 || (sortedSessions.length === 1 && sortedSessions[0].id !== currentScenarioId)) {
+                 nextSession = sortedSessions[nextIndex];
+             }
+        }
+
+        if (nextSession) {
+          navigate(`/mainpage/roleplay/${nextSession.id}`, {
+            state: { 
+              scenarioTitle: nextSession.title 
             }
-        });
-    }, [navigate, state, rolePlayName, timeTaken]);
-
-
-    const handleTryAgain = useCallback(() => {
-        if (currentScenarioId) {
-            // ✅ Try Again 시, 현재 시나리오 ID로 돌아가고 카테고리 정보 유지
-            navigate(`/mainpage/rolePlay/${currentScenarioId}`, {
-                state: { categoryName: categoryName } // 카테고리 정보 전달
-            });
+          });
         } else {
-            navigate('/mainpage/roleList');
+          alert("모든 학습을 완료했습니다! 🎉 목록으로 이동합니다.");
+          navigate('/mainpage/roleList');
         }
-    }, [navigate, currentScenarioId, categoryName]);
+      } else {
+        alert("학습 가능한 세션이 없습니다.");
+        navigate('/mainpage/roleList');
+      }
 
-    const handleNextLearning = useCallback(async () => {
-        try {
-            console.log(`[Next Learning] Fetching list for category: ${categoryName}`);
+    } catch (error) {
+      console.error("Failed to fetch next roleplay session:", error);
+      navigate('/mainpage/roleList');
+    }
+  }, [navigate, currentScenarioId]);
+
+  return (
+    <div className={`${styles.pageContainer} ${styles.appContainer}`}>
+      <Header hasBackButton customBackAction={handleBackClick} />
+      <Mascot image={characterImageSrc} text={speechBubbleText} />
+
+      <ContentSection color="blue">
+        {/* ⭐ [추가] contentWrapper로 감싸서 Flex 레이아웃 적용 */}
+        <div className={styles.contentWrapper}>
             
-            // 🔥 [수정 4] API 호출 시 category 파라미터 전달 (C007 에러 해결)
-            const response = await http.get<NextLearningResponse>('/learning/sessions', {
-                params: { limit: 20, category: categoryName }
-            });
+            <div className={styles.cardTitleBar}>
+              <span className={styles.cardTitleText}>Session Complete!</span>
+            </div>
 
-            const sessions = response.data.body.sessions;
+            <div className={styles.summaryDetails}>
+              <span className={styles.roleName}>{rolePlayName}</span>
 
-            if (sessions && sessions.length > 0) {
-                // 현재 ID보다 큰 ID를 찾거나, 완료 안 된 것 중 다음을 찾는 로직
-                let nextSession = sessions.find(s => !s.completed && s.id !== currentScenarioId);
-                
-                if (!nextSession) {
-                    nextSession = sessions.find(s => s.id > (currentScenarioId || 0));
-                }
+              {/* ⭐ 요약 카드용 구분선 클래스 사용 */}
+              <hr className={styles.summaryDivider}/>
 
-                if (nextSession) {
-                    // 🔥 다음 학습으로 이동할 때 카테고리 정보 유지
-                    navigate(`/mainpage/roleplay/${nextSession.id}`, {
-                        state: { categoryName: categoryName }
-                    });
-                } else {
-                    alert("더 이상 진행할 학습이 없습니다.");
-                    navigate('/mainpage/roleList');
-                }
-            } else {
-                alert("학습 가능한 세션이 없습니다.");
-                navigate('/mainpage/roleList');
-            }
+              <div className={`${styles.detailItem} ${styles.stat}`}>
+                <img
+                  src={sentenceCrt}
+                  alt="Correct sentences"
+                  className={styles.statIcon}
+                  style={{ width: '14px', height: '14px' }} 
+                />
+                <span className={styles.statLabel}>{correctCount}/{totalCount} sentences correct</span>
+              </div>
 
-        } catch (error) {
-            console.error("Failed to fetch next learning session:", error);
-            navigate('/mainpage/roleList');
-        }
-    }, [navigate, currentScenarioId, categoryName]);
+              <hr className={styles.summaryDivider}/>
 
-    return (
-        <div className={`${styles.pageContainer} ${styles.appContainer}`}>
-            <Header hasBackButton />
-            <Mascot image={characterImageSrc} text={speechBubbleText} />
+              <div className={`${styles.detailItem} ${styles.stat}`}>
+                <img
+                  src={clock}
+                  alt="Time taken"
+                  className={styles.statIcon}
+                  style={{ width: '14px', height: '14px' }} 
+                />
+                <span className={styles.statLabel}>{timeTaken}</span>
+              </div>
 
-            <ContentSection color="blue">
-                <h2 className={styles.summaryTitle}>Session Complete!</h2>
+              <hr className={styles.summaryDivider}/>
 
-                <div className={styles.summaryDetails}>
-                    <span className={styles.detailItem}>{rolePlayName}</span>
-                    <div className={`${styles.detailItem} ${styles.stat}`}>
-                        <CheckCircle className={styles.statIcon} />
-                        <span className={styles.statLabel}>{correctCount}/{totalCount} sentences correct</span>
-                    </div>
-                    <div className={`${styles.detailItem} ${styles.stat}`}>
-                        <Clock className={styles.statIcon} />
-                        <span className={styles.statLabel}>{timeTaken}</span>
-                    </div>
-                    <div className={`${styles.detailItem} ${styles.stat}`}>
-                        <Calendar className={styles.statIcon} />
-                        <span className={styles.statLabel}>{completionDate}</span>
-                    </div>
-                </div>
+              <div className={`${styles.detailItem} ${styles.stat}`}>
+                <img
+                  src={date}
+                  alt="Completion date"
+                  className={styles.statIcon}
+                  style={{ width: '14px', height: '14px' }} 
+                />
+                <span className={styles.statLabel}>{completionDate}</span>
+              </div>
+            </div>
 
-                {/* 대화 기록 리스트 */}
-                <div className={styles.completeHistoryArea}>
-                    {turnsHistory.map((turn, index) => (
-                        <TurnDisplay key={index} data={turn} index={index} />
-                    ))}
-                </div>
+            {/* 히스토리 영역 */}
+            <div className={styles.completeHistoryArea}>
+              {/* ⭐ [수정] index prop 제거 (TurnDisplay에서도 안쓰도록 수정함) */}
+              {turnsHistory.map((turn, index) => (
+                <TurnDisplay key={index} data={turn} />
+              ))}
+            </div>
 
-                <div className={styles.buttonsContainer}>
-                    <button className={`${styles.actionButton} ${styles.tryAgain}`} onClick={handleTryAgain}>
-                        Try again
-                    </button>
-                    <button className={`${styles.actionButton} ${styles.nextLearning}`} onClick={handleNextLearning}>
-                        Next learning
-                    </button>
-                </div>
-            </ContentSection>
+            <div className={styles.buttonsContainer}>
+              <button className={styles.tryAgain} onClick={handleTryAgain}>
+                Try again
+              </button>
+              <button className={styles.nextLearning} onClick={handleNextLearning}>
+                Next learning
+              </button>
+            </div>
         </div>
-    );
+      </ContentSection>
+    </div>
+  );
 };
 
 export default RolePlayComplete;

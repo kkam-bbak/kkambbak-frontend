@@ -3,9 +3,11 @@ import Button from '@/components/Button/Button';
 import Textarea from '@/components/Textarea/Textarea';
 import { useUser } from '@/stores/user';
 import styles from './ProfileSection.module.css';
+import { Link } from 'react-router-dom';
+import { LEARN } from '../../mainPage';
 
 type ProfileSectionProps = {
-  onMenuToggle: (e: React.MouseEvent, menu: 'learn') => void;
+  onMenuToggle: (e: React.MouseEvent, menu: typeof LEARN) => void;
 };
 
 function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
@@ -14,7 +16,7 @@ function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
   if (!user)
     return (
       <>
-        <Button isFull onClick={(e) => onMenuToggle(e, 'learn')}>
+        <Button isFull onClick={(e) => onMenuToggle(e, LEARN)}>
           Done
         </Button>
       </>
@@ -50,8 +52,21 @@ function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
         />
       </div>
 
-      <div>
-        <Button isFull onClick={(e) => onMenuToggle(e, 'learn')}>
+      <div className={styles.buttons}>
+        {!user.isGuest && (
+          <div className={styles['try-again-container']}>
+            <span className={styles['remain']}>
+              {user.remainingNameAttempts} rounds left
+            </span>
+            <Link to={'/profile-creation?step=korean'} replace>
+              <Button isFull disabled={user.remainingNameAttempts <= 0}>
+                Try again
+              </Button>
+            </Link>
+          </div>
+        )}
+
+        <Button isFull onClick={(e) => onMenuToggle(e, LEARN)}>
           Done
         </Button>
       </div>

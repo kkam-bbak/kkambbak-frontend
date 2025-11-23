@@ -7,9 +7,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 15px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-bottom: 15px;
     background-color: transparent;
 }
 
@@ -31,102 +29,117 @@
 /* 대화 기록 스크롤 영역 */
 .turnHistoryArea {
     /* JSX: className={styles.turnHistoryArea} */
-    padding-left: 15px;
-    padding-right: 15px;
+
     height: calc(100% - 145px); 
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-/* 텍스트 표시 박스 (검은색) */
 .textDisplayBox {
-    /* JSX: className={styles.textDisplayBox} */
     width: 100%;
-    height: 120px;
+    min-height: 120px; 
+    height: auto;      
     background-color: #101010;
     border-radius: 10px;
-    margin-bottom: 45px;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    /* margin-bottom 제거 -> turnWrapper에서 처리 */
 }
 
-.historyBox{
-    /* JSX: className={styles.historyBox} */
-    composes: textDisplayBox; /* textDisplayBox 스타일 상속 */
-    margin-bottom: 35px;
+.historyBox {
+    composes: textDisplayBox;
 }
 
-
-.dividerLine {
-    /* JSX: className={styles.dividerLine} */
-    width: 328px;
-    border: 1px solid black;
+/* ⭐ [핵심] 턴 전체를 감싸는 래퍼 */
+.turnWrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 35px; /* 대화 사이 간격 */
 }
 
+/* ⭐ [핵심] USER일 때 내부 아이콘/텍스트 위치 반전 */
+.rowReverse {
+    flex-direction: row-reverse;
+}
+
+/* ⭐ [핵심] USER일 때 텍스트 오른쪽 정렬 */
+.textRight {
+    text-align: right;
+}
+
+/* 구분선 */
+.divider {
+    width: auto; /* 100%에 맞춤 */
+    border: 0;
+    border-top: 1.5px solid black;
+    margin: 5px 15px;
+}
+
+/* 텍스트 라인 */
 .textLine {
-    /* JSX: className={styles.textLine} */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 15px 15px 15px;
+    padding: 10px 15px 10px 15px;
+    gap: 10px; /* ⭐ 텍스트와 아이콘 사이 간격 확보 */
 }
 
-/* 한국어 원문 텍스트 */
+/* 한국어 텍스트 */
 .koreanText {
-    /* JSX: className={styles.koreanText} */
     font-size: 13px;
     color: white;
     font-weight: 500;
-    margin-bottom: -15px;
+    line-height: 1.4;
+    word-break: keep-all; /* 단어 단위 줄바꿈 */
+    
+    /* ⭐ 추가: 남은 공간 채우기 & 줄어들기 허용 */
+    flex: 1; 
+    min-width: 0; /* Flexbox 내에서 텍스트 줄바꿈이 정상 작동하도록 필수 설정 */
 }
 
 /* 🎧 듣기 버튼 */
 .ttsButton {
-    /* JSX: className={styles.ttsButton} */
     width: 20px;
     height: 20px;
     border: none;
     background: none;
     cursor: pointer;
-    transition: color 0.2s;
-    color: #757575;
-    margin-right: 15px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* ⭐ 추가: 공간이 좁아져도 절대 찌그러지지 않음 */
+    flex-shrink: 0; 
 }
 
-.ttsButton.active {
-    /* JSX: className={`${styles.ttsButton} ${styles.active}`} */
-    color: white;
-}
-
-/* 📝 로마자 발음 */
+/* 📝 로마자 텍스트 */
 .romanizedText {
-    /* JSX: className={styles.romanizedText} */
     font-size: 13px;
     font-weight: 500;
     color: #757575;
     transition: color 0.3s;
-}
-
-.romanizedText.correct {
-    /* JSX: className={`${styles.romanizedText} ${styles.correct}`} */
-    color: rgb(57 255 20 / 100%);
-}
-
-.romanizedText.incorrect,
-.romanizedText.oos {
-    /* JSX: className={`${styles.romanizedText} ${styles.incorrect}`} */
-    /* JSX: className={`${styles.romanizedText} ${styles.oos}`} */
-    color: rgb(255 0 0 / 100%);
+    line-height: 1.3;
+    
+    /* ⭐ 추가: 남은 공간 채우기 & 줄어들기 허용 */
+    flex: 1;
+    min-width: 0;
 }
 
 /* 🎙️ 작은 마이크 아이콘 */
 .smallMicIcon {
-    /* JSX: className={styles.smallMicIcon} */
     width: 20px;
     height: 20px;
-    color: #757575;
-    transition: color 0.2s;
-    margin-right: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* ⭐ 추가: 공간이 좁아져도 절대 찌그러지지 않음 */
+    flex-shrink: 0; 
 }
 
 .smallMicIcon.active {
@@ -143,28 +156,45 @@
     font-weight: 500;
     display: block; 
     margin-left: 15px;
+    padding-bottom: 10px;
 }
 
+.englishText.textRight {
+    margin-left: 0;      /* 기존 AI용 왼쪽 여백 초기화 */
+    margin-right: 15px;  /* 오른쪽에서 15px만큼 떨어뜨려 왼쪽으로 이동 */
+}
 
+/* Role Container 공통 */
 .roleContainer {
-    /* JSX: className={styles.roleContainer} */
-    width: 44px;
+    width: auto;
+    min-width: 44px;
     height: 20px;
     background-color: white;
     color: black;
     border-radius: 5px;
-    margin-left: 0px;
     font-size: 12px;
     font-weight: 600;
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    align-items: center;
+    margin-top: 20px; /* 말풍선과의 간격 */
+    padding: 0 8px;
 }
 
-.costomer { /* 오타 costomer -> customer가 맞지만, 원본 유지 */
-    /* JSX: className={styles.costomer} */
-    composes: roleContainer; /* roleContainer 스타일 상속 */
-    width: 68px;
+.costomer { 
+    composes: roleContainer;
+}
+
+/* ⭐ AI: 왼쪽 정렬 */
+.aiRole {
+    align-self: flex-start;
+    
+}
+
+/* ⭐ USER: 오른쪽 정렬 */
+.userRole {
+    align-self: flex-end;
+    margin-right: 15px;
 }
 
 /* -------------------- 4. 턴 2 (선택지) 스타일 -------------------- */
@@ -238,8 +268,10 @@
 
 .mainMicIcon {
     /* JSX: className={styles.mainMicIcon} */
+    width: 54px;
+    height: 40px;
     font-size: 20px; 
-    transition: color 0.3s;
+    transition: color 0.1s;
 }
 
 /* 마이크 버튼 상태: CSS Modules에서 조합 클래스 사용 */
@@ -355,4 +387,127 @@
 .micArea .selectSubmitButton.on:active {
     background-color: #1a1a1a; 
     color: white; 
+}
+
+
+/* --- 학습 중단 확인 모달 (하단 고정) --- */
+
+/* 1. 전체 화면을 덮는 어두운 배경 */
+.exitModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* 반투명 검은 배경 */
+  z-index: 9999; /* 가장 위에 표시 */
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* 내용을 하단으로 정렬 */
+}
+
+/* 2. 모달 콘텐츠 래퍼 (가로 폭 제한 등) */
+.exitModalContent {
+  width: 100%;
+  max-width: 400px; /* 모바일 앱 너비 제한 */
+  padding: 0 20px 40px 20px; /* 좌우 여백 및 하단 여백 */
+  box-sizing: border-box;
+  animation: slideUp 0.3s ease-out; /* 밑에서 올라오는 애니메이션 효과 */
+}
+
+/* 3. 모달 카드 (파란색 박스) */
+.exitModalCard {
+  background-color:#007CFF; 
+  height: 230px;
+  border-radius: 24px;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  color: black;
+}
+
+/* 4. 질문 텍스트 */
+.exitModalQuestion {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-top: 20px;
+  margin-bottom: 70px;
+  white-space: pre-wrap; /* 줄바꿈 적용 */
+}
+
+/* 5. 버튼 영역 */
+.exitModalButtons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* 6. 버튼 공통 스타일 */
+.exitButtonNo,
+.exitButtonYes {
+  flex: 1; /* 버튼 크기 1:1 비율 */
+  padding: 16px 0;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  height: 40px;
+  transition: transform 0.1s, opacity 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* No 버튼 (흰색) */
+.exitButtonNo {
+  background-color: white;
+  color: black;
+}
+
+/* Yes 버튼 (흰색) */
+.exitButtonYes {
+  background-color: white;
+  color: black; 
+}
+
+/* 버튼 눌림 효과 */
+.exitButtonNo:active,
+.exitButtonYes:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 애니메이션 정의 */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+.tailIcon {
+    position: absolute;
+    bottom: -10px; /* 말풍선 바로 아래에 붙도록 조정 (이미지 높이에 따라 조절) */
+    width: 12px;   /* 꼬리 이미지 너비 */
+    height: 12px;
+    height: auto;
+   
+    z-index: 1;    /* 말풍선보다 위에 표시 */
+}
+
+/* ⭐ [추가] AI (왼쪽) 꼬리 위치 */
+.tailAI {
+    left: 20px; /* 왼쪽에서 20px 떨어짐 */
+}
+
+/* ⭐ [추가] USER (오른쪽) 꼬리 위치 */
+.tailUser {
+    right: 20px; /* 오른쪽에서 20px 떨어짐 */
 }

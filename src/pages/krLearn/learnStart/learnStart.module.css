@@ -2,6 +2,7 @@
 
 .learnStartContainer {
   width: 100%;
+
 }
 
 .start-bubble {
@@ -177,8 +178,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 50px;
-  margin-top: 10px;
+  height: 40px;
+  margin-top: 20px;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
@@ -233,13 +234,166 @@
   background-color: black;
 }
 
-.micButton.on .micIcon {
-  color: white;
+
+.micButton.disabled {
+    /* 1. 불투명도를 낮춰 흐릿하게 만듭니다. */
+    opacity: 0.5; 
+    
+    /* 2. 사용자 클릭을 막아 비활성화 상태임을 확실히 합니다. */
+    pointer-events: none;
+    
+    /* 3. (선택 사항) 커서를 '금지' 아이콘으로 바꿔 시각적 피드백을 강화합니다. */
+    cursor: not-allowed; 
+
+    /* 4. (선택 사항) 이미지를 흑백으로 처리하여 색상을 둔하게 만듭니다. */
+    filter: grayscale(80%); 
 }
 
-/* 비활성화 상태 */
-.micButton.disabled {
-  color: #e3e3e3;
-  cursor: not-allowed;
-  background-color: white;
+.mascotWrapper {
+    position: relative; /* 자식인 feedbackImage의 절대 위치 기준 */
+    width: fit-content; /* 마스코트 크기에 맞춤 */
+    margin: 0 auto; /* 중앙 정렬 */
 }
+
+.feedbackImage {
+    position: absolute;
+    /* 마스코트 위치에 따라 이 값들을 조정하여 캐릭터 머리 위에 위치시킵니다. */
+    top: 350px;       
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92px; /* 크기 조정 */
+    height: 84px; /* 크기 조정 */
+    z-index: 100; /* 마스코트 위에 표시 */
+}
+
+.micStatusImage {
+    width: 54px;   /* 요청하신 너비 */
+    height: 40px;  /* 요청하신 높이 */
+    object-fit: contain; /* 이미지 비율 유지 */
+    display: block; /* 중앙 정렬을 위해 블록 요소로 */
+}
+
+
+
+/*뒤로갈때 사용자 의사 묻기*/
+
+.exitModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* 🔥 [수정] 배경 전체를 어둡게 만듭니다 */
+    background-color: rgba(0, 0, 0, 0.5); 
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    /* 🔥 [수정] 콘텐츠를 하단으로 밀어냅니다. */
+    justify-content: flex-end; 
+    
+    padding: 0; 
+    z-index: 1000;
+}
+
+/* 🔥 [수정] 모달 카드 컨테이너: 하단 여백 및 너비 설정 */
+.exitModalContent {
+    width: 400px;
+    height: 280px;
+    display: flex;
+    justify-content: center;
+    
+    /* 하단에 여백을 주기 위해 */
+    padding-bottom: 65px; 
+    
+    /* 마스코트와 분리되도록 margin-top: auto; 삭제 */
+}
+
+
+/* 🔥 [추가/수정] 경고 메시지 카드 (하단 고정될 요소) */
+.exitModalCard {
+    background-color: #FF5000; /* 주황색 카드 배경 */
+    color: white;
+    padding: 20px 15px;
+    border-radius: 12px;
+    width: 90%; /* 모바일 화면에 맞춰 너비 조정 */
+    /* margin-top: auto; 삭제 */
+}
+
+.exitModalQuestion{
+  color: black;
+  font-weight: 500;
+  font-size: 18px;
+  width: 260px;
+  text-align: center;
+  /* 🔥 [수정] width를 100%로 설정하여 카드의 중앙에 배치 */
+    width: 260px; 
+    
+    /* 🔥 [수정] 텍스트 중앙 정렬 */
+    text-align: center; 
+    
+    /* 🔥 [수정] 상하 여백을 줄여 질문이 중앙에 위치하도록 함 */
+    margin-top: 10%;
+    margin-left: 10%;
+}
+.exitModalButtons {
+    /* 🔥 [수정] 버튼을 수평으로 나란히 배치하고 간격을 조정 */
+    display: flex;
+    margin-top: 20%;
+    justify-content: space-between; /* 버튼 사이에 공간 확보 */
+    width: 100%; /* 카드 너비 전체 사용 */
+    gap: 15px; /* 버튼 사이 간격 조정 */
+}
+
+/* 4. 개별 버튼 스타일 수정: 비율(width) 및 배경 */
+.exitButtonNo, .exitButtonYes {
+    /* 기존 스타일 유지 */
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    height: 40px;
+    /* 🔥 [수정] 버튼 너비를 균일하게 나누어 비율에 맞춤 */
+    flex: 1; 
+    
+    /* 배경색 지정 (요청대로 흰색) */
+    background-color: white; 
+    color: black; /* 텍스트 색상 (선택 사항) */
+}
+
+
+/* learnStart.module.css 하단에 추가 */
+
+/* 이미지 컨테이너: 상대 위치를 잡아주어 O/X 표시가 위에 뜨도록 함 */
+.wordImagePlaceholder {
+  position: relative;
+  width: 160px; /* 적절한 크기 지정 */
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 실제 단어 이미지 */
+.wordImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 이미지 비율 유지 */
+  border-radius: 10px;
+}
+
+/* 정답/오답 피드백 링 (선택 사항) */
+.resultRing, .resultCross {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  pointer-events: none;
+}
+

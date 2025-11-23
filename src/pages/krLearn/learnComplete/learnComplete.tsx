@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; 
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
 import type { WordResult } from '../learnStart/learnStart'; 
@@ -19,6 +19,37 @@ const getFormattedCompletionDate = (): string => {
   const now = new Date();
   return now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 };
+
+// 로컬 스토리지 타입 및 저장 로직
+const LS_LEARNING_TIMES_KEY = 'learning_completion_times';
+interface CompletionTime {
+    time: string; // 'Xm Ys' 형식
+    completedAt: number; // 타임스탬프
+}
+type LearningTimes = { [sessionId: number]: CompletionTime };
+
+const saveLocalLearningTime = (sessionId: number, durationMs: number) => {
+    if (sessionId === null || durationMs === 0) return;
+    
+    const timeString = formatDuration(durationMs);
+    const newCompletion: CompletionTime = {
+        time: timeString,
+        completedAt: Date.now(),
+    };
+    
+    try {
+        const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
+        const times: LearningTimes = storedData ? JSON.parse(storedData) : {};
+        
+        times[sessionId] = newCompletion;
+        
+        localStorage.setItem(LS_LEARNING_TIMES_KEY, JSON.stringify(times));
+        console.log(`[LearnComplete] Saved completion time for Session ${sessionId}: ${timeString}`);
+    } catch (e) {
+        console.error('Failed to save local learning time', e);
+    }
+};
+
 
 // API 응답 타입
 interface Session {
@@ -46,14 +77,13 @@ const ResultRow = ({ icon: Icon, value }: { icon: React.ElementType; value: stri
   </div>
 );
 
-// 🔥 [수정 1] LocationState에 categoryName 추가
 interface LocationState {
   sessionId?: number;
   resultId?: number;
   results?: WordResult[];
   topicName?: string;
   learningDuration?: number;
-  categoryName?: string; // 🔥 추가됨
+  categoryName?: string;
 }
 
 const LearnComplete: React.FC = () => {
@@ -66,7 +96,6 @@ const LearnComplete: React.FC = () => {
   const topicName = state?.topicName || 'Result'; 
   const learningDurationMs = state?.learningDuration || 0;
 
-  // 🔥 [수정 2] 카테고리 이름 가져오기 (없으면 기본값 'TOPIK')
   const categoryName = state?.categoryName || 'TOPIK';
 
   const correctCount = results.filter(r => r.isCorrect).length;
@@ -84,6 +113,18 @@ const LearnComplete: React.FC = () => {
     else { text = "I'm sorry .."; mascot = 'gloomy'; }
     return { speechBubbleText: text, mascotImage: mascot };
   }, [correctCount, totalCount]);
+   
+  useEffect(() => {
+    if (currentSessionId && learningDurationMs > 0) {
+        saveLocalLearningTime(currentSessionId, learningDurationMs);
+    }
+  }, [currentSessionId, learningDurationMs]);
+
+
+  // 🔥 [추가] 헤더 뒤로가기 버튼 클릭 시 learnList로 이동하는 핸들러
+  const handleBackToLearnList = () => {
+    navigate('/mainpage/learnList');
+  };
 
   // 핸들러
   const handleReview = () => {
@@ -94,14 +135,12 @@ const LearnComplete: React.FC = () => {
             results: results,
             topicName: topicName,
             learningTime: learningTime,
-            // categoryName: categoryName (리뷰 페이지에서도 필요하다면 추가)
         }
     });
   };
 
   const handleTryAgain = () => {
     if (currentSessionId) {
-      // 🔥 Try Again 할 때도 카테고리 정보를 유지해서 보냅니다.
       navigate(`/mainPage/learn/${currentSessionId}`, {
           state: { categoryName: categoryName }
       }); 
@@ -110,30 +149,26 @@ const LearnComplete: React.FC = () => {
     }
   };
 
-  const handleNextLearning = async () => {
+ const handleNextLearning = async () => {
     try {
       console.log(`[Next Learning] Fetching list for category: ${categoryName}`);
       
-      // 🔥 [수정 3] API 호출 시 category 파라미터 추가 (C007 에러 해결)
       const response = await http.get<NextLearningResponse>('/learning/sessions', {
         params: { 
             limit: 20,
-            category: categoryName // 🔥 필수!
+            category: categoryName
         }
       });
 
       const sessions = response.data.body.sessions;
 
       if (sessions && sessions.length > 0) {
-        // 1순위: 완료 안 된 것 중 다른 ID
         let nextSession = sessions.find(s => !s.completed && s.id !== currentSessionId);
         
-        // 2순위: 없으면 그냥 다음 번호
         if (!nextSession) {
             nextSession = sessions.find(s => s.id > (currentSessionId || 0));
         }
 
-        // 3순위: 그것도 없으면 목록의 첫 번째 (현재 ID 제외)
         if (!nextSession) {
             nextSession = sessions.find(s => s.id !== currentSessionId);
         }
@@ -141,7 +176,6 @@ const LearnComplete: React.FC = () => {
         if (nextSession) {
             console.log(`[Next Learning] Starting: ${nextSession.title}`);
             
-            // 🔥 [수정 4] 다음 학습으로 이동할 때도 카테고리 정보를 넘겨줘야 계속 유지됨
             navigate(`/mainPage/learn/${nextSession.id}`, {
                 state: { categoryName: categoryName }
             });
@@ -164,7 +198,9 @@ const LearnComplete: React.FC = () => {
 
   return (
     <div className={styles.learnCompleteContainer}>
-      <Header hasBackButton />
+      {/* 🔥 [중요] customBackAction이 적용된 헤더 */}
+      <Header hasBackButton customBackAction={handleBackToLearnList} />
+      
       <Mascot image={characterImageSrc} text={speechBubbleText} />
 
       <div className={styles.completeCard}>
