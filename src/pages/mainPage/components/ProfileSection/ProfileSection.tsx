@@ -3,6 +3,7 @@ import Button from '@/components/Button/Button';
 import Textarea from '@/components/Textarea/Textarea';
 import { useUser } from '@/stores/user';
 import styles from './ProfileSection.module.css';
+import { Link } from 'react-router-dom';
 
 type ProfileSectionProps = {
   onMenuToggle: (e: React.MouseEvent, menu: 'learn') => void;
@@ -50,7 +51,20 @@ function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
         />
       </div>
 
-      <div>
+      <div className={styles.buttons}>
+        {!user.isGuest && (
+          <div className={styles['try-again-container']}>
+            <span className={styles['remain']}>
+              {user.remainingNameAttempts} rounds left
+            </span>
+            <Link to={'/profile-creation?step=korean'} replace>
+              <Button isFull disabled={user.remainingNameAttempts <= 0}>
+                Try again
+              </Button>
+            </Link>
+          </div>
+        )}
+
         <Button isFull onClick={(e) => onMenuToggle(e, 'learn')}>
           Done
         </Button>
