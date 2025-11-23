@@ -3,10 +3,12 @@ import styles from './ContentSection.module.css';
 
 type ContentSectionProps = {
   color?: 'orange' | 'blue' | 'green' | 'pink';
+  noPadding?: boolean;
 } & React.ComponentProps<'section'>;
 
 function ContentSection({
   color = 'orange',
+  noPadding = false,
   className,
   children,
   ...props
@@ -14,8 +16,8 @@ function ContentSection({
   return (
     <section
       className={`${styles.section} ${styles[color]} ${
-        className ? className : ''
-      }`}
+        noPadding ? styles['no-padding'] : ''
+      } ${className ? className : ''}`}
       {...props}
     >
       {children}
