@@ -37,38 +37,6 @@ interface ReviewApiResultBody {
 }
 type ReviewResponse = ApiResponseBody<ReviewApiResultBody>;
 
-// --- API 인터페이스 정의 ---
-interface ApiResponseBody<T> {
-    status: { statusCode: string; message: string; description: string | null };
-    body: T;
-}
-
-interface ReviewSummary {
-    sessionId: number;
-    resultId: number;
-    sessionTitle: string;
-    totalCount: number;
-    correctCount: number;
-    durationSeconds: number;
-    completedAt: string;
-}
-
-interface ReviewItem {
-    vocabularyId: number;
-    korean: string;
-    romanization: string;
-    english: string;
-    correct: boolean;
-}
-
-interface ReviewApiResultBody {
-    summary: ReviewSummary;
-    items: ReviewItem[];
-}
-type ReviewResponse = ApiResponseBody<ReviewApiResultBody>;
-// --- API 인터페이스 정의 끝 ---
-
-
 interface ReviewState {
   sessionId?: number;
   resultId?: number;
@@ -122,29 +90,29 @@ const saveLocalLearningTime = (sessionId: number, durationSeconds: number) => {
     }
 };
 
-// ... (ResultRow, WordResultRow 컴포넌트 유지) ...
+// ... (ResultRow, WordResultRow 컴포넌트) ...
 const ResultRow = ({ icon: Icon, value }: { icon: React.ElementType; value: string }) => (
-  <div className={styles.resultRow}>
-    <Icon className={styles.resultIcon} />
-    <span className={styles.resultValue}>{value}</span>
-  </div>
+  <div className={styles.resultRow}>
+    <Icon className={styles.resultIcon} />
+    <span className={styles.resultValue}>{value}</span>
+  </div>
 );
 
 const WordResultRow: React.FC<{
-  label: string;
-  value: string;
-  isResult?: boolean;
-  isCorrect?: boolean;
+  label: string;
+  value: string;
+  isResult?: boolean;
+  isCorrect?: boolean;
 }> = ({ label, value, isResult = false, isCorrect }) => (
-  <div className={styles.WordResultRow}>
-    <span className={styles.wordLabel}>{label}</span>
-    <span className={styles.wordValue}>{value}</span>
-    {isResult && (
-      <span className={`${styles.resultTag} ${isCorrect ? styles.correct : styles.wrong}`}>
-        {isCorrect ? 'Correct' : 'Wrong'}
-      </span>
-    )}
-  </div>
+  <div className={styles.WordResultRow}>
+    <span className={styles.wordLabel}>{label}</span>
+    <span className={styles.wordValue}>{value}</span>
+    {isResult && (
+      <span className={`${styles.resultTag} ${isCorrect ? styles.correct : styles.wrong}`}>
+        {isCorrect ? 'Correct' : 'Wrong'}
+      </span>
+    )}
+  </div>
 );
 
 
@@ -329,54 +297,8 @@ const LearnReview: React.FC = () => {
           Try again
         </button>
       </div>
-    );
-  }
-
-  // 재도전 완료 후 업데이트된 결과를 보여줄 때 제목 변경
-  const displayTitle = isUpdateComplete ? `✅ Result Updated for ${reviewData.topicName}` : `${reviewData.topicName} Session Review`;
-
-
-  return (
-    <div className={styles.ReviewPageContainer}>
-      <div className={styles.reviewHeader}>
-        <h1 className={styles.reviewTitle}>{displayTitle}</h1>
-        <div className={styles.reviewResultsBox}>
-          <h2 className={styles.resultsTopicTitle}>{reviewData.topicName} Result</h2>
-          <ResultRow icon={CheckCircle} value={`${reviewData.correctCount}/${reviewData.totalCount} Vocabularies correct`} />
-          <ResultRow icon={Clock} value={reviewData.learningTime} />
-          <ResultRow icon={Calendar} value={reviewData.completionDate} />
-        </div>
-      </div>
-
-      <div className={styles.wordResultList}>
-        {reviewData.wordResults.length === 0 ? (
-            <div style={{color:'white', textAlign:'center', padding:'20px'}}>No review data.</div>
-        ) : (
-            reviewData.wordResults.map((word, index) => (
-              <div key={word.romnized || index} className={styles.rvWordResultContainer}>
-                <WordResultRow label="Romnized" value={word.romnized} isResult={true} isCorrect={word.isCorrect} />
-                <WordResultRow label="Korean" value={word.korean} />
-                <WordResultRow label="Translation" value={word.translation} />
-              </div>
-            ))
-        )}
-      </div>
-
-      <div className={styles.reviewActionContainer}>
-        <button
-          className={styles.reviewActionButton}
-          onClick={handleWrongOnlyTryAgain}
-          disabled={reviewData.correctCount === reviewData.totalCount} 
-          style={reviewData.correctCount === reviewData.totalCount ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-        >
-          Only wrong try Again
-        </button>
-        <button className={styles.reviewActionButton} onClick={handleTryAgain}>
-          Try again
-        </button>
-      </div>
-    </div>
-  );
+    </div>
+  );
 };
 
 export default LearnReview;
