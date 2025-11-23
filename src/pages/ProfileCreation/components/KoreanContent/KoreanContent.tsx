@@ -61,8 +61,7 @@ function KoreanContent({ updateMascot }: KoreanContentProps) {
     createNameMutate(info, {
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: ['user'] });
-        // TODO: 프로필 페이지로 이동해야 함
-        navigate('/mainpage');
+        navigate('/mainpage?menu=profile', { replace: true });
       },
     });
   };
