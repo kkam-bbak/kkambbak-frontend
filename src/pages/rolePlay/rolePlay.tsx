@@ -266,7 +266,7 @@ const RolePlay: React.FC = () => {
   const [selectedChoiceId, setSelectedChoiceId] = useState<number | null>(null);
   const [ttsOptionId, setTtsOptionId] = useState<number | null>(null);
   const [isLoadingNextTurn, setIsLoadingNextTurn] = useState(false);
-  const [selectedChoiceData, setSelectedChoiceData] = useState<DialogueData | null>(null);
+  const [selectedChoiceData, setSelectedChoiceData] = useState<DialogueData | null>(null); 
   
   const [showLoadingMessage, setShowLoadingMessage] = useState(false);
 
@@ -419,6 +419,7 @@ const RolePlay: React.FC = () => {
     }
   }, [sessionId, navigate, turnHistory, scenarioId, scenarioTitle]);
 
+  // ... (handleRecordingGrading, handlePracticeGrading, handleTtsPlaybackFinished 등 기존 함수 동일) ...
   const handleRecordingGrading = useCallback((feedback: string) => {
     if (timerRef.current) clearInterval(timerRef.current);
     setIsRecording(false);

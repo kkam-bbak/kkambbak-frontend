@@ -97,9 +97,28 @@ const TurnDisplay = ({ data, index }: { data: any; index?: number }) => {
                 <span className={styles.roleTag}>{data.speaker}</span>
             </div>
         </div>
-    );
+        <div className={styles.romanizedLine}>
+          <span className={`${styles.completeRomanizedText} ${romanizedClass}`}>{data.romanized}</span>
+          {isUserTurn && <span className={`${styles.smallMicIcon} ${styles.active}`}>🎤</span>}
+        </div>
+        <span className={styles.completeEnglishText}>{data.english}</span>
+      </div>
+      <div className={`${styles.roleTagContainer} ${isUserTurn ? styles.customerTag : styles.staffTag}`}>
+        <span className={styles.roleTag}>{data.speaker}</span>
+      </div>
+    </div>
+  );
 };
 
+const LS_KEY_COMPLETIONS = 'roleplay_completions';
+interface CompletionData {
+  isCompleted: boolean;
+  actualTime: number;
+}
+type CompletedScenarios = { [scenarioId: number]: CompletionData };
+
+
+// --- LocalStorage 키 (완료 여부 확인용) ---
 const LS_KEY_COMPLETIONS = 'roleplay_completions';
 interface CompletionData {
   isCompleted: boolean;
