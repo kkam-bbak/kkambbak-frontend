@@ -51,7 +51,7 @@ const MainPage: React.FC = () => {
             className={`${styles.item} ${styles.learn} `}
             onClick={(e) => handleMenuToggle(e, LEARN)}
           >
-            <h2 className={styles.title}>Learn Korean in the blink</h2>
+            <h2 className={styles.title}>Learn Korean with one blink</h2>
 
             <div
               className={`${styles.panel} ${

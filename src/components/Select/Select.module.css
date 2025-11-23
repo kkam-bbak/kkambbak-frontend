@@ -26,6 +26,10 @@
   border-radius: 10px;
 }
 
+.select:focus {
+  outline: none;
+}
+
 .icon {
   position: absolute;
   top: 50%;
