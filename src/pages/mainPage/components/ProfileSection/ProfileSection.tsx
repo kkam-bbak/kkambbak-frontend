@@ -3,7 +3,7 @@ import Button from '@/components/Button/Button';
 import Textarea from '@/components/Textarea/Textarea';
 import { useUser } from '@/stores/user';
 import styles from './ProfileSection.module.css';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { LEARN } from '../../mainPage';
 import { useEffect, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
@@ -16,12 +16,14 @@ type ProfileSectionProps = {
 
 function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
   const user = useUser((s) => s.user);
-  const [imgUrl, setImgUrl] = useState('');
+  const [imgUrl, setImgUrl] = useState<string>();
   const captureRef = useRef<HTMLDivElement>(null);
+  const [searchParam] = useSearchParams();
+
   const { data: blob } = useQuery({
     queryKey: ['profileImage', user?.name],
     queryFn: () => getImageBinary(user?.profileImage),
-    enabled: !!user,
+    enabled: searchParam.get('menu') === 'profile' && !!user,
   });
 
   const handleCapture = async () => {
@@ -34,6 +36,7 @@ function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
     link.href = dataUrl;
     link.download = 'capture.png';
     link.click();
+    document.body.removeChild(link);
   };
 
   useEffect(() => {
