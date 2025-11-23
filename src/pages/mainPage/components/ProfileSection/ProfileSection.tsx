@@ -5,6 +5,10 @@ import { useUser } from '@/stores/user';
 import styles from './ProfileSection.module.css';
 import { Link } from 'react-router-dom';
 import { LEARN } from '../../mainPage';
+import { useEffect, useRef, useState } from 'react';
+import html2canvas from 'html2canvas';
+import { getImageBinary } from '@/apis/users';
+import { useQuery } from '@tanstack/react-query';
 
 type ProfileSectionProps = {
   onMenuToggle: (e: React.MouseEvent, menu: typeof LEARN) => void;
@@ -12,6 +16,38 @@ type ProfileSectionProps = {
 
 function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
   const user = useUser((s) => s.user);
+  const [imgUrl, setImgUrl] = useState('');
+  const captureRef = useRef<HTMLDivElement>(null);
+  const { data: blob } = useQuery({
+    queryKey: ['profileImage', user?.name],
+    queryFn: () => getImageBinary(user?.profileImage),
+    enabled: !!user,
+  });
+
+  const handleCapture = async () => {
+    if (!captureRef.current) return;
+
+    const canvas = await html2canvas(captureRef.current);
+    const dataUrl = canvas.toDataURL('image/png');
+
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = 'capture.png';
+    link.click();
+  };
+
+  useEffect(() => {
+    let url: string | null = null;
+
+    if (blob) {
+      url = URL.createObjectURL(blob);
+      setImgUrl(url);
+    }
+
+    return () => {
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [blob]);
 
   if (!user)
     return (
@@ -21,14 +57,15 @@ function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
         </Button>
       </>
     );
+
   return (
     <section className={styles.section}>
-      <div>
+      <div className={styles['capture']} ref={captureRef}>
         <div className={styles.header}>
           <h2 className={styles.title}>Profile</h2>
           <img
             className={styles.image}
-            src={user.profileImage}
+            src={imgUrl}
             alt="사용자 프로필 이미지"
           />
         </div>
@@ -65,6 +102,10 @@ function ProfileSection({ onMenuToggle }: ProfileSectionProps) {
             </Link>
           </div>
         )}
+
+        <Button isFull onClick={handleCapture}>
+          Share
+        </Button>
 
         <Button isFull onClick={(e) => onMenuToggle(e, LEARN)}>
           Done
