@@ -40,7 +40,7 @@ const MainPage: React.FC = () => {
         image="basic"
         text={
           openMenu === ROLE
-            ? `Let's learn how to converse\nin Korean through role playing.`
+            ? `Let's learn how to converse in\nKorean through role playing.`
             : `Let's learn basic Korean words`
         }
       />
