@@ -7,7 +7,7 @@ import learnVideo from '../../assets/Learn Korean with one blink.mp4';
 import roleplayVideo from '../../assets/Role Play.mp4';
 import Button from '@/components/Button/Button';
 import ProfileSection from './components/ProfileSection/ProfileSection';
-import { http } from '../../apis/http'; 
+import { http } from '../../apis/http';
 
 export const LEARN = 'learn';
 const ROLE = 'role';
@@ -43,15 +43,15 @@ const MainPage: React.FC = () => {
 
       if (isCompleted) {
         // 설문 완료 상태라면 바로 학습 목록으로 이동
-        navigate('/mainpage/learnList');
+        navigate('/main/learnList');
       } else {
         // 설문 미완료 상태라면 설문 시작 페이지로 이동
-        navigate('/mainpage/surveyStart');
+        navigate('/main/surveyStart');
       }
     } catch (error) {
       console.error('설문 확인 중 오류 발생:', error);
       // API 호출 실패 시 기본 동작으로 설문 시작 페이지로 이동
-      navigate('/mainpage/surveyStart');
+      navigate('/main/surveyStart');
     }
   };
 
@@ -90,7 +90,9 @@ const MainPage: React.FC = () => {
                   muted
                   playsInline
                 />
-                <Button isFull onClick={handleStartLearning}>Start learning</Button>
+                <Button isFull onClick={handleStartLearning}>
+                  Start learning
+                </Button>
               </div>
             </div>
           </li>
@@ -115,7 +117,7 @@ const MainPage: React.FC = () => {
                   muted
                   playsInline
                 />
-                <Link to={'/mainpage/roleList'}>
+                <Link to={'/main/roleList'}>
                   <Button isFull>Start Role Playing</Button>
                 </Link>
               </div>

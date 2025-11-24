@@ -6,7 +6,7 @@ import ContentSection from '@/components/layout/ContentSection/ContentSection';
 function NotFound() {
   return (
     <div className={styles.page}>
-      <Header hasBackButton to={'/mainpage'} />
+      <Header hasBackButton to={'/main'} />
 
       <Mascot image="wrong" text="The Requested page could not be found." />
 

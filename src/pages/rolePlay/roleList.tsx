@@ -74,7 +74,7 @@ const RoleList: React.FC = () => {
 
   // ⭐ [추가] 뒤로 가기 핸들러: 메인 페이지로 이동
   const handleBackClick = useCallback(() => {
-    navigate('/mainpage');
+    navigate('/main');
   }, [navigate]);
 
   // 1. LocalStorage 데이터 로드
@@ -143,7 +143,7 @@ const RoleList: React.FC = () => {
       `Starting role play: ${selectedScenario.title} (ID: ${roleId})`,
     );
 
-    navigate(`/mainpage/rolePlay/${roleId}`, {
+    navigate(`/main/rolePlay/${roleId}`, {
       state: {
         scenarioTitle: selectedScenario.title,
       },

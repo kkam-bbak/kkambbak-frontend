@@ -20,7 +20,7 @@ export default function OAuthRedirect() {
         isGuest: false,
       });
 
-      navigate('/mainpage');
+      navigate('/main');
     } else {
       // 토큰이 없으면 로그인 페이지로
       navigate('/login');

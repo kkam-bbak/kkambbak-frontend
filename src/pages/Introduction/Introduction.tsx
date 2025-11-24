@@ -61,7 +61,7 @@ function Introduction() {
       </div>
 
       <div className={styles.buttons}>
-        <Link to={'/mainpage'}>
+        <Link to={'/main'}>
           <button className={styles.button}>Go to learning</button>
         </Link>
 

@@ -61,7 +61,7 @@ function KoreanContent({ updateMascot }: KoreanContentProps) {
     createNameMutate(info, {
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: ['user'] });
-        navigate('/mainpage?menu=profile', { replace: true });
+        navigate('/main?menu=profile', { replace: true });
       },
     });
   };
