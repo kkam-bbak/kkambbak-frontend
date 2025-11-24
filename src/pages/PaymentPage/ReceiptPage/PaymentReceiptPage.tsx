@@ -14,6 +14,7 @@ import Button from '@/components/Button/Button';
 import { Link } from 'react-router-dom';
 import Box from '@/components/Box/Box';
 import Select from '@/components/Select/Select';
+import Modal from '@/components/Modal/Modal';
 
 const PLAN = {
   PREMIUM: 'Premium',
@@ -133,22 +134,20 @@ function PaymentReceiptPage() {
       </div>
 
       {isOpenModal && (
-        <aside className={styles.aside} onClick={handleCloseModal}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <p className={`h1 ${styles.message}`}>
-              Are you sure you want to change to the standard Plan?
-            </p>
+        <Modal onCloseModal={handleCloseModal}>
+          <p className={`h1 ${styles.message}`}>
+            Are you sure you want to change to the standard Plan?
+          </p>
 
-            <div className={styles.buttons}>
-              <Button isFull onClick={handleCloseModal}>
-                No
-              </Button>
-              <Button isFull onClick={(e) => handleChangeButtonClick(e)}>
-                Yes
-              </Button>
-            </div>
+          <div className={styles.buttons}>
+            <Button isFull onClick={handleCloseModal}>
+              No
+            </Button>
+            <Button isFull onClick={(e) => handleChangeButtonClick(e)}>
+              Yes
+            </Button>
           </div>
-        </aside>
+        </Modal>
       )}
     </div>
   );
