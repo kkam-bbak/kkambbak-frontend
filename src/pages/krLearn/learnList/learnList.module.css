@@ -152,10 +152,12 @@
 
 /* 구분선 */
 .cardDivider {
-  width: 100%;
+  position: relative;
+  width: 328px;
   height: 1.5px;
   margin: 4px 0 10px;
   background-color: black;
+  right: 16px;
 }
 
 /* 하단 정보 */
