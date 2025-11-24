@@ -1269,35 +1269,28 @@ const RolePlay: React.FC = () => {
               </div>
             )}
           <div className={`${styles.micArea} ${styles.choiceButton}`}>
-            {customerData.map((option) => (
-              <button
-                key={option.id}
-                className={`${styles.choiceButtonAction} ${
-                  option.id === selectedChoiceId ? styles.selected : ''
-                }`}
-                onClick={() =>
-                  handleChoiceOptionClick(option.id, option.korean)
-                }
-                disabled={isDisabled}
-              >
-                {option.id}
-              </button>
-            ))}
-            <button
-              className={`${styles.mainMicButton} ${
-                styles.selectSubmitButton
-              } ${
-                step === STEPS.CHOICE_FEEDBACK
-                  ? gradingResult === 'CORRECT'
-                    ? styles.correctSubmit
-                    : styles.incorrectSubmit
-                  : ''
-              } ${submitButtonClass}`}
+            <div className={styles.choices}>
+              {customerData.map((option) => (
+                <Button
+                  key={option.id}
+                  onClick={() =>
+                    handleChoiceOptionClick(option.id, option.korean)
+                  }
+                  isFull
+                  disabled={isDisabled}
+                  selected={option.id === selectedChoiceId}
+                >
+                  {option.id}
+                </Button>
+              ))}
+            </div>
+            <Button
               onClick={handleChoiceSelect}
               disabled={!isSubmitActive}
+              isFull
             >
-              <span className={styles.selectSubmitText}>Select</span>
-            </button>
+              Select
+            </Button>
           </div>
         </>
       );
@@ -1463,18 +1456,12 @@ const RolePlay: React.FC = () => {
                 Role Play and go back?
               </div>
               <div className={styles.exitModalButtons}>
-                <button
-                  onClick={handleExitCancel}
-                  className={styles.exitButtonNo}
-                >
+                <Button onClick={handleExitCancel} isFull>
                   No
-                </button>
-                <button
-                  onClick={handleExitConfirm}
-                  className={styles.exitButtonYes}
-                >
+                </Button>
+                <Button onClick={handleExitConfirm} isFull>
                   Yes
-                </button>
+                </Button>
               </div>
             </div>
           </div>

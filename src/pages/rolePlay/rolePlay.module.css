@@ -261,6 +261,10 @@
   animation: pressed 1s ease infinite;
 }
 
+.record-button:disabled .mic-image {
+  filter: invert(0.9);
+}
+
 @keyframes pressed {
   0% {
     filter: invert(0);
@@ -358,9 +362,16 @@
 .micArea.choiceButton {
   /* JSX: className={`${styles.micArea} ${styles.choiceButton}`} */
   display: flex;
+  gap: 16px;
   align-items: center;
-  justify-content: space-between;
+  width: 100%;
   background-color: transparent;
+}
+
+.choices {
+  display: flex;
+  gap: 16px;
+  width: 100%;
 }
 
 .choiceButton .choiceButtonAction {
@@ -444,12 +455,16 @@
   background-color: rgb(0 0 0 / 60%); /* 반투명 검은 배경 */
 }
 
+@media (min-width: 600px) {
+  .exitModalOverlay {
+    position: absolute;
+    bottom: 0;
+  }
+}
+
 /* 2. 모달 콘텐츠 래퍼 (가로 폭 제한 등) */
 .exitModalContent {
-  box-sizing: border-box;
   width: 100%;
-  max-width: 400px; /* 모바일 앱 너비 제한 */
-  padding: 0 20px 40px; /* 좌우 여백 및 하단 여백 */
   animation: slideUp 0.3s ease-out; /* 밑에서 올라오는 애니메이션 효과 */
 }
 
@@ -460,7 +475,7 @@
   color: var(--color-grayscale-7);
   text-align: center;
   background-color: #007cff;
-  border-radius: 24px;
+  border-radius: 24px 24px 0 0;
   box-shadow: 0 4px 20px rgb(0 0 0 / 20%);
 }
 
