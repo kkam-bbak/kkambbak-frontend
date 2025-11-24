@@ -23,7 +23,7 @@
   /* JSX: className={styles.cardTitleText} */
   font-size: 18px;
   font-weight: 500;
-  color: black;
+  color: var(--color-grayscale-7);
 }
 
 .cardStepText {
@@ -102,7 +102,7 @@
   font-size: 13px;
   font-weight: 500;
   line-height: 24px;
-  color: white;
+  color: var(--color-grayscale-1);
   word-break: keep-all; /* 단어 단위 줄바꿈 */
 }
 
@@ -148,7 +148,7 @@
 
 .smallMicIcon.active {
   /* JSX: className={`${styles.smallMicIcon} ${styles.active}`} */
-  color: white;
+  color: var(--color-grayscale-1);
 }
 
 /* 영어 번역 텍스트 */
@@ -179,8 +179,8 @@
   margin-top: 20px; /* 말풍선과의 간격 */
   font-size: 12px;
   font-weight: 600;
-  color: black;
-  background-color: white;
+  color: var(--color-grayscale-7);
+  background-color: var(--color-grayscale-1);
   border-radius: 5px;
 }
 
@@ -236,8 +236,8 @@
   height: 40px;
   font-size: 14px;
   font-weight: 600;
-  color: black;
-  background-color: white;
+  color: var(--color-grayscale-7);
+  background-color: var(--color-grayscale-1);
   border-radius: 10px;
 }
 
@@ -315,21 +315,21 @@
 /* 마이크 버튼 상태: CSS Modules에서 조합 클래스 사용 */
 .mainMicButton.off {
   /* JSX: className={`${styles.mainMicButton} ${styles.off}`} */
-  background-color: white;
+  background-color: var(--color-grayscale-1);
 }
 
 .mainMicButton.off .mainMicIcon {
-  color: black;
+  color: var(--color-grayscale-7);
 }
 
 .mainMicButton.on {
   /* JSX: className={`${styles.mainMicButton} ${styles.on}`} */
-  color: white;
-  background-color: black;
+  color: var(--color-grayscale-1);
+  background-color: var(--color-grayscale-7);
 }
 
 .mainMicButton.on .mainMicIcon {
-  color: white;
+  color: var(--color-grayscale-1);
 }
 
 .mainMicButton.disabled {
@@ -349,7 +349,7 @@
 }
 
 /* choice 버튼 스타일 */
-.choiceOptionsArea {
+.choice-options-area {
   /* JSX: className={styles.choiceOptionsArea} */
   position: absolute;
   top: 190px;
@@ -371,14 +371,14 @@
   font-weight: 600;
   color: #1a1a1a;
   cursor: pointer;
-  background-color: white;
+  background-color: var(--color-grayscale-1);
   border: 2px solid #eee;
   border-radius: 10px;
   transition: all 0.2s ease;
 }
 
 .choiceButton .choiceButtonAction.selected {
-  color: white;
+  color: var(--color-grayscale-1);
 
   /* JSX: className={`${styles.choiceButtonAction} ${styles.selected}`} */
   background-color: #1a1a1a;
@@ -393,9 +393,9 @@
   height: 40px;
   font-size: 14px;
   font-weight: 600;
-  color: black;
+  color: var(--color-grayscale-7);
   cursor: pointer;
-  background-color: white;
+  background-color: var(--color-grayscale-1);
   border: none;
   border-radius: 10px;
 }
@@ -408,7 +408,7 @@
   cursor: not-allowed;
 
   /* JSX: className={styles.off} ${styles.disabled} */
-  background-color: white;
+  background-color: var(--color-grayscale-1);
   opacity: 0.5;
 }
 
@@ -419,7 +419,7 @@
   cursor: pointer;
 
   /* JSX: className={styles.on} */
-  background-color: white;
+  background-color: var(--color-grayscale-1);
   opacity: 1;
 }
 
@@ -427,7 +427,7 @@
 
 /* JSX에서 styles.on이 적용된 버튼에 :active 의사 클래스 사용 */
 .micArea .selectSubmitButton.on:active {
-  color: white;
+  color: var(--color-grayscale-1);
   background-color: #1a1a1a;
 }
 
@@ -457,7 +457,7 @@
 .exitModalCard {
   height: 230px;
   padding: 30px 20px;
-  color: black;
+  color: var(--color-grayscale-7);
   text-align: center;
   background-color: #007cff;
   border-radius: 24px;
@@ -500,14 +500,14 @@
 
 /* No 버튼 (흰색) */
 .exitButtonNo {
-  color: black;
-  background-color: white;
+  color: var(--color-grayscale-7);
+  background-color: var(--color-grayscale-1);
 }
 
 /* Yes 버튼 (흰색) */
 .exitButtonYes {
-  color: black;
-  background-color: white;
+  color: var(--color-grayscale-7);
+  background-color: var(--color-grayscale-1);
 }
 
 /* 버튼 눌림 효과 */
