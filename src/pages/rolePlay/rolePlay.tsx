@@ -132,7 +132,9 @@ const evaluatePronunciation = async (
     const response = await http.post('/roleplay/evaluate', formData, {
       params: { sessionId, dialogueId },
     });
+
     console.log(response.data.body.score);
+
     return response.data.body;
   } catch (error) {
     console.error('❌ Evaluation failed:', error);
