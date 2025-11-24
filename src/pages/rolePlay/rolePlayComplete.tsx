@@ -185,16 +185,16 @@ const RolePlayComplete: React.FC = () => {
   }, [correctCount, totalCount]);
 
   const handleBackClick = useCallback(() => {
-    navigate('/mainpage/roleList');
+    navigate('/main/roleList');
   }, [navigate]);
 
   const handleTryAgain = useCallback(() => {
     if (currentScenarioId) {
-      navigate(`/mainpage/rolePlay/${currentScenarioId}`, {
+      navigate(`/main/rolePlay/${currentScenarioId}`, {
         state: { scenarioTitle: rolePlayName },
       });
     } else {
-      navigate('/mainpage/roleList');
+      navigate('/main/roleList');
     }
   }, [navigate, currentScenarioId, rolePlayName]);
 
@@ -243,22 +243,22 @@ const RolePlayComplete: React.FC = () => {
         }
 
         if (nextSession) {
-          navigate(`/mainpage/roleplay/${nextSession.id}`, {
+          navigate(`/main/roleplay/${nextSession.id}`, {
             state: {
               scenarioTitle: nextSession.title,
             },
           });
         } else {
           alert('모든 학습을 완료했습니다! 🎉 목록으로 이동합니다.');
-          navigate('/mainpage/roleList');
+          navigate('/main/roleList');
         }
       } else {
         alert('학습 가능한 세션이 없습니다.');
-        navigate('/mainpage/roleList');
+        navigate('/main/roleList');
       }
     } catch (error) {
       console.error('Failed to fetch next roleplay session:', error);
-      navigate('/mainpage/roleList');
+      navigate('/main/roleList');
     }
   }, [navigate, currentScenarioId]);
 

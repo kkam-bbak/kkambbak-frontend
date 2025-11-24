@@ -379,7 +379,7 @@ const RolePlay: React.FC = () => {
 
   const handleExitConfirm = useCallback(() => {
     setShowExitModal(false);
-    navigate('/mainpage/roleList');
+    navigate('/main/roleList');
   }, [navigate]);
 
   const handleExitCancel = useCallback(() => {
@@ -532,7 +532,7 @@ const RolePlay: React.FC = () => {
               ? [...turnHistory, lastTurnAdded]
               : turnHistory;
 
-            navigate('/mainpage/rolePlay/complete', {
+            navigate('/main/rolePlay/complete', {
               state: {
                 sessionId,
                 scenarioId: parseInt(scenarioId || '0'),
@@ -906,7 +906,7 @@ const RolePlay: React.FC = () => {
           modalOpen(
             '일시적인 서버 지연으로 응답하지 못했습니다.\n토큰은 차감되지 않았습니다.\n목록으로 돌아갑니다.',
           );
-          navigate('/mainpage/roleList');
+          navigate('/main/roleList');
           return;
         }
         if (statusCode === 'R015') {

@@ -12,7 +12,7 @@ export default function Splash() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (user) {
-        navigate('/mainpage');
+        navigate('/main');
       } else {
         navigate('/login');
       }

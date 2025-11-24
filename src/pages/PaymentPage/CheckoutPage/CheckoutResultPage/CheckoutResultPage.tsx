@@ -43,7 +43,7 @@ function CheckoutResultPage() {
         <Box text={data?.userEmail ?? ''} label="Email *" />
       </div>
 
-      <Link to={'/mainpage/roleList'}>
+      <Link to={'/main/roleList'}>
         <Button isFull>Back to learning</Button>
       </Link>
     </div>
