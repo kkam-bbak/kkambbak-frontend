@@ -11,6 +11,8 @@ import MicOn from '@/assets/MicOn.png';
 import MicOff from '@/assets/MicOff.png';
 import CrtSnd from '@/assets/CrtSnd.mp3';
 import WrgSnd from '@/assets/WrgSnd.mp3'; 
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
+import Button from '@/components/Button/Button';
 
 // --- 인터페이스 정의 ---
 interface ApiResponseBody<T> {
@@ -673,7 +675,7 @@ const LearnStart: React.FC = () => {
         {renderResultFeedbackImage()}
         <Mascot image={getMascotImage()} text={bubbleText} />
       </div>
-      <div className={styles.learningCard}>
+      <ContentSection>
         <div className={styles.cardTitleBar}>
           <span className={styles.topicName}>{content.topicTitle}</span>
           <span className={styles.wordCount}>{`${Math.min(currentWordIndex, totalWords).toString().padStart(2, '0')}/${totalWords.toString().padStart(2, '0')}`}</span>
@@ -705,8 +707,8 @@ const LearnStart: React.FC = () => {
         </div>
         {isIncorrectView ? (
           <div className={styles.actionButtonsContainer}>
-            <button className={styles.actionButton} onClick={() => handleAction('tryAgain')}>Try Again</button>
-            <button className={styles.actionButton} onClick={() => handleAction('next')}>Next</button>
+            <Button className={styles.actionButton} onClick={() => handleAction('tryAgain')}>Try Again</Button>
+            <Button className={styles.actionButton} onClick={() => handleAction('next')}>Next</Button>
           </div>
         ) : (
           <button className={`${styles.micButton} ${micOn ? styles.on : styles.off} ${isMicButtonDisabled ? styles.disabled : ''}`}
@@ -716,7 +718,7 @@ const LearnStart: React.FC = () => {
             {renderMicIcon()}
           </button>
         )}
-      </div>
+      </ContentSection>
       
       {showExitModal && (
         <div className={styles.exitModalOverlay}>
@@ -726,8 +728,8 @@ const LearnStart: React.FC = () => {
                     Are you sure you want to quit <br /> Learning and go back?
                 </div>
                 <div className={styles.exitModalButtons}>
-                    <button onClick={handleContinueLearning} className={styles.exitButtonNo}>No</button>
-                    <button onClick={handleExitLearning} className={styles.exitButtonYes}>Yes</button>
+                    <Button onClick={handleContinueLearning} className={styles.exitButtonNo}>No</Button>
+                    <Button onClick={handleExitLearning} className={styles.exitButtonYes}>Yes</Button>
                 </div>
             </div>
           </div>
