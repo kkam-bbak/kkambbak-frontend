@@ -977,7 +977,7 @@ const RolePlay: React.FC = () => {
 
   if (isLoading)
     return (
-      <div className={styles.pageContainer}>
+      <div className={styles['loading-page']}>
         <Mascot image="thinking" text="Loading roleplay..." />
       </div>
     );
