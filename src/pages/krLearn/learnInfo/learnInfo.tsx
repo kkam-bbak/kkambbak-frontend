@@ -171,88 +171,77 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
 
   return (
     <div className={modalClassName}>
-            {/* ⭐ [핵심 수정]: customBackAction에 onClose 연결 */}
-            <Header hasBackButton customBackAction={onClose} />     {' '}
-      {/* 🔥 styles.mascotWrapper 적용 */}     {' '}
+      {/* ⭐ [핵심 수정]: customBackAction에 onClose 연결 */}
+      <Header hasBackButton customBackAction={onClose} />
+      {/* 🔥 styles.mascotWrapper 적용 */}
       <div className={styles.mascotWrapper}>
-                <Mascot image={getMascotImage()} text={currentSpeechText} />   
-         {' '}
+        <Mascot image={getMascotImage()} text={currentSpeechText} />
       </div>
-           {' '}
+
       <div className="page-container">
-               {' '}
         <ContentSection>
-                    {/* 🔥 styles.learningCardInfo 적용 */}         {' '}
+          {/* 🔥 styles.learningCardInfo 적용 */}
           <div className={`${styles.learningCardInfo} ${getCardClass()}`}>
-                       {' '}
             <div className={styles.cardTitleBarInfo}>
-                           {' '}
-              <span className={styles.topicNameInfo}>Casual_Emotions</span>     
-                     {' '}
+              <span className={styles.topicNameInfo}>Casual_Emotions</span>
+
               <span className={styles.wordCountInfo}>{`01/${wordCount
                 .toString()
                 .padStart(2, '0')}`}</span>
-                         {' '}
             </div>
-                       {' '}
+
             <div
               className={`${styles.wordDisplayAreaInfo} ${getInputClass(
                 'image',
               )}`}
             >
-                            {/* 내용 없음 */}           {' '}
+              {/* 내용 없음 */}
             </div>
-                       {' '}
+
             <div className={styles.inputFieldsContainerInfo}>
-                            {/* Romnized */}             {' '}
+              {/* Romnized */}
               <div
                 className={`${styles.inputRowInfo} ${getInputClass(
                   'romnized',
                 )}`}
               >
-                                <label>Romnized</label>
-                               {' '}
-                <input type="text" readOnly value={isFieldsActive ? '' : ''} /> 
-                             {' '}
+                <label>Romnized</label>
+
+                <input type="text" readOnly value={isFieldsActive ? '' : ''} />
+
                 <button
                   className={`${styles.speakerIconInfo} ${
                     currentStep === 7 ? styles.highlightSpeaker : ''
                   }`}
                   disabled={currentStep !== 7}
                 >
-                                   {' '}
                   <img
                     src={soundButton}
                     alt="listen"
                     className={styles.speakerIconImage}
                   />
-                                 {' '}
                 </button>
-                             {' '}
               </div>
-                            {/* Korean */}             {' '}
+              {/* Korean */}
               <div
                 className={`${styles.inputRowInfo} ${getInputClass('korean')}`}
               >
-                                <label>Korean</label>
-                               {' '}
-                <input type="text" readOnly value={isFieldsActive ? '' : ''} /> 
-                           {' '}
+                <label>Korean</label>
+
+                <input type="text" readOnly value={isFieldsActive ? '' : ''} />
               </div>
-                            {/* Translation */}             {' '}
+              {/* Translation */}
               <div
                 className={`${styles.inputRowInfo} ${
                   styles.translationInfo
                 } ${getInputClass('translation')}`}
               >
-                                <label>Translation</label>
-                               {' '}
-                <input type="text" readOnly value={isFieldsActive ? '' : ''} /> 
-                           {' '}
+                <label>Translation</label>
+
+                <input type="text" readOnly value={isFieldsActive ? '' : ''} />
               </div>
-                         {' '}
             </div>
-                       {' '}
+
             <button
               className={`${styles.micButtonInfo} ${getMicButtonState()}`}
               onMouseDown={handleMicDown}
@@ -261,15 +250,11 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
               onTouchEnd={handleMicUp}
               disabled={currentStep !== 3 && currentStep !== 4}
             >
-                            {renderMicIcon()}           {' '}
+              {renderMicIcon()}
             </button>
-                     {' '}
           </div>
-                 {' '}
         </ContentSection>
-             {' '}
       </div>
-         {' '}
     </div>
   );
 };
