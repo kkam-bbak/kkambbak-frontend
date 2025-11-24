@@ -13,6 +13,7 @@ import CrtSnd from '@/assets/CrtSnd.mp3';
 import WrgSnd from '@/assets/WrgSnd.mp3'; 
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 import Button from '@/components/Button/Button';
+import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
 
 // --- 인터페이스 정의 ---
 interface ApiResponseBody<T> {
@@ -661,10 +662,10 @@ const LearnStart: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className={styles.learnStartContainer}>
-        <Header hasBackButton />
-        <Mascot image="basic" text={bubbleText} />
-      </div>
+        <div className={styles.spinnerWrapper}>
+            <SpinnerIcon />
+        </div>
+    
     );
   }
 
@@ -692,7 +693,11 @@ const LearnStart: React.FC = () => {
           <div className={styles.inputRow}>
             <label>Romnized</label>
             <input type="text" value={isRomnizedVisible ? content.romanized : ''} readOnly />
-            <button className={`${styles.speakerIcon}`} onClick={handleSpeakerClick} disabled={!isSpeakerActive}>
+            <button 
+                className={`${styles.speakerIcon} ${isTtsPlaying ? styles.active : ''}`} 
+                onClick={handleSpeakerClick} 
+                disabled={!isSpeakerActive}
+            >
               <img src={soundButton} alt="sound" className={styles.speakerIconImage} />
             </button>
           </div>

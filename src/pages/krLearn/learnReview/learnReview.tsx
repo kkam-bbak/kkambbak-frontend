@@ -6,6 +6,8 @@ import { http } from '../../../apis/http';
 import Header from '@/components/layout/Header/Header'; 
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import type { WordResult } from '../learnStart/learnStart';
+import Button from '@/components/Button/Button';
+import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
 
 // --- API 인터페이스 ---
 interface ApiResponseBody<T> {
@@ -252,19 +254,14 @@ const LearnReview: React.FC = () => {
     
   if (reviewData.isLoading) {
     return (
-      <div className={styles.ReviewPageContainer}>
-        <Header hasBackButton customBackAction={handleBackButtonClick} />
-        <Mascot image="thinking" text="Loading results..." />
-        <div className={styles.reviewHeader}>
-            <h1 className={styles.reviewTitle} style={{marginTop: '20px'}}>
-                Loading...
-            </h1>
+      
+        <div className={styles.spinner}>
+            <SpinnerIcon />
         </div>
-      </div>
     );
   }
 
-  const displayTitle = isUpdateComplete ? `✅ Result Updated` : `${reviewData.topicName} Session Review`;
+  const displayTitle = isUpdateComplete ? `Result Updated` : `${reviewData.topicName} Session Review`;
 
   // 🔥 [버튼 비활성화 조건] 전체 개수와 정답 개수가 같으면 비활성화
   const isAllCorrect = reviewData.totalCount > 0 && reviewData.correctCount === reviewData.totalCount;
@@ -277,20 +274,25 @@ const LearnReview: React.FC = () => {
         <h1 className={styles.reviewTitle}>{displayTitle}</h1>
         <div className={styles.reviewResultsBox}>
           <h2 className={styles.resultsTopicTitle}>{reviewData.topicName} Result</h2>
+          <hr className={styles.divider}/>
           <ResultRow icon={CheckCircle} value={`${reviewData.correctCount}/${reviewData.totalCount} Vocabularies correct`} />
+          <hr className={styles.divider}/>
           <ResultRow icon={Clock} value={reviewData.learningTime} />
+          <hr className={styles.divider}/>
           <ResultRow icon={Calendar} value={reviewData.completionDate} />
         </div>
       </div>
 
       <div className={styles.wordResultList}>
         {reviewData.wordResults.length === 0 ? (
-            <div style={{color:'white', textAlign:'center', padding:'20px'}}>No data available.</div>
+            <div style={{color:'white', textAlign:'center'}}>No data available.</div>
         ) : (
             reviewData.wordResults.map((word, index) => (
               <div key={word.romnized || index} className={styles.rvWordResultContainer}>
                 <WordResultRow label="Romnized" value={word.romnized} isResult={true} isCorrect={word.isCorrect} />
+                <hr className={styles.divider}/>
                 <WordResultRow label="Korean" value={word.korean} />
+                <hr className={styles.divider}/>
                 <WordResultRow label="Translation" value={word.translation} />
               </div>
             ))
@@ -298,17 +300,17 @@ const LearnReview: React.FC = () => {
       </div>
 
       <div className={styles.reviewActionContainer}>
-        <button
+        <Button
           className={styles.reviewActionButton}
           onClick={handleWrongOnlyTryAgain}
           disabled={isAllCorrect} // 🔥 다 맞으면 비활성화
-          style={isAllCorrect ? { opacity: 0.5, cursor: 'not-allowed', backgroundColor: '#555' } : {}}
+          style={isAllCorrect ? { cursor: 'not-allowed', backgroundColor: 'white', color:'E3E3E3' } : {}}
         >
           Only wrong try Again
-        </button>
-        <button className={styles.reviewActionButton} onClick={handleTryAgain}>
+        </Button>
+        <Button className={styles.reviewActionButton} onClick={handleTryAgain}>
           Try again
-        </button>
+        </Button>
       </div>
     </div>
   );
