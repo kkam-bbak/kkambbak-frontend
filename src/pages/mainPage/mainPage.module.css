@@ -68,10 +68,15 @@
   overflow: hidden;
 }
 
+.video{
+  margin-top: 20px;
+}
+
+
 .learn {
   top: 0;
   padding-bottom: calc(
-    52px * 2 + 32px
+    52px * 2 + 32px + 5px
   ); /* role, profile header * 2 + 추가 여백 */
 
   background-color: var(--color-primary-orange);

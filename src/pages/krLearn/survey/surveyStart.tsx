@@ -2,12 +2,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { http } from '../../../apis/http';
-//import Character1 from '../../../assets/Character1.png';
 import styles from './surveyStart.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
-
+import Button from '@/components/Button/Button';
 // --- 데이터 및 타입 정의 (유지) ---
 const surveyData = [
   /* ... */
@@ -89,21 +88,21 @@ const SurveyStart: React.FC = () => {
       <CharacterSection />
 
       {/* 하단 Survey 내용 창 */}
-      <ContentSection>
+      <ContentSection noPadding>
         <h1 className={styles.surveyTitle}>Survey</h1>
 
         {/* 1. Start 버튼 */}
         <div className={styles.startButtonContainer}>
-          <button className={styles.startButton} onClick={handleStart}>
+          <Button  isFull className={styles.startButton} onClick={handleStart}>
             Start
-          </button>
+          </Button>
         </div>
 
         {/* 2. Skip to learning 버튼 */}
         <div className={styles.skipButtonContainer}>
-          <button className={styles.skipButton} onClick={handleSkip}>
+          <Button isFull className={styles.skipButton} onClick={handleSkip}>
             Skip to learning
-          </button>
+          </Button>
         </div>
       </ContentSection>
     </div>
