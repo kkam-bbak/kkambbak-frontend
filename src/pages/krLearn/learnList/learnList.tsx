@@ -111,8 +111,7 @@ const TopicCard: React.FC<TopicCardProps> = ({
     >
       <div className={styles.cardHeader}>
         <h3>{topic.title}</h3>
-        
-        {/* ⭐ [수정] 조건문 제거: 버튼은 항상 렌더링하되 CSS로 숨김/보임 처리 */}
+      
         <button
           className={`${styles.topicStartButton} ${buttonStyleClass}`}
           onClick={(e) => {

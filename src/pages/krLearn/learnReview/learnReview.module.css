@@ -4,19 +4,16 @@
   border-radius: 20px;
   font-family: 'Inter', sans-serif;
   color: white;
-
   overflow-y: auto; /* 페이지 전체에 스크롤 부여 */
-
   /* 🔥 수정: 하단 fixed 버튼 높이(50px) + 상하 패딩(15px*2)을 고려하여 공간 확보 */
   padding: 0;
-
   position: relative;
   box-sizing: border-box;
-
   /* 스크롤바 숨기기 (유지) */
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 
 /* Chrome, Safari, Opera 브라우저의 스크롤바 숨김 */
 .ReviewPageContainer::-webkit-scrollbar {
@@ -24,7 +21,6 @@
 }
 
 /* -------------------- 1. 상단 타이틀 및 요약 카드 -------------------- */
-
 .reviewHeader {
   padding: 5px 15px 15px 15px;
   /* 🔥 수정: 스크롤 시 상단에 고정 */
@@ -48,8 +44,9 @@
   background-color: black;
   color: white;
   border-radius: 10px;
-  padding: 0px 15px 15px 15px;
+  padding: 0px 15px 20px 15px;
   height: 131px;
+
 }
 
 .resultsTopicTitle {
@@ -69,12 +66,14 @@
   gap: 10px;
   margin-bottom: 10px;
 }
+
 .resultIcon {
   width: 20px;
   height: 20px;
   color: white;
   margin-right: 5px;
 }
+
 .resultValue {
   font-size: 12px;
   font-weight: 500;
@@ -82,34 +81,25 @@
 }
 
 /* -------------------- 2. 단어별 결과 목록 -------------------- */
-
 .wordResultList {
   position: relative;
   padding: 0 15px;
-  
   /* 🔥 수정 1: 내용이 없어도 최소한 이만큼은 공간을 확보함 */
-  min-height: 450px; 
-  /* 또는 아예 고정하고 싶다면 */
-  /* height: 450px; */
-  
+  min-height: 450px;
   overflow-y: scroll; /* 스크롤 기능은 유지 */
-
   /* IE 및 구형 Edge */
   -ms-overflow-style: none;
   /* Firefox */
   scrollbar-width: none;
-  
-  /* 🔥 수정 2: (선택사항) 빈 공간일 때 배경색이 필요하다면 추가 */
-  /* background-color: rgba(0,0,0,0.1); */
 }
 
 /* Chrome, Safari, Edge 최신 버전 */
 .wordResultList::-webkit-scrollbar {
   display: none;
 }
+
 /* 단어 컨테이너 (단어 한 쌍) */
 .rvWordResultContainer {
-
   background-color: black;
   border-radius: 10px;
   margin-bottom: 8px;
@@ -159,7 +149,6 @@
   display: flex; /* Flexbox 활성화 */
   justify-content: center; /* 수평 중앙 정렬 (기존 text-align: center 대체) */
   align-items: center; /* 수직 중앙 정렬 */
-
 }
 
 .resultTag.correct {
@@ -173,20 +162,16 @@
 }
 
 /* -------------------- 3. 하단 고정 버튼 -------------------- */
-
 .reviewActionContainer {
   /* 🔥 수정: Fixed 속성을 다시 적용 */
   position: sticky;
   bottom: 0px;
   border-bottom-left-radius: 40px;
   border-bottom-right-radius: 40px;
-
   width: 358px; /*경계선 때문에 360px 적용 안함*/
   height: 72px;
   background-color: #ff5000;
-
   /* 🔥 수정: 이미지처럼 버튼이 하단 경계에 가깝게 붙도록 패딩 조정 */
-
   padding: 15px;
   display: flex;
   justify-content: space-between;
@@ -207,4 +192,24 @@
   color: black;
 }
 
+.divider {
+  position: absolute;
+  color: black;
+  border: 1.5px solid;
+  margin:0px;
+  padding:0px;
+}
 
+.spinner {
+  /* ⭐ Flexbox로 중앙 정렬 */
+  display: flex;
+  justify-content: center; /* 가로 중앙 */
+  align-items: center;     /* 세로 중앙 */
+  
+  /* ⭐ 영역 확보 (필수) */
+  width: 100%;   /* 너비 꽉 채우기 */
+  height: 100%;  /* 부모 높이를 꽉 채우거나, min-height: 200px; 처럼 고정 높이 지정 */
+  
+  /* (선택) 로딩 영역에 여백이 필요하다면 */
+  /* padding: 20px 0; */
+}

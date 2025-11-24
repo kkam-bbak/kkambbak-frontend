@@ -83,7 +83,7 @@
   justify-content: space-between;
   font-weight: 500;
   font-size: 16px;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
   color: black;
 }
 
@@ -105,7 +105,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   flex-shrink: 0;
 }
 
@@ -114,7 +114,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 8px;
+
 }
 
 .inputRowInfo {
@@ -197,11 +197,12 @@
 /* 마이크 버튼 */
 .micButtonInfo {
   position: absolute;
-  bottom: 16px;
+
   left: 16px;
   right: 16px;
+  top: 374px;
   /* width: 100% - 32px (padding) 으로 자동 조정됨 (left/right 설정 시) */
-  height: 50px;
+  height: 40px;
   border: none;
   border-radius: 10px;
   font-size: 16px;
@@ -216,6 +217,7 @@
 }
 
 .micIcon {
+
   font-size: 24px;
   
   /* 🔥 핵심 1: 위치 및 레이어 순서 명시 */

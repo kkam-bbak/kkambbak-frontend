@@ -130,7 +130,6 @@
   pointer-events: auto;
 }
 
-/* Completed (Topik 2)의 Learn Again 버튼 스타일 */
 .learnAgain {
   width: 65px;
   height: 20px;
@@ -143,15 +142,22 @@
   color: white;
   background-color: #757575;
   
-  /* topicStartButton과 함께 사용되므로 호버 효과는 자동 적용됨 */
+  /* ⭐ [추가] 항상 보이게 설정 */
+  opacity: 1 !important; 
+  pointer-events: auto !important;
+
+  /* ⭐ [추가] 텍스트 한 줄로 유지 */
+  white-space: nowrap;
 }
 
 /* 구분선 */
 .cardDivider {
-  width: 100%;
+  position: relative;
+  width: 328px;
   height: 1.5px;
   margin: 4px 0 10px;
   background-color: black;
+  right: 16px;
 }
 
 /* 하단 정보 */
