@@ -43,14 +43,14 @@
 
 /* Skip to learning 버튼 (가장 하단 고정) */
 .skipButtonContainer {
-  bottom: 20px;
+  bottom: 16px;
   height: 40px;
 }
 
 /* ⭐️ Start 버튼 컨테이너 (Skip 버튼 위에 위치) */
 .startButtonContainer {
-  /* Skip 버튼 bottom 20px + Skip 버튼 height 40px + 10px 간격 = 70px */
-  bottom: 70px;
+  /* Skip 버튼 bottom 16px + Skip 버튼 height 40px + 16px 간격 = 72px */
+  bottom: 72px;
 }
 
 /* Skip/Start learning 버튼 크기 일치 */
@@ -67,3 +67,5 @@
   border: none;
   border-radius: 10px;
 }
+
+

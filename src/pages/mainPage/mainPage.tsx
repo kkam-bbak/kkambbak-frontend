@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import styles from './mainPage.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
@@ -7,6 +7,7 @@ import learnVideo from '../../assets/Learn Korean with one blink.mp4';
 import roleplayVideo from '../../assets/Role Play.mp4';
 import Button from '@/components/Button/Button';
 import ProfileSection from './components/ProfileSection/ProfileSection';
+import { http } from '../../apis/http'; 
 
 export const LEARN = 'learn';
 const ROLE = 'role';
@@ -21,6 +22,7 @@ type MENU = typeof LEARN | typeof ROLE | typeof PROFILE;
 const MainPage: React.FC = () => {
   const [openMenu, setOpenMenu] = useState<MENU>(LEARN);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate(); // 네비게이션 훅 사용
 
   const handleMenuToggle = (e: React.MouseEvent, menu: MENU) => {
     e.stopPropagation();
@@ -31,6 +33,27 @@ const MainPage: React.FC = () => {
     const menu = searchParams.get('menu');
     setOpenMenu(MENUS[menu] ?? LEARN);
   }, [searchParams]);
+
+  // Start Learning 버튼 클릭 핸들러
+  const handleStartLearning = async () => {
+    try {
+      // 설문 완료 여부 확인 API 호출
+      const response = await http.get('/surveys/check');
+      const isCompleted = response.data?.body?.completed;
+
+      if (isCompleted) {
+        // 설문 완료 상태라면 바로 학습 목록으로 이동
+        navigate('/mainpage/learnList');
+      } else {
+        // 설문 미완료 상태라면 설문 시작 페이지로 이동
+        navigate('/mainpage/surveyStart');
+      }
+    } catch (error) {
+      console.error('설문 확인 중 오류 발생:', error);
+      // API 호출 실패 시 기본 동작으로 설문 시작 페이지로 이동
+      navigate('/mainpage/surveyStart');
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -64,12 +87,10 @@ const MainPage: React.FC = () => {
                   className={styles.video}
                   autoPlay
                   loop
-                  muted // 소리 끔 (필수: 없으면 자동재생 안됨)
-                  playsInline // 모바일 전체화면 방지 (필수)
+                  muted
+                  playsInline
                 />
-                <Link to={'/mainpage/surveyStart'}>
-                  <Button isFull>Start learning</Button>
-                </Link>
+                <Button isFull onClick={handleStartLearning}>Start learning</Button>
               </div>
             </div>
           </li>
@@ -91,8 +112,8 @@ const MainPage: React.FC = () => {
                   className={styles.video}
                   autoPlay
                   loop
-                  muted // 소리 끔 (필수: 없으면 자동재생 안됨)
-                  playsInline // 모바일 전체화면 방지 (필수)
+                  muted
+                  playsInline
                 />
                 <Link to={'/mainpage/roleList'}>
                   <Button isFull>Start Role Playing</Button>
