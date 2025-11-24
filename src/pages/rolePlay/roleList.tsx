@@ -7,6 +7,7 @@ import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 import Clock from '@/assets/Clock.png';
+import Button from '@/components/Button/Button';
 
 // --- LocalStorage 타입 정의 ---
 const LS_KEY_COMPLETIONS = 'roleplay_completions';
@@ -212,9 +213,9 @@ const RoleList: React.FC = () => {
       <ContentSection color="blue">
         <div className={styles.roleListContentHeader}>
           <h2 className={styles.roleListTitle}>Role Play</h2>
-          <button className={styles.subscribeButton} onClick={handleSubscribe}>
+          <Button size="sm" onClick={handleSubscribe}>
             Subscribe
-          </button>
+          </Button>
         </div>
 
         <div className={styles.roleListItemsContainer}>
@@ -249,15 +250,15 @@ const RoleList: React.FC = () => {
                   ) : (
                     /* Case 2: 학습 미완료 -> 선택되었을 때(isSelected)만 'Start' 표시 */
                     isSelected && (
-                      <button
-                        className={styles.roleStartButton} // 기존 흰색 버튼 스타일
+                      <Button
+                        size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleStart(role.id);
                         }}
                       >
                         Start
-                      </button>
+                      </Button>
                     )
                   )}
                 </div>
