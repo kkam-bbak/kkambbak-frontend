@@ -26,7 +26,7 @@
   margin: 0;
   font-size: 18px;
   font-weight: 500;
-  color: black; /* 파란색 배경 위 흰색 텍스트 */
+  color: var(--color-grayscale-7); /* 파란색 배경 위 흰색 텍스트 */
 }
 
 .subscribeButton {
@@ -35,9 +35,9 @@
   padding: 5px 10px;
   font-size: 10px;
   font-weight: 600;
-  color: black;
+  color: var(--color-grayscale-7);
   cursor: pointer;
-  background-color: white;
+  background-color: var(--color-grayscale-1);
   border: none;
   border-radius: 5px;
 }
@@ -46,7 +46,6 @@
 .roleListItemsContainer {
   /* content-window의 height 430px 기준, 헤더(약 60px)를 제외한 나머지 공간 사용 */
   height: calc(100% - 20px);
-  
 
   /* content-window가 overflow: hidden을 가지므로, 스크롤바가 안 보이게 설정 */
   overflow-y: scroll;
@@ -70,31 +69,30 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  
+
   /* 🔥 [수정 1] 요소 위치 고정 */
+
   /* center 대신 space-between을 사용하여 헤더는 위, 정보는 아래로 밀어버립니다 */
-  justify-content: space-between; 
-  
+  justify-content: space-between;
   width: 100%;
   height: 82px; /* 높이를 조금 넉넉하게 잡는 것을 추천 (기존 82px -> 92px 등) */
   padding: 12px 15px; /* 내부 여백으로 위치 미세 조정 */
-  
   margin-bottom: 8px;
-  color: #484848; 
+  color: #484848;
+
+  /* 선택되지 않았을 때(기본) 배경색이 투명이어야 목록처럼 보입니다. */
+
+  /* 만약 기본 상태가 어두운 카드라면 위 background-color 유지, 아니라면 아래처럼 transparent */
   background-color: #101010;
+  border-bottom: 1px solid transparent; /* 레이아웃 흔들림 방지용 투명 테두리 */
   border-radius: 10px;
   transition: color 0.1s;
-  
-  /* 선택되지 않았을 때(기본) 배경색이 투명이어야 목록처럼 보입니다. */
-  /* 만약 기본 상태가 어두운 카드라면 위 background-color 유지, 아니라면 아래처럼 transparent */
-  background-color: #101010; 
-  border-bottom: 1px solid transparent; /* 레이아웃 흔들림 방지용 투명 테두리 */
 }
 
 /* 선택된 항목 스타일 */
 .roleItemRow.selected {
+  color: var(--color-grayscale-1);
   background-color: #101010; /* 선택 시 검은 배경 */
-  color: white;
 }
 
 /* 1. 제목 헤더 */
@@ -103,8 +101,9 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
+
   /* margin-bottom 제거 -> space-between이 간격 자동 조절 */
-  margin-bottom: 0; 
+  margin-bottom: 0;
 }
 
 .roleItemTitle {
@@ -115,17 +114,14 @@
 
 /* 2. 구분선 (HR) 스타일 수정 */
 .divider {
+  width: 100%; /* 부모 너비에 맞춤 */
+  height: 1px; /* 선 두께 */
+  margin: 0; /* flex space-between이 간격을 잡아주므로 마진 제거 */
+  background-color: var(--color-grayscale-7); /* 선 색상 */
+
   /* 🔥 [수정 2] HR 태그 색상 적용 방법 */
   border: none; /* 기본 입체 테두리 제거 */
-  height: 1px;  /* 선 두께 */
-  background-color: black; /* 선 색상 */
-  
-  width: 100%;  /* 부모 너비에 맞춤 */
-  margin: 0;    /* flex space-between이 간격을 잡아주므로 마진 제거 */
-
 }
-
-
 
 /* 3. 시간 정보 */
 .roleItemInfo {
@@ -134,9 +130,10 @@
   align-items: center;
   justify-content: flex-end;
   width: 100%;
+  padding-right: 8px;
+
   /* margin-bottom 제거 */
   margin-bottom: 0;
-  padding-right: 8px;
 }
 
 /* 버튼 스타일 (기존 유지) */
@@ -145,47 +142,44 @@
   height: 20px;
   padding: 0;
   margin-left: 10px;
-  color: black;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-grayscale-7);
   cursor: pointer;
-  background-color: white;
+  background-color: var(--color-grayscale-1);
   border: none;
   border-radius: 6px;
-  font-weight: 600;
-  font-size: 10px;
 }
 
 .learnAgainButton {
-  width: 72px !important;
-  height: 20px;
-  padding: 0; 
-  white-space: nowrap; 
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translateY(-8px);
+  width: 72px !important;
+  height: 20px;
+  padding: 0;
   margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-grayscale-1);
+  white-space: nowrap;
+  cursor: pointer;
   background-color: #484848;
-  color: white;
   border: none;
   border-radius: 6px;
-  font-weight: 600;
-  font-size: 10px;
-  cursor: pointer;
 }
 
-.roleTime{
-  font-weight: 500;
-  font-size: 10px;
+.roleTime {
   margin-right: 5px;
+  font-size: 10px;
+  font-weight: 500;
 }
 
 .roleTimeIcon {
   width: 10px;
   height: 10px;
-
-  filter: invert(15%) sepia(0%) saturate(0%) hue-rotate(154deg) brightness(30%) contrast(87%);
-  
-
+  filter: invert(15%) sepia(0%) saturate(0%) hue-rotate(154deg) brightness(30%)
+    contrast(87%);
   transition: filter 0.1s;
 }
 
