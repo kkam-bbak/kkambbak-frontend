@@ -237,6 +237,39 @@
 }
 
 /* -------------------- 4. 메인 마이크 버튼 -------------------- */
+.record-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.record-button:hover .mic-image {
+  filter: invert(1);
+}
+
+.record-button .mic-image {
+  width: 54px;
+}
+
+.record-button:active .mic-image {
+  animation: pressed 1s ease infinite;
+}
+
+@keyframes pressed {
+  0% {
+    filter: invert(0);
+  }
+
+  50% {
+    filter: invert(0.6);
+  }
+
+  100% {
+    filter: invert(0);
+  }
+}
+
 .micArea {
   /* JSX: className={styles.micArea} */
   position: absolute;

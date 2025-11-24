@@ -1153,28 +1153,21 @@ const RolePlay: React.FC = () => {
           </div>
 
           <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
-            <div className={styles.micButtonWrapper}>
-              <button
-                className={`${styles.mainMicButton} ${mainMicButtonClass}`}
-                onMouseDown={handleMicPress}
-                onMouseUp={handleMicRelease}
-                onTouchStart={handleMicPress}
-                onTouchEnd={handleMicRelease}
-                disabled={!isMicActionable || isCurrentlySpeaking}
-              >
-                <span className={styles.mainMicIcon}>
-                  <img
-                    src={isRecording ? MicOn : MicOff}
-                    alt={isRecording ? 'On' : 'Off'}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                    }}
-                  />
-                </span>
-              </button>
-            </div>
+            <Button
+              className={styles['record-button']}
+              onMouseDown={handleMicPress}
+              onMouseUp={handleMicRelease}
+              onTouchStart={handleMicPress}
+              onTouchEnd={handleMicRelease}
+              disabled={!isMicActionable || isCurrentlySpeaking}
+              isFull
+            >
+              <img
+                className={styles['mic-image']}
+                src={isRecording ? MicOn : MicOff}
+                alt={isRecording ? 'On' : 'Off'}
+              />
+            </Button>
           </div>
         </div>
       );
