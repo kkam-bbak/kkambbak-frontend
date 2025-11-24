@@ -9,6 +9,8 @@ import CorrectImg from '@/assets/Correct.png';
 import InCorrectImg from '@/assets/InCorrect.png';
 import MicOn from '@/assets/MicOn.png'; 
 import MicOff from '@/assets/MicOff.png';
+import CrtSnd from '@/assets/CrtSnd.mp3';
+import WrgSnd from '@/assets/WrgSnd.mp3'; 
 
 // --- 인터페이스 정의 ---
 interface ApiResponseBody<T> {
@@ -35,40 +37,44 @@ interface LearningStartBody {
     sessionTitle: string;
 }
 type LearningStartResponse = ApiResponseBody<LearningStartBody>;
+
 interface NextItem {
-  itemId: number;
-  korean: string;
-  romanization: string;
-  english: string;
-  imageUrl: string; 
+  itemId: number;
+  korean: string;
+  romanization: string;
+  english: string;
+  imageUrl: string; 
 }
+
 interface GradeData {
-  correct: boolean;
-  moved: boolean;
-  finished: boolean;
-  next: NextItem | null;
-  correctAnswer: string | null;
+  correct: boolean;
+  moved: boolean;
+  finished: boolean;
+  next: NextItem | null;
+  correctAnswer: string | null;
+  score: number;
 }
 type GradeResponse = ApiResponseBody<GradeData>;
+
 interface LearningContent {
-  topicTitle: string;
-  itemId: number;
-  korean: string;
-  romanized: string;
-  translation: string;
-  imageUrl: string;
+  topicTitle: string;
+  itemId: number;
+  korean: string;
+  romanized: string;
+  translation: string;
+  imageUrl: string;
 }
 export interface WordResult {
-  romnized: string;
-  korean: string;
-  translation: string;
-  isCorrect: boolean;
+  romnized: string;
+  korean: string;
+  translation: string;
+  isCorrect: boolean;
 }
 interface LocationState {
-  wordsToRetry?: WordResult[];
-  isRetryWrong?: boolean;
-  baseResultId?: number;
-  categoryName?: string;
+  wordsToRetry?: WordResult[];
+  isRetryWrong?: boolean;
+  baseResultId?: number;
+  categoryName?: string;
 }
 type LearningStatus = 'initial' | 'listen' | 'countdown' | 'speak';
 type ResultStatus = 'none' | 'processing' | 'correct' | 'incorrect';
@@ -83,6 +89,7 @@ const formatDuration = (ms: number) => {
     return `${minutes}m ${seconds}s`;
 };
 
+// (삭제하지 않더라도 호출을 안 하면 되지만, 일단 함수는 둡니다)
 const clearLocalLearningTime = (sessionId: number) => {
     try {
         const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
@@ -202,26 +209,48 @@ const LearnStart: React.FC = () => {
   const countdownRef = useRef<number | null>(null);
   
   const [showExitModal, setShowExitModal] = useState(false); 
+  
+  const [isTtsPlaying, setIsTtsPlaying] = useState(false);
 
+  // --- 가시성 조건 ---
   const isWordVisible = status !== 'initial';
   const isSpeakerActive = status !== 'initial';
+  
   const isInputTextHiddenDuringChallenge = (status === 'countdown' || status === 'speak') && resultStatus === 'none';
   const isInputTextVisible = !isInputTextHiddenDuringChallenge;
-  const isRomnizedVisible = isInputTextVisible;
+
+  const isRomnizedVisible = isInputTextVisible || isTtsPlaying; 
   const isKoreanVisible = isInputTextVisible;
   const isTranslationVisible = isInputTextVisible;
+
   const isIncorrectView = resultStatus === 'incorrect';
-  
   const isMicActiveForRecording = (status === 'countdown' || status === 'speak') && resultStatus === 'none' && !isProcessing;
 
+  // TTS
   const speakKoreanText = useCallback((text: string) => {
     if (!('speechSynthesis' in window) || showExitModal) return; 
+    
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'ko-KR';
-    window.speechSynthesis.cancel();
+    
+    setIsTtsPlaying(true);
+    utterance.onend = () => setIsTtsPlaying(false);
+    utterance.onerror = () => setIsTtsPlaying(false);
+
+    window.speechSynthesis.cancel(); 
     window.speechSynthesis.speak(utterance);
   }, [showExitModal]);
 
+  // 효과음
+  useEffect(() => {
+    if (resultStatus === 'correct') {
+      const audio = new Audio(CrtSnd);
+      audio.play().catch((e) => console.error("Audio play failed", e));
+    } else if (resultStatus === 'incorrect') {
+      const audio = new Audio(WrgSnd);
+      audio.play().catch((e) => console.error("Audio play failed", e));
+    }
+  }, [resultStatus]);
 
   const handleSessionData = (data: LearningStartBody) => {
       if (data.firstVocabulary) {
@@ -231,7 +260,6 @@ const LearnStart: React.FC = () => {
         if (data.baseResultId !== undefined) setBaseResultId(data.baseResultId);
         setCurrentWordIndex(1);
         setStatus('initial');
-        
         startTimeRef.current = Date.now();
         resultsRef.current = []; 
       } else {
@@ -272,16 +300,17 @@ const LearnStart: React.FC = () => {
   }, [sessionIdParam, navigate, wordsToRetry, isRetryWrong, baseResultId]);
 
 
-  // --- 채점 로직 ---
   const startGrading = useCallback(async (action: 'GRADE' | 'NEXT_AFTER_WRONG', audioFile: File | null = null) => {
       if (isProcessingRef.current && action === 'GRADE' && !audioFile) return;
 
-      if (resultId === null) { console.error('Result ID is missing.'); return; }
+      if (resultId === null) { 
+          console.warn('startGrading called without resultId. Ignoring.'); 
+          return; 
+      }
       const numericSessionId = Number(sessionIdParam);
 
       if (action === 'GRADE' && !audioFile) {
           if (isProcessingRef.current) return; 
-
           console.warn("오디오 파일 없음: 시간 초과 또는 녹음 실패로 간주 -> 오답 처리");
           setResultStatus('incorrect'); 
           return;
@@ -292,11 +321,16 @@ const LearnStart: React.FC = () => {
           isProcessingRef.current = true;
       }
       setMicOn(false);
+      setIsTtsPlaying(false); 
 
       const formData = new FormData();
       formData.append('action', action);
       formData.append('itemId', String(content.itemId));
+      formData.append('resultId', String(resultId)); 
       
+      const mode = isRetryWrong ? 'WRONG_ONLY' : 'ALL';
+      formData.append('mode', mode); 
+
       if (audioFile) {
           formData.append('audioFile', audioFile);
       }
@@ -309,7 +343,7 @@ const LearnStart: React.FC = () => {
         );
         const data = response.data.body;
         
-        console.log("%c📊 [채점 결과]", "color: #00ff00; font-weight: bold;", data);
+        console.log("💯 채점 점수 (Score):", data.score);
         
         setResultStatus(data.correct ? 'correct' : 'incorrect');
         if (data.correct) setDisplayStatus('initial_feedback');
@@ -340,7 +374,8 @@ const LearnStart: React.FC = () => {
                         state: {
                             sessionId: numericSessionId,
                             isUpdateComplete: true, 
-                            isRetryWrong: true
+                            isRetryWrong: true,
+                            resultId: resultId 
                         }
                     });
                 } else {
@@ -352,6 +387,7 @@ const LearnStart: React.FC = () => {
                             topicName: content.topicTitle,
                             learningDuration: duration,
                             categoryName: currentCategory,
+                            totalCount: totalWords 
                         } 
                     });
                 }
@@ -388,7 +424,8 @@ const LearnStart: React.FC = () => {
         setIsProcessing(false);
         isProcessingRef.current = false;
       }
-    }, [resultId, content, navigate, isRetryWrong, baseResultId, sessionIdParam, currentCategory]);
+    }, [resultId, content, navigate, isRetryWrong, baseResultId, sessionIdParam, currentCategory, totalWords]);
+
 
   useEffect(() => {
     if (hasFetched.current) return;
@@ -396,14 +433,15 @@ const LearnStart: React.FC = () => {
     fetchLearningData();
   }, [fetchLearningData]);
 
-  // --- 타이머 & 상태 제어 useEffect ---
+  // --- 타이머 & 상태 제어 ---
   useEffect(() => {
     let timer: number | undefined;
     
-    if (isLoading || totalWords === 0 || showExitModal) {
+    if (isLoading || totalWords === 0 || showExitModal || resultId === null) {
         if (countdownRef.current !== null) clearInterval(countdownRef.current);
         if (timer) clearTimeout(timer);
         window.speechSynthesis.cancel();
+        setIsTtsPlaying(false); 
         return; 
     }
     
@@ -411,6 +449,7 @@ const LearnStart: React.FC = () => {
         setResultStatus('none');
         setDisplayStatus('none');
         isProcessingRef.current = false;
+        setIsTtsPlaying(false);
         const initialTimer = setTimeout(() => { setStatus('listen'); }, 2000);
         return () => clearTimeout(initialTimer);
     }
@@ -444,7 +483,7 @@ const LearnStart: React.FC = () => {
                         }
                     } 
                     else {
-                        if (!isProcessingRef.current) {
+                        if (!isProcessingRef.current && resultId !== null) {
                             startGrading('GRADE', null);
                         }
                     }
@@ -461,14 +500,16 @@ const LearnStart: React.FC = () => {
       if (countdownRef.current !== null) clearInterval(countdownRef.current);
       if (timer) clearTimeout(timer);
       window.speechSynthesis.cancel();
+      setIsTtsPlaying(false);
     };
-  }, [status, resultStatus, displayStatus, content.korean, isLoading, totalWords, startGrading, showExitModal, micOn, isProcessing]);
+  }, [status, resultStatus, displayStatus, content.korean, isLoading, totalWords, startGrading, showExitModal, micOn, isProcessing, speakKoreanText, resultId]);
 
   const handleAction = async (action: 'tryAgain' | 'next') => {
     if (action === 'next') await startGrading('NEXT_AFTER_WRONG', null);
     else if (action === 'tryAgain') { setStatus('initial'); setResultStatus('none'); setDisplayStatus('none'); }
   };
 
+  // ... (마이크 핸들러) ...
   const handleMicDown = async (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     if (!isMicActiveForRecording || showExitModal) return;
@@ -490,16 +531,22 @@ const LearnStart: React.FC = () => {
 
             try {
                 if (audioChunksRef.current.length === 0) {
-                    startGrading('GRADE', null);
+                    console.warn("No audio data recorded.");
+                    setIsProcessing(false);
+                    isProcessingRef.current = false;
+                    setResultStatus('incorrect');
                     return;
                 }
+
                 const webmBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                 const wavFile = await convertToWav(webmBlob);
                 
                 startGrading('GRADE', wavFile);
             } catch (error) {
                 console.error("Audio processing error:", error);
-                startGrading('GRADE', null);
+                setIsProcessing(false);
+                isProcessingRef.current = false;
+                setResultStatus('incorrect');
             } finally {
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
@@ -527,23 +574,16 @@ const LearnStart: React.FC = () => {
     }
   };
 
-  // 🔥 [수정] bubbleText 로직 순서 변경
-  // 결과 상태('correct'/'incorrect')를 'isProcessing' 보다 먼저 확인합니다.
   const bubbleText = (() => {
     if (showExitModal) return 'What was it? Tell me!';
     if (isLoading) return 'Loading session data...';
-
-    // 1순위: 정답/오답 결과가 있다면 그것을 우선 표시
     if (resultStatus === 'correct') {
       if (displayStatus === 'initial_feedback') return 'good job!';
       if (displayStatus === 'meaning_revealed') return `${content.romanized} means ${content.translation.toLowerCase()}.`;
       return 'good job!';
     }
     if (resultStatus === 'incorrect') return 'Should we try again?';
-
-    // 2순위: 결과가 없고 처리 중이라면 Grading... 표시
     if (isProcessing) return 'Grading...';
-
     if (status === 'initial') return 'Start!';
     if (status === 'countdown' || status === 'speak') return 'What was it? speak now!';
     return 'Listen carefully';
@@ -603,10 +643,10 @@ const LearnStart: React.FC = () => {
       setShowExitModal(true);
   };
 
+  // ⭐ [수정] 뒤로 가기/나가기 시에 clearLocalLearningTime 호출 제거
   const handleExitLearning = () => {
-      if (sessionIdParam && !isRetryWrong) {
-        clearLocalLearningTime(Number(sessionIdParam));
-      }
+      // 기존에 있던 clearLocalLearningTime(Number(sessionIdParam)) 삭제
+      // 이렇게 해야 재학습 도중 나가더라도 기존 완료 기록이 보존됨
       
       setShowExitModal(false);
       navigate('/mainpage/learnList'); 
@@ -636,10 +676,10 @@ const LearnStart: React.FC = () => {
       <div className={styles.learningCard}>
         <div className={styles.cardTitleBar}>
           <span className={styles.topicName}>{content.topicTitle}</span>
-          <span className={styles.wordCount}>{`${currentWordIndex.toString().padStart(2, '0')}/${totalWords.toString().padStart(2, '0')}`}</span>
+          <span className={styles.wordCount}>{`${Math.min(currentWordIndex, totalWords).toString().padStart(2, '0')}/${totalWords.toString().padStart(2, '0')}`}</span>
         </div>
         <div className={styles.wordDisplayArea}>
-          {status === 'countdown' && !isIncorrectView && (
+          {status === 'countdown' && resultStatus === 'none' && (
             <div className={styles.countdownBarContainer}>
               <div className={styles.countdownBarFill} style={{ width: `${100 - (countdownTime / 10) * 100}%` }}></div>
             </div>

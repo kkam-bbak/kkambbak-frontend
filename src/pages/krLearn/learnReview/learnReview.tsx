@@ -192,13 +192,26 @@ const LearnReview: React.FC = () => {
   }, [initialSessionId, reviewData.isLoading, fetchReviewResult]);
 
 
-  // 뒤로 가기 (목록으로)
+// 뒤로 가기 (완료 페이지로)
   const handleBackButtonClick = () => {
-    // 재도전 모드가 아니었을 때만 완료 기록 저장
+    // 재도전 모드가 아니었을 때만 완료 기록 저장 (기존 로직 유지)
     if (!isRetryWrong && reviewData.sessionId && reviewData.rawDurationSeconds > 0) {
         saveLocalLearningTime(reviewData.sessionId, reviewData.rawDurationSeconds);
     }
-    navigate('/mainpage/learnList');
+
+    // ⭐ [수정] 목록(/learnList) 대신 완료 페이지(/learn/complete)로 이동
+    navigate('/mainpage/learn/complete', {
+        state: {
+            // 완료 페이지에 필요한 정보를 다시 넘겨줍니다.
+            resultId: reviewData.resultId,
+            sessionId: reviewData.sessionId,
+            // wordResults를 results라는 이름으로 전달 (LearnComplete에서 사용하는 이름 확인 필요)
+            results: reviewData.wordResults, 
+            topicName: reviewData.topicName,
+            learningDuration: reviewData.rawDurationSeconds * 1000, // ms 단위로 변환 필요할 수 있음
+            categoryName: 'TOPIK', // 카테고리 정보가 있다면 state에서 가져와서 넣기
+        }
+    });
   };
 
   // 🔥 [핵심] Only Wrong Try Again 핸들러

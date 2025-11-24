@@ -84,6 +84,8 @@ interface LocationState {
   topicName?: string;
   learningDuration?: number;
   categoryName?: string;
+
+  totalCount?: number;
 }
 
 const LearnComplete: React.FC = () => {
@@ -99,7 +101,7 @@ const LearnComplete: React.FC = () => {
   const categoryName = state?.categoryName || 'TOPIK';
 
   const correctCount = results.filter(r => r.isCorrect).length;
-  const totalCount = results.length || 0;
+  const totalCount = state?.totalCount || results.length || 0;
 
   const learningTime = useMemo(() => formatDuration(learningDurationMs), [learningDurationMs]);
   const completionDate = useMemo(() => getFormattedCompletionDate(), []);
