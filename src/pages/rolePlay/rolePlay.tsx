@@ -11,6 +11,8 @@ import MicOff from '@/assets/MicOff.png';
 import MicBase from '@/assets/MicBase.png';
 import TailAI from '@/assets/TailAI.png';
 import TailUser from '@/assets/TailUser.png';
+import Modal from '@/components/Modal/Modal';
+import Button from '@/components/Button/Button';
 
 // --- 인터페이스 정의 ---
 interface ApiResponseBody<T> {
@@ -355,6 +357,8 @@ const RolePlay: React.FC = () => {
   const [isLoadingNextTurn, setIsLoadingNextTurn] = useState(false);
   const [selectedChoiceData, setSelectedChoiceData] =
     useState<DialogueData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalText, setModalText] = useState('');
 
   const [showLoadingMessage, setShowLoadingMessage] = useState(false);
 
@@ -362,6 +366,15 @@ const RolePlay: React.FC = () => {
   const flowTimerRef = useRef<number | null>(null);
 
   const [showExitModal, setShowExitModal] = useState(false);
+
+  const modalOpen = (message: string) => {
+    setIsModalOpen(true);
+    setModalText(message);
+  };
+  const modalClose = () => {
+    setIsModalOpen(false);
+    setModalText('');
+  };
 
   const handleBackClick = useCallback(() => {
     setShowExitModal(true);
@@ -430,7 +443,7 @@ const RolePlay: React.FC = () => {
           errorMsg.includes('Credit limit') ||
           errorMsg === 'Credit limit standard'
         ) {
-          alert('크레딧이 부족합니다. 충전 페이지로 이동합니다.');
+          modalOpen('크레딧이 부족합니다. 충전 페이지로 이동합니다.');
           navigate('/payment/checkout');
           return;
         }
@@ -851,7 +864,8 @@ const RolePlay: React.FC = () => {
     recorder.onstop = async () => {
       try {
         if (audioChunksRef.current.length === 0) {
-          alert('녹음된 내용이 없습니다. 다시 시도해주세요.');
+          modalOpen('녹음된 내용이 없습니다. 다시 시도해주세요.');
+
           if (currentDialogue?.speaker === 'AI') {
             setStep(STEPS.SPEAK_SETUP);
           } else {
@@ -868,7 +882,7 @@ const RolePlay: React.FC = () => {
           { type: mimeType },
         );
         if (audioFile.size === 0) {
-          alert('녹음 파일 크기가 0입니다. 다시 시도해주세요.');
+          modalOpen('녹음 파일 크기가 0입니다. 다시 시도해주세요.');
           if (currentDialogue?.speaker === 'AI') {
             setStep(STEPS.SPEAK_SETUP);
           } else {
@@ -892,7 +906,7 @@ const RolePlay: React.FC = () => {
         console.error('Evaluation failed:', err);
         const statusCode = err?.response?.data?.status?.statusCode;
         if (statusCode === 'OA001') {
-          alert(
+          modalOpen(
             '일시적인 서버 지연으로 응답하지 못했습니다.\n토큰은 차감되지 않았습니다.\n목록으로 돌아갑니다.',
           );
           navigate('/mainpage/roleList');
@@ -905,7 +919,7 @@ const RolePlay: React.FC = () => {
             handlePracticeGrading('RETRY');
           }
         } else {
-          alert('녹음 인식에 실패했습니다. 다시 시도해주세요.');
+          modalOpen('녹음 인식에 실패했습니다. 다시 시도해주세요.');
           if (currentDialogue?.speaker === 'AI') {
             setStep(STEPS.SPEAK_SETUP);
           } else {
@@ -1477,6 +1491,15 @@ const RolePlay: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {isModalOpen && (
+        <Modal onCloseModal={modalClose}>
+          <p className={styles['modal-message']}>{modalText}</p>
+          <Button isFull onClick={modalClose}>
+            Yes
+          </Button>
+        </Modal>
       )}
     </div>
   );

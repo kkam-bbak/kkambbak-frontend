@@ -1,438 +1,438 @@
-
 /* -------------------- 2. 카드 내부 컴포넌트 스타일 -------------------- */
 
 /* 카드 타이틀 바 */
 .cardTitleBar {
-    /* JSX: className={styles.cardTitleBar} */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 15px;
-    background-color: transparent;
+  /* JSX: className={styles.cardTitleBar} */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 15px;
+  background-color: transparent;
 }
 
 .cardTitleText {
-    /* JSX: className={styles.cardTitleText} */
-    font-size: 18px;
-    font-weight: 500;
-    margin: 0;
-    color: black;
+  margin: 0;
+
+  /* JSX: className={styles.cardTitleText} */
+  font-size: 18px;
+  font-weight: 500;
+  color: black;
 }
 
 .cardStepText {
-    /* JSX: className={styles.cardStepText} */
-    font-size: 18px;
-    font-weight: 500;
+  /* JSX: className={styles.cardStepText} */
+  font-size: 18px;
+  font-weight: 500;
 }
-
 
 /* 대화 기록 스크롤 영역 */
 .turnHistoryArea {
-    /* JSX: className={styles.turnHistoryArea} */
+  /* JSX: className={styles.turnHistoryArea} */
 
-    height: calc(100% - 145px); 
-    overflow-y: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  height: calc(100% - 145px);
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .textDisplayBox {
-    width: 100%;
-    min-height: 120px; 
-    height: auto;      
-    background-color: #101010;
-    border-radius: 10px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; 
-    /* margin-bottom 제거 -> turnWrapper에서 처리 */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  min-height: 120px;
+  background-color: #101010;
+  border-radius: 10px;
+
+  /* margin-bottom 제거 -> turnWrapper에서 처리 */
 }
 
 .historyBox {
-    composes: textDisplayBox;
+  /* composes: textdisplaybox; */
 }
 
 /* ⭐ [핵심] 턴 전체를 감싸는 래퍼 */
 .turnWrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 35px; /* 대화 사이 간격 */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 35px; /* 대화 사이 간격 */
 }
 
 /* ⭐ [핵심] USER일 때 내부 아이콘/텍스트 위치 반전 */
 .rowReverse {
-    flex-direction: row-reverse;
+  flex-direction: row-reverse;
 }
 
 /* ⭐ [핵심] USER일 때 텍스트 오른쪽 정렬 */
 .textRight {
-    text-align: right;
+  text-align: right;
 }
 
 /* 구분선 */
 .divider {
-    width: auto; /* 100%에 맞춤 */
-    border: 0;
-    border-top: 1.5px solid black;
-    margin: 5px 15px;
+  width: auto; /* 100%에 맞춤 */
+  margin: 5px 15px;
+  border: 0;
+  border-top: 1.5px solid black;
 }
 
 /* 텍스트 라인 */
 .textLine {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px 10px 15px;
-    gap: 10px; /* ⭐ 텍스트와 아이콘 사이 간격 확보 */
+  display: flex;
+  gap: 10px; /* ⭐ 텍스트와 아이콘 사이 간격 확보 */
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
 }
 
 /* 한국어 텍스트 */
 .koreanText {
-    font-size: 13px;
-    color: white;
-    font-weight: 500;
-    line-height: 1.4;
-    word-break: keep-all; /* 단어 단위 줄바꿈 */
-    
-    /* ⭐ 추가: 남은 공간 채우기 & 줄어들기 허용 */
-    flex: 1; 
-    min-width: 0; /* Flexbox 내에서 텍스트 줄바꿈이 정상 작동하도록 필수 설정 */
+  /* ⭐ 추가: 남은 공간 채우기 & 줄어들기 허용 */
+  flex: 1;
+  min-width: 0; /* Flexbox 내에서 텍스트 줄바꿈이 정상 작동하도록 필수 설정 */
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: white;
+  word-break: keep-all; /* 단어 단위 줄바꿈 */
 }
 
 /* 🎧 듣기 버튼 */
 .ttsButton {
-    width: 20px;
-    height: 20px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    /* ⭐ 추가: 공간이 좁아져도 절대 찌그러지지 않음 */
-    flex-shrink: 0; 
+  display: flex;
+
+  /* ⭐ 추가: 공간이 좁아져도 절대 찌그러지지 않음 */
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  border: none;
 }
 
 /* 📝 로마자 텍스트 */
 .romanizedText {
-    font-size: 13px;
-    font-weight: 500;
-    color: #757575;
-    transition: color 0.3s;
-    line-height: 1.3;
-    
-    /* ⭐ 추가: 남은 공간 채우기 & 줄어들기 허용 */
-    flex: 1;
-    min-width: 0;
+  /* ⭐ 추가: 남은 공간 채우기 & 줄어들기 허용 */
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #757575;
+  transition: color 0.3s;
 }
 
 /* 🎙️ 작은 마이크 아이콘 */
 .smallMicIcon {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    /* ⭐ 추가: 공간이 좁아져도 절대 찌그러지지 않음 */
-    flex-shrink: 0; 
+  display: flex;
+
+  /* ⭐ 추가: 공간이 좁아져도 절대 찌그러지지 않음 */
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
 }
 
 .smallMicIcon.active {
-    /* JSX: className={`${styles.smallMicIcon} ${styles.active}`} */
-    color: white;
+  /* JSX: className={`${styles.smallMicIcon} ${styles.active}`} */
+  color: white;
 }
-
 
 /* 영어 번역 텍스트 */
 .englishText {
-    /* JSX: className={styles.englishText} */
-    color: #007CFF;
-    font-size: 13px;
-    font-weight: 500;
-    display: block; 
-    margin-left: 15px;
-    padding-bottom: 10px;
+  display: block;
+  padding-bottom: 10px;
+  margin-left: 15px;
+  font-size: 13px;
+  font-weight: 500;
+
+  /* JSX: className={styles.englishText} */
+  color: #007cff;
 }
 
 .englishText.textRight {
-    margin-left: 0;      /* 기존 AI용 왼쪽 여백 초기화 */
-    margin-right: 15px;  /* 오른쪽에서 15px만큼 떨어뜨려 왼쪽으로 이동 */
+  margin-right: 15px; /* 오른쪽에서 15px만큼 떨어뜨려 왼쪽으로 이동 */
+  margin-left: 0; /* 기존 AI용 왼쪽 여백 초기화 */
 }
 
 /* Role Container 공통 */
 .roleContainer {
-    width: auto;
-    min-width: 44px;
-    height: 20px;
-    background-color: white;
-    color: black;
-    border-radius: 5px;
-    font-size: 12px;
-    font-weight: 600;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px; /* 말풍선과의 간격 */
-    padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 44px;
+  height: 20px;
+  padding: 0 8px;
+  margin-top: 20px; /* 말풍선과의 간격 */
+  font-size: 12px;
+  font-weight: 600;
+  color: black;
+  background-color: white;
+  border-radius: 5px;
 }
 
-.costomer { 
-    composes: roleContainer;
+.costomer {
+  /* composes: rolecontainer; */
 }
 
 /* ⭐ AI: 왼쪽 정렬 */
 .aiRole {
-    align-self: flex-start;
-    
+  align-self: flex-start;
 }
 
 /* ⭐ USER: 오른쪽 정렬 */
 .userRole {
-    align-self: flex-end;
-    margin-right: 15px;
+  align-self: flex-end;
+  margin-right: 15px;
 }
 
 /* -------------------- 4. 턴 2 (선택지) 스타일 -------------------- */
 .choiceOptionsArea {
-    /* JSX: className={styles.choiceOptionsArea} */
-    width: 100%;
-    height: 120px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  /* JSX: className={styles.choiceOptionsArea} */
+  width: 100%;
+  height: 120px;
+  margin-top: 15px;
 }
 
 .activeChoiceContent {
-    /* JSX: className={styles.activeChoiceContent} */
-    width: 300px;
-    height: 120px;
-    top: 52px;
-    left: 15px;
-    background-color: #101010;
-    border-radius: 10px;
+  top: 52px;
+  left: 15px;
+
+  /* JSX: className={styles.activeChoiceContent} */
+  width: 300px;
+  height: 120px;
+  background-color: #101010;
+  border-radius: 10px;
 }
 
-.choiceItem { 
-    /* JSX: className={styles.choiceItem} */
-    display: flex; 
-    align-items: center; 
-    gap: 20px; 
-    width: 100%; 
+.choiceItem {
+  /* JSX: className={styles.choiceItem} */
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  width: 100%;
 }
 
 .choiceButtonAction {
-    /* JSX: className={styles.choiceButtonAction} */
-    width: 60px;
-    height: 40px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    background-color: white;
-    color: black;
+  /* JSX: className={styles.choiceButtonAction} */
+  width: 60px;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  color: black;
+  background-color: white;
+  border-radius: 10px;
 }
 
 /* -------------------- 4. 메인 마이크 버튼 -------------------- */
 .micArea {
-    /* JSX: className={styles.micArea} */
-    position: absolute; 
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 72px; 
-    background-color: transparent; 
-    margin-left: 15px;
-    margin-right: 15px;
+  /* JSX: className={styles.micArea} */
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  margin-right: 15px;
+  margin-left: 15px;
+  background-color: transparent;
 }
 
 .mainMicButton {
-    /* JSX: className={styles.mainMicButton} */
-    width: 328px;
-    height: 40px; 
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s, transform 0.1s;
-    border: none;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* JSX: className={styles.mainMicButton} */
+  width: 328px;
+  height: 40px;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  transition: background-color 0.3s, transform 0.1s;
 }
 
 .mainMicIcon {
-    /* JSX: className={styles.mainMicIcon} */
-    width: 54px;
-    height: 40px;
-    font-size: 20px; 
-    transition: color 0.1s;
+  /* JSX: className={styles.mainMicIcon} */
+  width: 54px;
+  height: 40px;
+  font-size: 20px;
+  transition: color 0.1s;
 }
 
 /* 마이크 버튼 상태: CSS Modules에서 조합 클래스 사용 */
 .mainMicButton.off {
-    /* JSX: className={`${styles.mainMicButton} ${styles.off}`} */
-    background-color: white;
+  /* JSX: className={`${styles.mainMicButton} ${styles.off}`} */
+  background-color: white;
 }
 
 .mainMicButton.off .mainMicIcon {
-    color: black;
+  color: black;
 }
 
 .mainMicButton.on {
-    /* JSX: className={`${styles.mainMicButton} ${styles.on}`} */
-    color: white;
-    background-color: black;
+  /* JSX: className={`${styles.mainMicButton} ${styles.on}`} */
+  color: white;
+  background-color: black;
 }
 
 .mainMicButton.on .mainMicIcon {
-    color: white;
+  color: white;
 }
 
 .mainMicButton.disabled {
-    /* JSX: className={`${styles.mainMicButton} ${styles.disabled}`} */
-    cursor: not-allowed;
-    background-color: #e3e3e3;
-    opacity: 0.3;
+  /* JSX: className={`${styles.mainMicButton} ${styles.disabled}`} */
+  cursor: not-allowed;
+  background-color: #e3e3e3;
+  opacity: 0.3;
 }
 
 /* 마이크 상태 텍스트 (ON/OFF) */
 .micStatusText {
-    /* JSX: className={styles.micStatusText} */
-    font-size: 10px;
-    font-weight: 700;
-    margin-top: 4px;
+  margin-top: 4px;
+
+  /* JSX: className={styles.micStatusText} */
+  font-size: 10px;
+  font-weight: 700;
 }
 
-
-/*choice 버튼 스타일*/
+/* choice 버튼 스타일 */
 .choiceOptionsArea {
-    /* JSX: className={styles.choiceOptionsArea} */
-    position:absolute;
-    top: 190px;
+  /* JSX: className={styles.choiceOptionsArea} */
+  position: absolute;
+  top: 190px;
 }
 
 .micArea.choiceButton {
-    /* JSX: className={`${styles.micArea} ${styles.choiceButton}`} */
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    background-color: transparent; 
+  /* JSX: className={`${styles.micArea} ${styles.choiceButton}`} */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: transparent;
 }
 
-
 .choiceButton .choiceButtonAction {
-    /* JSX: className={styles.choiceButtonAction} */
-    width: 60px;
-    height: 40px;
-    font-size: 14px;
-    font-weight: 600;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background-color: white; 
-    color: #1a1a1a;
-    border: 2px solid #eeeeee;
+  /* JSX: className={styles.choiceButtonAction} */
+  width: 60px;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  cursor: pointer;
+  background-color: white;
+  border: 2px solid #eee;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 .choiceButton .choiceButtonAction.selected {
-    /* JSX: className={`${styles.choiceButtonAction} ${styles.selected}`} */
-    background-color: #1a1a1a; 
-    color: white; 
-    border: 2px solid #1a1a1a;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  color: white;
+
+  /* JSX: className={`${styles.choiceButtonAction} ${styles.selected}`} */
+  background-color: #1a1a1a;
+  border: 2px solid #1a1a1a;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 40%);
 }
 
 .micArea .selectSubmitButton {
-    /* JSX: className={styles.selectSubmitButton} */
-    flex-grow: 1; 
-    max-width: 176px; 
-    height: 40px;
-    font-size: 14px;
-    font-weight: 600;
-    border-radius: 10px; 
-    background-color: white;
-    color: black;
-    border: none;
-    cursor: pointer;
+  /* JSX: className={styles.selectSubmitButton} */
+  flex-grow: 1;
+  max-width: 176px;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  color: black;
+  cursor: pointer;
+  background-color: white;
+  border: none;
+  border-radius: 10px;
 }
+
 /* ⭐ 기본 상태 (선택 전) */
 .micArea .selectSubmitButton,
-.micArea .selectSubmitButton.off.disabled { 
-    /* JSX: className={styles.off} ${styles.disabled} */
-    background-color: white;
-    color: #1a1a1a;
-    opacity: 0.5; 
-    cursor: not-allowed;
-    pointer-events: none;
+.micArea .selectSubmitButton.off.disabled {
+  color: #1a1a1a;
+  pointer-events: none;
+  cursor: not-allowed;
+
+  /* JSX: className={styles.off} ${styles.disabled} */
+  background-color: white;
+  opacity: 0.5;
 }
 
 /* ⭐ 활성화 상태 (선택 후) */
 .micArea .selectSubmitButton.on {
-    /* JSX: className={styles.on} */
-    background-color: white;
-    color: #1a1a1a;
-    opacity: 1; 
-    cursor: pointer;
-    pointer-events: auto;
+  color: #1a1a1a;
+  pointer-events: auto;
+  cursor: pointer;
+
+  /* JSX: className={styles.on} */
+  background-color: white;
+  opacity: 1;
 }
 
 /* ⭐⭐⭐ 핵심 수정: 버튼이 실제로 눌리는 순간 (:active) ⭐⭐⭐ */
+
 /* JSX에서 styles.on이 적용된 버튼에 :active 의사 클래스 사용 */
 .micArea .selectSubmitButton.on:active {
-    background-color: #1a1a1a; 
-    color: white; 
+  color: white;
+  background-color: #1a1a1a;
 }
-
 
 /* --- 학습 중단 확인 모달 (하단 고정) --- */
 
 /* 1. 전체 화면을 덮는 어두운 배경 */
 .exitModalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6); /* 반투명 검은 배경 */
+  inset: 0;
   z-index: 9999; /* 가장 위에 표시 */
   display: flex;
-  justify-content: center;
   align-items: flex-end; /* 내용을 하단으로 정렬 */
+  justify-content: center;
+  background-color: rgb(0 0 0 / 60%); /* 반투명 검은 배경 */
 }
 
 /* 2. 모달 콘텐츠 래퍼 (가로 폭 제한 등) */
 .exitModalContent {
+  box-sizing: border-box;
   width: 100%;
   max-width: 400px; /* 모바일 앱 너비 제한 */
-  padding: 0 20px 40px 20px; /* 좌우 여백 및 하단 여백 */
-  box-sizing: border-box;
+  padding: 0 20px 40px; /* 좌우 여백 및 하단 여백 */
   animation: slideUp 0.3s ease-out; /* 밑에서 올라오는 애니메이션 효과 */
 }
 
 /* 3. 모달 카드 (파란색 박스) */
 .exitModalCard {
-  background-color:#007CFF; 
   height: 230px;
-  border-radius: 24px;
   padding: 30px 20px;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   color: black;
+  text-align: center;
+  background-color: #007cff;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 20%);
 }
 
 /* 4. 질문 텍스트 */
 .exitModalQuestion {
+  margin-top: 20px;
+  margin-bottom: 70px;
   font-size: 18px;
   font-weight: 500;
   line-height: 1.4;
-  margin-top: 20px;
-  margin-bottom: 70px;
   white-space: pre-wrap; /* 줄바꿈 적용 */
 }
 
@@ -446,68 +446,73 @@
 /* 6. 버튼 공통 스타일 */
 .exitButtonNo,
 .exitButtonYes {
+  display: flex;
   flex: 1; /* 버튼 크기 1:1 비율 */
+  align-items: center;
+  justify-content: center;
+  height: 40px;
   padding: 16px 0;
-  border-radius: 10px;
-  border: none;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  height: 40px;
+  border: none;
+  border-radius: 10px;
   transition: transform 0.1s, opacity 0.2s;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* No 버튼 (흰색) */
 .exitButtonNo {
-  background-color: white;
   color: black;
+  background-color: white;
 }
 
 /* Yes 버튼 (흰색) */
 .exitButtonYes {
+  color: black;
   background-color: white;
-  color: black; 
 }
 
 /* 버튼 눌림 효과 */
 .exitButtonNo:active,
 .exitButtonYes:active {
-  transform: scale(0.98);
   opacity: 0.9;
+  transform: scale(0.98);
 }
 
 /* 애니메이션 정의 */
 @keyframes slideUp {
   from {
-    transform: translateY(100%);
     opacity: 0;
+    transform: translateY(100%);
   }
+
   to {
-    transform: translateY(0);
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
-
 .tailIcon {
-    position: absolute;
-    bottom: -10px; /* 말풍선 바로 아래에 붙도록 조정 (이미지 높이에 따라 조절) */
-    width: 12px;   /* 꼬리 이미지 너비 */
-    height: 12px;
-    height: auto;
-   
-    z-index: 1;    /* 말풍선보다 위에 표시 */
+  position: absolute;
+  bottom: -10px; /* 말풍선 바로 아래에 붙도록 조정 (이미지 높이에 따라 조절) */
+  z-index: 1; /* 말풍선보다 위에 표시 */
+  width: 12px; /* 꼬리 이미지 너비 */
+  height: 12px;
+  height: auto;
 }
 
 /* ⭐ [추가] AI (왼쪽) 꼬리 위치 */
 .tailAI {
-    left: 20px; /* 왼쪽에서 20px 떨어짐 */
+  left: 20px; /* 왼쪽에서 20px 떨어짐 */
 }
 
 /* ⭐ [추가] USER (오른쪽) 꼬리 위치 */
 .tailUser {
-    right: 20px; /* 오른쪽에서 20px 떨어짐 */
+  right: 20px; /* 오른쪽에서 20px 떨어짐 */
+}
+
+.modal-message {
+  display: block;
+  margin: 33px 0 50px;
+  text-align: center;
 }
