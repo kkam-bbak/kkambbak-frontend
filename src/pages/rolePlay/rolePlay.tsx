@@ -255,7 +255,7 @@ const TurnContentBox = React.memo(
             )}
           </div>
 
-          <hr className={styles.divider} />
+          <div className={styles.divider} />
 
           <div
             className={`${styles.textLine} ${styles.romanizedLine} ${rowDirectionClass}`}
@@ -265,10 +265,7 @@ const TurnContentBox = React.memo(
             >
               {data.romanized}
             </span>
-            <span
-              className={`${styles.smallMicIcon} ${styles.active}`}
-              style={{ marginLeft: '5px', marginRight: '5px' }}
-            >
+            <span className={`${styles.smallMicIcon} ${styles.active}`}>
               <img
                 src={MicBase}
                 alt="Mic"
@@ -281,14 +278,14 @@ const TurnContentBox = React.memo(
             </span>
           </div>
 
-          <hr className={styles.divider} />
-
-          <span
-            className={`${styles.englishText} ${styles.historyEnglish} ${textAlignmentClass}`}
-          >
-            {data.english}
-          </span>
-
+          <div className={styles.divider} />
+          <div className={`${styles.textLine} ${styles.romanizedLine}`}>
+            <span
+              className={`${styles.englishText} ${styles.historyEnglish} ${textAlignmentClass}`}
+            >
+              {data.english}
+            </span>
+          </div>
           <img
             src={isUser ? TailUser : TailAI}
             className={`${styles.tailIcon} ${
@@ -1115,7 +1112,7 @@ const RolePlay: React.FC = () => {
                   />
                 </button>
               </div>
-              <hr className={styles.divider} />
+              <div className={styles.divider} />
               <div className={`${styles.textLine} ${styles.romanizedLine}`}>
                 <span
                   className={`${styles.romanizedText} ${currentGradeClass}`}
@@ -1134,10 +1131,12 @@ const RolePlay: React.FC = () => {
                   />
                 </span>
               </div>
-              <hr className={styles.divider} />
-              <span className={`${styles.englishText} ${currentGradeClass}`}>
-                {currentDialogue.english}
-              </span>
+              <div className={styles.divider} />
+              <div className={`${styles.textLine}`}>
+                <span className={`${styles.englishText} ${currentGradeClass}`}>
+                  {currentDialogue.english}
+                </span>
+              </div>
 
               <img
                 src={TailAI}
@@ -1225,7 +1224,7 @@ const RolePlay: React.FC = () => {
                     </button>
                   </div>
 
-                  <hr className={styles.divider} />
+                  <div className={styles.divider} />
 
                   <div
                     className={`${styles.textLine} ${styles.romanizedLine} ${styles.rowReverse}`}
@@ -1235,10 +1234,7 @@ const RolePlay: React.FC = () => {
                     >
                       {displayOption.romanized}
                     </span>
-                    <span
-                      className={`${styles.smallMicIcon} ${styles.active}`}
-                      style={{ marginLeft: '5px', marginRight: '5px' }}
-                    >
+                    <span className={`${styles.smallMicIcon} ${styles.active}`}>
                       <img
                         src={MicBase}
                         alt="Mic"
@@ -1251,7 +1247,7 @@ const RolePlay: React.FC = () => {
                     </span>
                   </div>
 
-                  <hr className={styles.divider} />
+                  <div className={styles.divider} />
 
                   <span className={`${styles.englishText} ${styles.textRight}`}>
                     {displayOption.english}
@@ -1355,7 +1351,7 @@ const RolePlay: React.FC = () => {
                   />
                 </button>
               </div>
-              <hr className={styles.divider} />
+              <div className={styles.divider} />
               <div
                 className={`${styles.textLine} ${styles.romanizedLine} ${practiceRow}`}
               >
@@ -1368,7 +1364,6 @@ const RolePlay: React.FC = () => {
                   className={`${styles.smallMicIcon} ${
                     isRecording || practiceButtonActive ? styles.active : ''
                   }`}
-                  style={{ margin: '0 5px' }}
                 >
                   <img
                     src={MicBase}
@@ -1377,7 +1372,7 @@ const RolePlay: React.FC = () => {
                   />
                 </span>
               </div>
-              <hr className={styles.divider} />
+              <div className={styles.divider} />
               <span
                 className={`${styles.englishText} ${currentGradeClass} ${practiceAlign}`}
               >
