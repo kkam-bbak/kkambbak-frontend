@@ -1,12 +1,15 @@
 import React, { useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; 
-import { CheckCircle, Clock, Calendar } from 'lucide-react';
 import type { WordResult } from '../learnStart/learnStart'; 
 import styles from './learnComplete.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import { http } from '../../../apis/http';
-
+import Clock from '@/assets/Clock.png';
+import Check from '@/assets/sentenceCrt.png';
+import Calendar from '@/assets/Calendar.png';
+import ContentSection from '@/components/layout/ContentSection/ContentSection';
+import Button from '@/components/Button/Button';
 // 유틸리티
 const formatDuration = (durationMs: number): string => {
   const totalSeconds = Math.round(durationMs / 1000);
@@ -70,9 +73,9 @@ interface NextLearningResponse {
   };
 }
 
-const ResultRow = ({ icon: Icon, value }: { icon: React.ElementType; value: string }) => (
+const ResultRow = ({ icon, value }: { icon: string; value: string }) => (
   <div className={styles.resultRow}>
-    <Icon className={styles.resultIcon}/>
+    <img src={icon} alt="icon" className={styles.resultIcon} />
     <span className={styles.resultValue}>{value}</span>
   </div>
 );
@@ -205,24 +208,28 @@ const LearnComplete: React.FC = () => {
       
       <Mascot image={characterImageSrc} text={speechBubbleText} />
 
-      <div className={styles.completeCard}>
+      <ContentSection className={styles.completeCard}>
         <h1 className={styles.sessionCompleteTitle}>Session Complete!</h1>
         <div className={styles.resultsBox}>
           <h2 className={styles.comresultsTopicTitle}>{topicName} Result</h2>
-          <ResultRow icon={CheckCircle} value={`${correctCount}/${totalCount} Vocabularies correct`} />
+          <hr className={styles.divider}/>
+          {/* ⭐ 이미지 변수(Check, Clock, Calendar)를 icon prop으로 전달 */}
+          <ResultRow icon={Check} value={`${correctCount}/${totalCount} Vocabularies correct`} />
+          <hr className={styles.divider}/>
           <ResultRow icon={Clock} value={learningTime} />
+          <hr className={styles.divider}/>
           <ResultRow icon={Calendar} value={completionDate} />
-        </div>
+      </div>
 
         <div className={styles.actionButtonsRow}>
-          <button onClick={handleReview} className={styles.actionButton}>Review</button>
-          <button onClick={handleTryAgain} className={styles.actionButton}>Try again</button>
+          <Button onClick={handleReview} className={styles.actionButton}>Review</Button>
+          <Button onClick={handleTryAgain} className={styles.actionButton}>Try again</Button>
         </div>
 
-        <button onClick={handleNextLearning} className={styles.nextLearningButton}>
+        <Button isFull onClick={handleNextLearning} className={styles.nextLearningButton}>
           Next learning
-        </button>
-      </div>
+        </Button>
+      </ContentSection>
     </div>
   );
 };
