@@ -116,6 +116,7 @@ const TopicCard: React.FC<TopicCardProps> = ({
     >
       <div className={styles.cardHeader}>
         <h3>{topic.title}</h3>
+      
         <button
           className={`${styles.topicStartButton} ${buttonStyleClass}`}
           onClick={(e) => {
