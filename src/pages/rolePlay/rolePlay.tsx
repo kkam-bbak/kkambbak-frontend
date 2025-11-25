@@ -186,7 +186,7 @@ const BUBBLE_TEXT = {
   [STEPS.PRACTICE_SPEAK]: 'Speak Now!',
   [STEPS.CHOICE_SETUP]: 'Which is correct?',
   CORRECT: 'Good job!',
-  INCORRECT: "It's a waste.",
+  INCORRECT: "That was close.",
   OOS: "That's out of our Learning Scope\ntry to focus on your Study",
 };
 
@@ -456,7 +456,6 @@ const RolePlay: React.FC = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (scrollRef.current) {
-        // ⭐ [수정] 애니메이션 없이 즉시 이동
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     }, 100);
@@ -464,7 +463,6 @@ const RolePlay: React.FC = () => {
   }, [turnHistory, step, selectedChoiceId, showLoadingMessage]);
 
   useEffect(() => {
-    // ⭐ [수정] NodeJS.Timeout 제거 -> ReturnType<typeof setTimeout> 사용 (또는 타입 추론)
     let loadingTimer: ReturnType<typeof setTimeout>;
     if (isLoadingNextTurn) {
       loadingTimer = setTimeout(() => {
@@ -557,7 +555,6 @@ const RolePlay: React.FC = () => {
     [sessionId, navigate, turnHistory, scenarioId, scenarioTitle],
   );
 
-  // ... (handleRecordingGrading, handlePracticeGrading, handleTtsPlaybackFinished 등 기존 함수 동일) ...
   const handleRecordingGrading = useCallback(
     (feedback: string) => {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -808,11 +805,15 @@ const RolePlay: React.FC = () => {
           audio: true,
         });
         let mimeType = '';
+        // ⭐ 수정 1: Mac(Safari) 호환 포맷(mp4, aac) 우선순위 및 지원 리스트 추가
         const supportedTypes = [
-          'audio/wav',
-          'audio/mp4',
-          'audio/webm;codecs=opus',
+          'audio/webm;codecs=opus', // Chrome/Firefox (최적)
           'audio/webm',
+          'audio/wav',
+          'audio/ogg',
+          'audio/mp4', // Safari (Mac/iOS)
+          'audio/aac', // Safari Fallback
+          'audio/x-m4a', // Safari Fallback
         ];
         for (const type of supportedTypes) {
           if (MediaRecorder.isTypeSupported(type)) {
@@ -834,7 +835,7 @@ const RolePlay: React.FC = () => {
         recorder.onerror = (event) => console.error('Recording error:', event);
         mediaRecorderRef.current = recorder;
         recorder.start();
-        console.log('🎤 Recording started');
+        console.log(`🎤 Recording started with MimeType: ${mimeType}`);
       } catch (err) {
         console.error('Mic access failed:', err);
         setError('마이크 접근 권한이 없습니다.');
@@ -862,7 +863,6 @@ const RolePlay: React.FC = () => {
       try {
         if (audioChunksRef.current.length === 0) {
           modalOpen('녹음된 내용이 없습니다. 다시 시도해주세요.');
-
           if (currentDialogue?.speaker === 'AI') {
             setStep(STEPS.SPEAK_SETUP);
           } else {
@@ -870,14 +870,36 @@ const RolePlay: React.FC = () => {
           }
           return;
         }
+
         const mimeType = audioMimeTypeRef.current;
-        const fileExtension = mimeType.includes('wav') ? 'wav' : 'webm';
+        let fileExtension = 'wav'; // 기본값
+
+        // ⭐ 수정 2: 브라우저가 제공한 MimeType에 맞춰 정확한 확장자 매핑
+        if (mimeType.includes('webm')) {
+          fileExtension = 'webm';
+        } else if (
+          mimeType.includes('mp4') ||
+          mimeType.includes('aac') ||
+          mimeType.includes('m4a')
+        ) {
+          fileExtension = 'm4a'; // Mac/Safari용 확장자 (서버 지원 리스트 포함됨)
+        } else if (mimeType.includes('ogg')) {
+          fileExtension = 'ogg';
+        } else if (mimeType.includes('wav')) {
+          fileExtension = 'wav';
+        }
+
+        console.log(
+          `📤 Sending Audio: MIME=${mimeType}, Extension=.${fileExtension}`,
+        );
+
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         const audioFile = new File(
           [audioBlob],
           `recording-${Date.now()}.${fileExtension}`,
           { type: mimeType },
         );
+
         if (audioFile.size === 0) {
           modalOpen('녹음 파일 크기가 0입니다. 다시 시도해주세요.');
           if (currentDialogue?.speaker === 'AI') {
@@ -946,7 +968,9 @@ const RolePlay: React.FC = () => {
     if (step === STEPS.START && currentDialogue) {
       flowTimerRef.current = setTimeout(() => {
         const nextStep =
-          currentDialogue.speaker === 'AI' ? STEPS.LISTEN : STEPS.CHOICE_SETUP;
+          currentDialogue.speaker === 'AI'
+            ? STEPS.LISTEN
+            : STEPS.CHOICE_SETUP;
         setStep(nextStep);
       }, 1500);
     }
@@ -1013,7 +1037,6 @@ const RolePlay: React.FC = () => {
   const renderActiveInput = () => {
     const isCurrentlySpeaking = window.speechSynthesis.speaking;
 
-    // 로딩 처리 (기존 코드 유지)
     if (isLoadingNextTurn) {
       if (showLoadingMessage) {
         return (
@@ -1047,12 +1070,10 @@ const RolePlay: React.FC = () => {
       return null;
     }
 
-    // ⭐ [수정] step이 CHOICE_FEEDBACK일 때는 TurnContentBox(기록용)로 렌더링하지 않고
-    // 아래의 CASE 2(선택지 UI)로 넘겨서 화면을 유지하게 합니다.
     if (
       selectedChoiceData &&
       step !== STEPS.CHOICE_SETUP &&
-      step !== STEPS.CHOICE_FEEDBACK && // 👈 이 조건 추가!
+      step !== STEPS.CHOICE_FEEDBACK &&
       !isPracticeFlow
     ) {
       return (
@@ -1095,7 +1116,9 @@ const RolePlay: React.FC = () => {
           <div className={styles.turnWrapper}>
             <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
               <div className={`${styles.textLine} ${styles.koreanLine}`}>
-                <span className={`${styles.koreanText} ${currentGradeClass}`}>
+                <span
+                  className={`${styles.koreanText} ${currentGradeClass}`}
+                >
                   {currentDialogue.korean}
                 </span>
                 <button
@@ -1147,7 +1170,9 @@ const RolePlay: React.FC = () => {
             <div
               className={`${styles.roleContainer} ${styles.costomer} ${styles.aiRole}`}
             >
-              <span className={styles.roleTag}>{currentDialogue.speaker}</span>
+              <span className={styles.roleTag}>
+                {currentDialogue.speaker}
+              </span>
             </div>
           </div>
 
@@ -1189,7 +1214,8 @@ const RolePlay: React.FC = () => {
       return (
         <>
           {displayOption &&
-            (step === STEPS.CHOICE_SETUP || step === STEPS.CHOICE_FEEDBACK) && (
+            (step === STEPS.CHOICE_SETUP ||
+              step === STEPS.CHOICE_FEEDBACK) && (
               <div className={styles.turnWrapper}>
                 <div
                   className={`${styles.textDisplayBox} ${styles.historyBox}`}
@@ -1204,7 +1230,8 @@ const RolePlay: React.FC = () => {
                     </span>
                     <button
                       className={`${styles.ttsButton} ${
-                        isCurrentlySpeaking && ttsOptionId === displayOption.id
+                        isCurrentlySpeaking &&
+                        ttsOptionId === displayOption.id
                           ? styles.active
                           : styles.choiceTtsInactive
                       }`}
@@ -1234,7 +1261,9 @@ const RolePlay: React.FC = () => {
                     >
                       {displayOption.romanized}
                     </span>
-                    <span className={`${styles.smallMicIcon} ${styles.active}`}>
+                    <span
+                      className={`${styles.smallMicIcon} ${styles.active}`}
+                    >
                       <img
                         src={MicBase}
                         alt="Mic"
@@ -1249,7 +1278,9 @@ const RolePlay: React.FC = () => {
 
                   <div className={styles.divider} />
 
-                  <span className={`${styles.englishText} ${styles.textRight}`}>
+                  <span
+                    className={`${styles.englishText} ${styles.textRight}`}
+                  >
                     {displayOption.english}
                   </span>
 
@@ -1298,7 +1329,8 @@ const RolePlay: React.FC = () => {
     // CASE 3: Practice Flow (Practice)
     else if (isPracticeFlow && practiceLineData) {
       const practiceButtonActive =
-        step === STEPS.PRACTICE_SPEAK || step === STEPS.PRACTICE_LISTEN_DONE;
+        step === STEPS.PRACTICE_SPEAK ||
+        step === STEPS.PRACTICE_LISTEN_DONE;
       const practiceMainMicClass = practiceButtonActive
         ? isRecording
           ? styles.on
@@ -1316,7 +1348,9 @@ const RolePlay: React.FC = () => {
       const isPracticeUser = practiceLineData.speaker === 'USER';
       const practiceAlign = isPracticeUser ? styles.textRight : '';
       const practiceRow = isPracticeUser ? styles.rowReverse : '';
-      const practiceRole = isPracticeUser ? styles.userRole : styles.aiRole;
+      const practiceRole = isPracticeUser
+        ? styles.userRole
+        : styles.aiRole;
 
       return (
         <div className={styles.activeTurnRecordingFlow}>
@@ -1355,7 +1389,9 @@ const RolePlay: React.FC = () => {
                 </span>
                 <span
                   className={`${styles.smallMicIcon} ${
-                    isRecording || practiceButtonActive ? styles.active : ''
+                    isRecording || practiceButtonActive
+                      ? styles.active
+                      : ''
                   }`}
                 >
                   <img
@@ -1383,7 +1419,9 @@ const RolePlay: React.FC = () => {
             <div
               className={`${styles.roleContainer} ${styles.customer} ${practiceRole}`}
             >
-              <span className={styles.roleTag}>{practiceLineData.speaker}</span>
+              <span className={styles.roleTag}>
+                {practiceLineData.speaker}
+              </span>
             </div>
           </div>
 
@@ -1425,7 +1463,8 @@ const RolePlay: React.FC = () => {
         <div className={styles.cardTitleBar}>
           <span className={styles.cardTitleText}>{scenarioTitle}</span>
           <span className={styles.cardStepText}>
-            {String(Math.min(turnHistory.length + 1, 6)).padStart(2, '0')}/06
+            {String(Math.min(turnHistory.length + 1, 6)).padStart(2, '0')}
+            /06
           </span>
         </div>
         <div

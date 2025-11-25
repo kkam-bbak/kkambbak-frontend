@@ -1,3 +1,4 @@
+// src/pages/krLearn/learnStart/learnStart.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import styles from './learnStart.module.css';
@@ -92,23 +93,6 @@ const formatDuration = (ms: number) => {
   return `${minutes}m ${seconds}s`;
 };
 
-// (삭제하지 않더라도 호출을 안 하면 되지만, 일단 함수는 둡니다)
-const clearLocalLearningTime = (sessionId: number) => {
-  try {
-    const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
-    if (storedData) {
-      const times: any = JSON.parse(storedData);
-      delete times[sessionId];
-      if (times[String(sessionId) as unknown as number]) {
-        delete times[String(sessionId) as unknown as number];
-      }
-      localStorage.setItem(LS_LEARNING_TIMES_KEY, JSON.stringify(times));
-    }
-  } catch (e) {
-    console.error('Failed to clear local learning time', e);
-  }
-};
-
 const emptyContent: LearningContent = {
   topicTitle: 'Loading...',
   itemId: 0,
@@ -144,60 +128,24 @@ const nextItemToContent = (
     'https://placehold.co/100x100/E64A19/FFFFFF?text=' + item.korean,
 });
 
-// ... WAV util functions ...
-const writeWavHeader = (sampleRate: number, dataLength: number) => {
-  const buffer = new ArrayBuffer(44);
-  const view = new DataView(buffer);
-  const writeString = (view: DataView, offset: number, string: string) => {
-    for (let i = 0; i < string.length; i++)
-      view.setUint8(offset + i, string.charCodeAt(i));
-  };
-  writeString(view, 0, 'RIFF');
-  view.setUint32(4, 36 + dataLength, true);
-  writeString(view, 8, 'WAVE');
-  writeString(view, 12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, 1, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * 2, true);
-  view.setUint16(32, 2, true);
-  view.setUint16(34, 16, true);
-  writeString(view, 36, 'data');
-  view.setUint32(40, dataLength, true);
-  return buffer;
-};
-const convertToWav = async (webmBlob: Blob): Promise<File> => {
-  const audioContext = new (window.AudioContext ||
-    (window as any).webkitAudioContext)();
-  const arrayBuffer = await webmBlob.arrayBuffer();
-  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-  const channelData = audioBuffer.getChannelData(0); // Mono
-  const dataLength = channelData.length * 2;
-  const buffer = new ArrayBuffer(dataLength);
-  const view = new DataView(buffer);
-  for (let i = 0; i < channelData.length; i++) {
-    const sample = Math.max(-1, Math.min(1, channelData[i]));
-    view.setInt16(i * 2, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
-  }
-  const header = writeWavHeader(audioBuffer.sampleRate, dataLength);
-  const wavBlob = new Blob([header, buffer], { type: 'audio/wav' });
-  return new File([wavBlob], 'recording.wav', { type: 'audio/wav' });
-};
-
 const LearnStart: React.FC = () => {
   const location = useLocation();
   const state = location.state as LocationState;
-  const { topicId: sessionIdParam } = useParams<{ topicId: string }>();
+  
+  const params = useParams();
+  const sessionIdParam = params.topicId; 
+
   const navigate = useNavigate();
   const currentCategory = state?.categoryName || 'TOPIK';
 
-  // Refs
   const hasFetched = useRef(false);
   const startTimeRef = useRef<number>(0);
   const resultsRef = useRef<WordResult[]>([]);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  
+  // 오디오 타입 Ref
+  const audioMimeTypeRef = useRef<string>('audio/wav');
 
   const isProcessingRef = useRef(false);
 
@@ -227,7 +175,6 @@ const LearnStart: React.FC = () => {
 
   const [isTtsPlaying, setIsTtsPlaying] = useState(false);
 
-  // --- 가시성 조건 ---
   const isWordVisible = status !== 'initial';
   const isSpeakerActive = status !== 'initial';
 
@@ -245,7 +192,6 @@ const LearnStart: React.FC = () => {
     resultStatus === 'none' &&
     !isProcessing;
 
-  // TTS
   const speakKoreanText = useCallback(
     (text: string) => {
       if (!('speechSynthesis' in window) || showExitModal) return;
@@ -263,7 +209,6 @@ const LearnStart: React.FC = () => {
     [showExitModal],
   );
 
-  // 효과음
   useEffect(() => {
     if (resultStatus === 'correct') {
       const audio = new Audio(CrtSnd);
@@ -332,25 +277,25 @@ const LearnStart: React.FC = () => {
   const startGrading = useCallback(
     async (
       action: 'GRADE' | 'NEXT_AFTER_WRONG',
-      audioFile: File | null = null,
+      audioFileObj: File | Blob | null = null,
     ) => {
-      if (isProcessingRef.current && action === 'GRADE' && !audioFile) return;
+      if (isProcessingRef.current && action === 'GRADE' && !audioFileObj) return;
 
       if (resultId === null) {
         console.warn('startGrading called without resultId. Ignoring.');
         return;
       }
+      
       const numericSessionId = Number(sessionIdParam);
 
-      if (action === 'GRADE' && !audioFile) {
+      if (action === 'GRADE' && !audioFileObj) {
         if (isProcessingRef.current) return;
-        console.warn(
-          '오디오 파일 없음: 시간 초과 또는 녹음 실패로 간주 -> 오답 처리',
-        );
+        // 🔥 [수정] 파일 없음 에러 로그는 간단하게 유지
+        console.error('❌ [Grading Failed] 녹음된 오디오 파일이 없습니다.'); 
         setResultStatus('incorrect');
-        return;
+        return; 
       }
-
+      
       if (action === 'GRADE') {
         setIsProcessing(true);
         isProcessingRef.current = true;
@@ -366,8 +311,12 @@ const LearnStart: React.FC = () => {
       const mode = isRetryWrong ? 'WRONG_ONLY' : 'ALL';
       formData.append('mode', mode);
 
-      if (audioFile) {
-        formData.append('audioFile', audioFile);
+      if (audioFileObj) {
+        if (audioFileObj instanceof File) {
+            formData.append('audioFile', audioFileObj);
+        } else {
+            formData.append('audioFile', audioFileObj, 'recording.webm');
+        }
       }
 
       try {
@@ -378,7 +327,7 @@ const LearnStart: React.FC = () => {
         );
         const data = response.data.body;
 
-        console.log('💯 채점 점수 (Score):', data.score);
+        console.log('✅ 채점 성공 (Score):', data.score);
 
         setResultStatus(data.correct ? 'correct' : 'incorrect');
         if (data.correct) setDisplayStatus('initial_feedback');
@@ -404,21 +353,34 @@ const LearnStart: React.FC = () => {
           const duration = endTime - startTimeRef.current;
 
           setTimeout(() => {
+            const safeSessionId = Number(sessionIdParam);
+            console.log('🚀 [LearnStart] Navigating with Session ID:', {
+              rawParam: sessionIdParam,
+              safeSessionId: safeSessionId,
+              resultId: resultId
+            });
+
+            if (isNaN(safeSessionId)) {
+                alert('Session ID 오류 발생! 목록으로 이동합니다.');
+                navigate('/main/learnList');
+                return;
+            }
+
             if (isRetryWrong) {
               navigate('/main/learn/review', {
                 state: {
-                  sessionId: numericSessionId,
+                  sessionId: safeSessionId, 
                   isUpdateComplete: true,
                   isRetryWrong: true,
                   resultId: resultId,
+                  categoryName: currentCategory,
                 },
               });
             } else {
               navigate('/main/learn/complete', {
                 state: {
                   resultId: resultId,
-                  sessionId: numericSessionId,
-                  results: resultsRef.current,
+                  sessionId: safeSessionId,
                   topicName: content.topicTitle,
                   learningDuration: duration,
                   categoryName: currentCategory,
@@ -454,7 +416,9 @@ const LearnStart: React.FC = () => {
           }
         }
       } catch (error: any) {
-        console.error('Grading failed:', error);
+        // 🔥 [수정] 에러 로그를 하나로 통합하여 깔끔하게 출력
+        console.error('❌ [Grading Failed] 서버 채점 요청 실패:', error);
+        
         setResultStatus('incorrect');
         setIsProcessing(false);
         isProcessingRef.current = false;
@@ -465,7 +429,6 @@ const LearnStart: React.FC = () => {
       content,
       navigate,
       isRetryWrong,
-      baseResultId,
       sessionIdParam,
       currentCategory,
       totalWords,
@@ -536,7 +499,7 @@ const LearnStart: React.FC = () => {
               }
             } else {
               if (!isProcessingRef.current && resultId !== null) {
-                startGrading('GRADE', null);
+                startGrading('GRADE', null); 
               }
             }
             return 10;
@@ -572,7 +535,7 @@ const LearnStart: React.FC = () => {
   ]);
 
   const handleAction = async (action: 'tryAgain' | 'next') => {
-    if (action === 'next') await startGrading('NEXT_AFTER_WRONG', null);
+    if (action === 'next') await startGrading('NEXT_AFTER_WRONG', null); 
     else if (action === 'tryAgain') {
       setStatus('initial');
       setResultStatus('none');
@@ -580,14 +543,33 @@ const LearnStart: React.FC = () => {
     }
   };
 
-  // ... (마이크 핸들러) ...
   const handleMicDown = async (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     if (!isMicActiveForRecording || showExitModal) return;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      
+      let mimeType = '';
+      const supportedTypes = [
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/wav',
+        'audio/ogg',
+        'audio/mp4', // Mac Safari
+        'audio/aac', // Safari Fallback
+        'audio/x-m4a', // Safari Fallback
+      ];
+      for (const type of supportedTypes) {
+        if (MediaRecorder.isTypeSupported(type)) {
+          mimeType = type;
+          break;
+        }
+      }
+      audioMimeTypeRef.current = mimeType || 'audio/wav';
+
+      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+      
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -602,21 +584,40 @@ const LearnStart: React.FC = () => {
 
         try {
           if (audioChunksRef.current.length === 0) {
-            console.warn('No audio data recorded.');
+            console.warn('⚠️ 녹음된 데이터가 없습니다.');
             setIsProcessing(false);
             isProcessingRef.current = false;
             setResultStatus('incorrect');
             return;
           }
 
-          const webmBlob = new Blob(audioChunksRef.current, {
-            type: 'audio/webm',
-          });
-          const wavFile = await convertToWav(webmBlob);
+          const currentMimeType = audioMimeTypeRef.current;
+          let fileExtension = 'wav';
 
-          startGrading('GRADE', wavFile);
+          if (currentMimeType.includes('webm')) {
+            fileExtension = 'webm';
+          } else if (
+            currentMimeType.includes('mp4') || 
+            currentMimeType.includes('aac') || 
+            currentMimeType.includes('m4a')
+          ) {
+            fileExtension = 'm4a'; // Mac/Safari
+          } else if (currentMimeType.includes('ogg')) {
+            fileExtension = 'ogg';
+          }
+
+          console.log(`🎤 녹음 완료: MIME=${currentMimeType}, 확장자=.${fileExtension}`);
+
+          const audioBlob = new Blob(audioChunksRef.current, {
+            type: currentMimeType,
+          });
+          
+          const audioFile = new File([audioBlob], `recording.${fileExtension}`, { type: currentMimeType });
+          
+          startGrading('GRADE', audioFile); 
+
         } catch (error) {
-          console.error('Audio processing error:', error);
+          console.error('❌ 오디오 처리 중 오류 발생:', error);
           setIsProcessing(false);
           isProcessingRef.current = false;
           setResultStatus('incorrect');
@@ -630,7 +631,7 @@ const LearnStart: React.FC = () => {
       mediaRecorder.start();
       setMicOn(true);
     } catch (err) {
-      console.error('Error accessing microphone:', err);
+      console.error('❌ 마이크 접근 실패:', err);
       alert('마이크 권한이 필요합니다.');
     }
   };
@@ -739,11 +740,7 @@ const LearnStart: React.FC = () => {
     setShowExitModal(true);
   };
 
-  // ⭐ [수정] 뒤로 가기/나가기 시에 clearLocalLearningTime 호출 제거
   const handleExitLearning = () => {
-    // 기존에 있던 clearLocalLearningTime(Number(sessionIdParam)) 삭제
-    // 이렇게 해야 재학습 도중 나가더라도 기존 완료 기록이 보존됨
-
     setShowExitModal(false);
     navigate('/main/learnList');
   };
@@ -859,7 +856,6 @@ const LearnStart: React.FC = () => {
           </button>
         )}
       </ContentSection>
-
       {showExitModal && (
         <div className={styles.exitModalOverlay}>
           <div className={styles.exitModalContent}>
