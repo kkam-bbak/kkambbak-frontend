@@ -44,3 +44,9 @@
 .pay img {
   height: 20px;
 }
+
+.modal-text {
+  margin: 36px 0 50px;
+  text-align: center;
+  white-space: pre-line;
+}
