@@ -32,11 +32,10 @@ const HAS_SEEN_INFO_KEY = 'hasSeenLearnInfo';
 // 로컬 스토리지 타입 및 키 정의
 const LS_LEARNING_TIMES_KEY = 'learning_completion_times';
 interface CompletionTime {
-    time: string; // 'Xm Ys' 형식
-    completedAt: number; // 타임스탬프
+  time: string; // 'Xm Ys' 형식
+  completedAt: number; // 타임스탬프
 }
 type LearningTimes = { [sessionId: number]: CompletionTime };
-
 
 const formatDuration = (durationSeconds: number): string => {
   const minutes = Math.floor(durationSeconds / 60);
@@ -45,44 +44,48 @@ const formatDuration = (durationSeconds: number): string => {
 };
 
 // 로컬 스토리지에서 시간 데이터를 가져오는 함수
-const getLocalLearningTime = (sessionId: number): CompletionTime | undefined => {
-    try {
-        const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
-        if (storedData) {
-            const times: LearningTimes = JSON.parse(storedData);
-            return times[sessionId] || times[String(sessionId) as unknown as number];
-        }
-    } catch (e) {
-        console.error('Failed to read local learning times', e);
+const getLocalLearningTime = (
+  sessionId: number,
+): CompletionTime | undefined => {
+  try {
+    const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
+    if (storedData) {
+      const times: LearningTimes = JSON.parse(storedData);
+      return times[sessionId] || times[String(sessionId) as unknown as number];
     }
-    return undefined;
+  } catch (e) {
+    console.error('Failed to read local learning times', e);
+  }
+  return undefined;
 };
 
-
 const sessionToTopic = (session: Session): Topic => {
-    let durationString = formatDuration(session.durationSeconds);
-    let finalCompleted = session.completed; 
+  let durationString = formatDuration(session.durationSeconds);
+  let finalCompleted = session.completed;
 
-    if (session.completed) {
-        const localTimeData = getLocalLearningTime(session.id);
-        if (localTimeData) {
-            durationString = localTimeData.time;
-        } else {
-            finalCompleted = false; 
-        }
+  if (session.completed) {
+    const localTimeData = getLocalLearningTime(session.id);
+    if (localTimeData) {
+      durationString = localTimeData.time;
+    } else {
+      finalCompleted = false;
     }
-    
-    const timeText = durationString === '0m 0s' 
-        ? (finalCompleted ? 'Completed' : 'Est. Time N/A') 
-        : durationString;
+  }
 
-    return {
-        id: session.id,
-        title: session.title,
-        vocabularies: session.vocabularyCount,
-        time: timeText, 
-        completed: finalCompleted, 
-    };
+  const timeText =
+    durationString === '0m 0s'
+      ? finalCompleted
+        ? 'Completed'
+        : 'Est. Time N/A'
+      : durationString;
+
+  return {
+    id: session.id,
+    title: session.title,
+    vocabularies: session.vocabularyCount,
+    time: timeText,
+    completed: finalCompleted,
+  };
 };
 
 // TopicCard 컴포넌트
@@ -106,12 +109,13 @@ const TopicCard: React.FC<TopicCardProps> = ({
 
   return (
     <div
-      className={`${styles.topicCard} ${isCompleted ? styles.completed : ''} ${isActive ? styles.activeCard : ''}`}
+      className={`${styles.topicCard} ${isCompleted ? styles.completed : ''} ${
+        isActive ? styles.activeCard : ''
+      }`}
       onClick={() => onCardClick(topic.id)}
     >
       <div className={styles.cardHeader}>
         <h3>{topic.title}</h3>
-      
         <button
           className={`${styles.topicStartButton} ${buttonStyleClass}`}
           onClick={(e) => {
@@ -145,14 +149,14 @@ const LearnList: React.FC = () => {
 
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
-  
+
   const [isNavigating, setIsNavigating] = useState(false);
 
   const [sessions, setSessions] = useState<Session[]>([]);
   const [nextCursor, setNextCursor] = useState<string | number | null>(null);
   const [hasNext, setHasNext] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const fetchSessions = useCallback(
@@ -163,13 +167,13 @@ const LearnList: React.FC = () => {
     ) => {
       if (isLoading || (!hasNext && !isInitial)) return;
 
-      setIsLoading(true); 
+      setIsLoading(true);
       const categoryParam = category.toUpperCase();
-      const limit = 4; 
+      const limit = 4;
 
       try {
         const cursorParam = cursor !== null ? String(cursor) : undefined;
-        
+
         const response = await http.get('/learning/sessions', {
           params: {
             category: categoryParam,
@@ -180,40 +184,39 @@ const LearnList: React.FC = () => {
 
         const data = response.data.body;
         const newSessions: Session[] = data.sessions || [];
-        
-        setSessions((prevSessions) => 
-            isInitial ? newSessions : [...prevSessions, ...newSessions]
+
+        setSessions((prevSessions) =>
+          isInitial ? newSessions : [...prevSessions, ...newSessions],
         );
-        
+
         setNextCursor(data.nextCursor);
         setHasNext(data.hasNext);
-        
       } catch (error) {
         console.error('Failed to fetch learning sessions:', error);
         if (isInitial) {
-            setSessions([]);
-            setActiveTopicId(null);
+          setSessions([]);
+          setActiveTopicId(null);
         }
-        setHasNext(false); 
+        setHasNext(false);
       } finally {
-        setIsLoading(false); 
+        setIsLoading(false);
       }
     },
-    [hasNext, isLoading]
+    [hasNext, isLoading],
   );
 
   useEffect(() => {
     setSessions([]);
     setNextCursor(null);
     setHasNext(true);
-    setActiveTopicId(null); 
-    
+    setActiveTopicId(null);
+
     fetchSessions(activeTab, null, true);
   }, [activeTab]);
 
   useEffect(() => {
     if (sessions.length > 0 && activeTopicId === null) {
-      const firstIncomplete = sessions.find(s => !s.completed);
+      const firstIncomplete = sessions.find((s) => !s.completed);
       setActiveTopicId(firstIncomplete ? firstIncomplete.id : sessions[0].id);
     }
   }, [sessions, activeTopicId]);
@@ -230,7 +233,7 @@ const LearnList: React.FC = () => {
       fetchSessions(activeTab, nextCursor);
     }
   }, [hasNext, isLoading, nextCursor, activeTab, fetchSessions]);
-  
+
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (scrollContainer) {
@@ -246,29 +249,29 @@ const LearnList: React.FC = () => {
   const topicsToDisplay: Topic[] = sessions.map(sessionToTopic);
 
   const handleConfirmStart = (topicId: number) => {
-    if (isNavigating) return; 
-    
-    setIsNavigating(true); 
+    if (isNavigating) return;
+
+    setIsNavigating(true);
     handleCloseInfoModal();
-    
-    console.log(`[Confirm Start] Navigating to: /mainPage/learn/${topicId}`);
-    
-    navigate(`/mainPage/learn/${topicId}`, {
-        state: {
-            categoryName: activeTab.toUpperCase() 
-        }
-    }); 
+
+    console.log(`[Confirm Start] Navigating to: /main/learn/${topicId}`);
+
+    navigate(`/main/learn/${topicId}`, {
+      state: {
+        categoryName: activeTab.toUpperCase(),
+      },
+    });
   };
 
   const handleStartLearning = (topicId: number) => {
-    if (isNavigating) return; 
+    if (isNavigating) return;
 
     const topic = topicsToDisplay.find((t) => t.id === topicId);
     if (!topic) return;
 
     if (topic.completed) {
-        handleConfirmStart(topicId);
-        return;
+      handleConfirmStart(topicId);
+      return;
     }
 
     const hasSeenInfo = localStorage.getItem(HAS_SEEN_INFO_KEY);
@@ -295,9 +298,9 @@ const LearnList: React.FC = () => {
       setActiveTab(tab);
     }
   };
-  
+
   const handleGoBackToMain = useCallback(() => {
-      navigate('/mainpage');
+    navigate('/main');
   }, [navigate]);
 
   const activeBubbleText =
@@ -307,7 +310,6 @@ const LearnList: React.FC = () => {
 
   return (
     <div className={styles.contentLitContainer}>
-      
       {!isInfoModalOpen && (
         <>
           <Header hasBackButton customBackAction={handleGoBackToMain} />
@@ -318,13 +320,17 @@ const LearnList: React.FC = () => {
       <ContentSection noPadding>
         <div className={styles.tabButtonsContainer}>
           <button
-            className={`${styles.tabButton} ${activeTab === 'topik' ? styles.activeTabButton : ''}`}
+            className={`${styles.tabButton} ${
+              activeTab === 'topik' ? styles.activeTabButton : ''
+            }`}
             onClick={() => handleTabChange('topik')}
           >
             Topik
           </button>
           <button
-            className={`${styles.tabButton} ${activeTab === 'casual' ? styles.activeTabButton : ''}`}
+            className={`${styles.tabButton} ${
+              activeTab === 'casual' ? styles.activeTabButton : ''
+            }`}
             onClick={() => handleTabChange('casual')}
           >
             Casual
@@ -333,13 +339,15 @@ const LearnList: React.FC = () => {
 
         <div className={`${styles.scrollableList}`} ref={scrollRef}>
           {topicsToDisplay.length === 0 && !isLoading ? (
-            <p className="no-sessions-message">No learning sessions available.</p>
+            <p className="no-sessions-message">
+              No learning sessions available.
+            </p>
           ) : (
             topicsToDisplay.map((topic) => (
               <TopicCard
                 key={topic.id}
                 topic={topic}
-                onStart={handleStartLearning} 
+                onStart={handleStartLearning}
                 onCardClick={handleCardClick}
                 isActive={topic.id === activeTopicId}
                 isCompleted={topic.completed}

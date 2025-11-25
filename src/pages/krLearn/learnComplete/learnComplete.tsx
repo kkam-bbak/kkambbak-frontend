@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; 
-import type { WordResult } from '../learnStart/learnStart'; 
+import { useNavigate, useLocation } from 'react-router-dom';
+import type { WordResult } from '../learnStart/learnStart';
 import styles from './learnComplete.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
@@ -20,39 +20,45 @@ const formatDuration = (durationMs: number): string => {
 
 const getFormattedCompletionDate = (): string => {
   const now = new Date();
-  return now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  return now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 };
 
 // 로컬 스토리지 타입 및 저장 로직
 const LS_LEARNING_TIMES_KEY = 'learning_completion_times';
 interface CompletionTime {
-    time: string; // 'Xm Ys' 형식
-    completedAt: number; // 타임스탬프
+  time: string; // 'Xm Ys' 형식
+  completedAt: number; // 타임스탬프
 }
 type LearningTimes = { [sessionId: number]: CompletionTime };
 
 const saveLocalLearningTime = (sessionId: number, durationMs: number) => {
-    if (sessionId === null || durationMs === 0) return;
-    
-    const timeString = formatDuration(durationMs);
-    const newCompletion: CompletionTime = {
-        time: timeString,
-        completedAt: Date.now(),
-    };
-    
-    try {
-        const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
-        const times: LearningTimes = storedData ? JSON.parse(storedData) : {};
-        
-        times[sessionId] = newCompletion;
-        
-        localStorage.setItem(LS_LEARNING_TIMES_KEY, JSON.stringify(times));
-        console.log(`[LearnComplete] Saved completion time for Session ${sessionId}: ${timeString}`);
-    } catch (e) {
-        console.error('Failed to save local learning time', e);
-    }
-};
+  if (sessionId === null || durationMs === 0) return;
 
+  const timeString = formatDuration(durationMs);
+  const newCompletion: CompletionTime = {
+    time: timeString,
+    completedAt: Date.now(),
+  };
+
+  try {
+    const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
+    const times: LearningTimes = storedData ? JSON.parse(storedData) : {};
+
+    times[sessionId] = newCompletion;
+
+    localStorage.setItem(LS_LEARNING_TIMES_KEY, JSON.stringify(times));
+    console.log(
+      `[LearnComplete] Saved completion time for Session ${sessionId}: ${timeString}`,
+    );
+  } catch (e) {
+    console.error('Failed to save local learning time', e);
+  }
+};
 
 // API 응답 타입
 interface Session {
@@ -96,108 +102,125 @@ const LearnComplete: React.FC = () => {
   const location = useLocation();
   const state = location.state as LocationState;
 
-  const results = state?.results || []; 
+  const results = state?.results || [];
   const currentSessionId = state?.sessionId ? Number(state.sessionId) : null;
-  const topicName = state?.topicName || 'Result'; 
+  const topicName = state?.topicName || 'Result';
   const learningDurationMs = state?.learningDuration || 0;
 
   const categoryName = state?.categoryName || 'TOPIK';
 
-  const correctCount = results.filter(r => r.isCorrect).length;
+  const correctCount = results.filter((r) => r.isCorrect).length;
   const totalCount = state?.totalCount || results.length || 0;
 
-  const learningTime = useMemo(() => formatDuration(learningDurationMs), [learningDurationMs]);
+  const learningTime = useMemo(
+    () => formatDuration(learningDurationMs),
+    [learningDurationMs],
+  );
   const completionDate = useMemo(() => getFormattedCompletionDate(), []);
 
   const { speechBubbleText, mascotImage: characterImageSrc } = useMemo(() => {
     let text = '';
     let mascot: MascotImage;
-    if (totalCount > 0 && correctCount === totalCount) { text = 'Perfect!!!'; mascot = 'shining'; } 
-    else if (totalCount > 0 && correctCount >= totalCount * (2 / 3)) { text = "It's not bad~"; mascot = 'smile'; } 
-    else if (totalCount > 0 && correctCount >= totalCount * (1 / 2)) { text = 'So so~'; mascot = 'thinking'; } 
-    else { text = "I'm sorry .."; mascot = 'gloomy'; }
+    if (totalCount > 0 && correctCount === totalCount) {
+      text = 'Perfect!!!';
+      mascot = 'shining';
+    } else if (totalCount > 0 && correctCount >= totalCount * (2 / 3)) {
+      text = "It's not bad~";
+      mascot = 'smile';
+    } else if (totalCount > 0 && correctCount >= totalCount * (1 / 2)) {
+      text = 'So so~';
+      mascot = 'thinking';
+    } else {
+      text = "I'm sorry ..";
+      mascot = 'gloomy';
+    }
     return { speechBubbleText: text, mascotImage: mascot };
   }, [correctCount, totalCount]);
-   
+
   useEffect(() => {
     if (currentSessionId && learningDurationMs > 0) {
-        saveLocalLearningTime(currentSessionId, learningDurationMs);
+      saveLocalLearningTime(currentSessionId, learningDurationMs);
     }
   }, [currentSessionId, learningDurationMs]);
 
-
   // 🔥 [추가] 헤더 뒤로가기 버튼 클릭 시 learnList로 이동하는 핸들러
   const handleBackToLearnList = () => {
-    navigate('/mainpage/learnList');
+    navigate('/main/learnList');
   };
 
   // 핸들러
   const handleReview = () => {
-    navigate('/mainpage/learn/review', {
-        state: {
-            sessionId: currentSessionId,
-            resultId: state?.resultId,
-            results: results,
-            topicName: topicName,
-            learningTime: learningTime,
-        }
+    navigate('/main/learn/review', {
+      state: {
+        sessionId: currentSessionId,
+        resultId: state?.resultId,
+        results: results,
+        topicName: topicName,
+        learningTime: learningTime,
+      },
     });
   };
 
   const handleTryAgain = () => {
     if (currentSessionId) {
-      navigate(`/mainPage/learn/${currentSessionId}`, {
-          state: { categoryName: categoryName }
-      }); 
+      navigate(`/main/learn/${currentSessionId}`, {
+        state: { categoryName: categoryName },
+      });
     } else {
-      navigate('/mainpage/learnList');
+      navigate('/main/learnList');
     }
   };
 
- const handleNextLearning = async () => {
+  const handleNextLearning = async () => {
     try {
-      console.log(`[Next Learning] Fetching list for category: ${categoryName}`);
-      
-      const response = await http.get<NextLearningResponse>('/learning/sessions', {
-        params: { 
+      console.log(
+        `[Next Learning] Fetching list for category: ${categoryName}`,
+      );
+
+      const response = await http.get<NextLearningResponse>(
+        '/learning/sessions',
+        {
+          params: {
             limit: 20,
-            category: categoryName
-        }
-      });
+            category: categoryName,
+          },
+        },
+      );
 
       const sessions = response.data.body.sessions;
 
       if (sessions && sessions.length > 0) {
-        let nextSession = sessions.find(s => !s.completed && s.id !== currentSessionId);
-        
+        let nextSession = sessions.find(
+          (s) => !s.completed && s.id !== currentSessionId,
+        );
+
         if (!nextSession) {
-            nextSession = sessions.find(s => s.id > (currentSessionId || 0));
+          nextSession = sessions.find((s) => s.id > (currentSessionId || 0));
         }
 
         if (!nextSession) {
-            nextSession = sessions.find(s => s.id !== currentSessionId);
+          nextSession = sessions.find((s) => s.id !== currentSessionId);
         }
 
         if (nextSession) {
-            console.log(`[Next Learning] Starting: ${nextSession.title}`);
-            
-            navigate(`/mainPage/learn/${nextSession.id}`, {
-                state: { categoryName: categoryName }
-            });
+          console.log(`[Next Learning] Starting: ${nextSession.title}`);
+
+          navigate(`/main/learn/${nextSession.id}`, {
+            state: { categoryName: categoryName },
+          });
         } else {
-            console.log("[Next Learning] No suitable next session found.");
-            alert("더 이상 진행할 학습이 없습니다. 목록으로 이동합니다.");
-            navigate('/mainpage/learnList');
+          console.log('[Next Learning] No suitable next session found.');
+          alert('더 이상 진행할 학습이 없습니다. 목록으로 이동합니다.');
+          navigate('/main/learnList');
         }
       } else {
-        console.log("[Next Learning] No sessions returned.");
-        alert("학습 가능한 세션이 없습니다.");
-        navigate('/mainpage/learnList');
+        console.log('[Next Learning] No sessions returned.');
+        alert('학습 가능한 세션이 없습니다.');
+        navigate('/main/learnList');
       }
-
     } catch (error) {
-      console.error("Failed to fetch next learning session:", error);
-      navigate('/mainpage/learnList');
+      console.error('Failed to fetch next learning session:', error);
+      navigate('/main/learnList');
     }
   };
 
@@ -205,28 +228,39 @@ const LearnComplete: React.FC = () => {
     <div className={styles.learnCompleteContainer}>
       {/* 🔥 [중요] customBackAction이 적용된 헤더 */}
       <Header hasBackButton customBackAction={handleBackToLearnList} />
-      
+
       <Mascot image={characterImageSrc} text={speechBubbleText} />
 
       <ContentSection className={styles.completeCard}>
         <h1 className={styles.sessionCompleteTitle}>Session Complete!</h1>
         <div className={styles.resultsBox}>
           <h2 className={styles.comresultsTopicTitle}>{topicName} Result</h2>
-          <hr className={styles.divider}/>
+          <hr className={styles.divider} />
           {/* ⭐ 이미지 변수(Check, Clock, Calendar)를 icon prop으로 전달 */}
-          <ResultRow icon={Check} value={`${correctCount}/${totalCount} Vocabularies correct`} />
-          <hr className={styles.divider}/>
+          <ResultRow
+            icon={Check}
+            value={`${correctCount}/${totalCount} Vocabularies correct`}
+          />
+          <hr className={styles.divider} />
           <ResultRow icon={Clock} value={learningTime} />
-          <hr className={styles.divider}/>
+          <hr className={styles.divider} />
           <ResultRow icon={Calendar} value={completionDate} />
       </div>
 
         <div className={styles.actionButtonsRow}>
-          <Button onClick={handleReview} className={styles.actionButton}>Review</Button>
-          <Button onClick={handleTryAgain} className={styles.actionButton}>Try again</Button>
+          <Button onClick={handleReview} className={styles.actionButton}>
+            Review
+          </Button>
+          <Button onClick={handleTryAgain} className={styles.actionButton}>
+            Try again
+          </Button>
         </div>
 
-        <Button isFull onClick={handleNextLearning} className={styles.nextLearningButton}>
+        <Button
+          isFull
+          onClick={handleNextLearning}
+          className={styles.nextLearningButton}
+        >
           Next learning
         </Button>
       </ContentSection>

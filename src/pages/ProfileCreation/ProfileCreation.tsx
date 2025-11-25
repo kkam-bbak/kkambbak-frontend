@@ -33,8 +33,8 @@ export type MascotInfo = { image: MascotImage; text: string };
 export default function ProfileCreation() {
   const user = useUser((s) => s.user);
 
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [changedImage, setChangedImage] = useState<string | null>(null);
+  const [changedImageFile, setChangedImageFile] = useState<File | null>(null);
   const [name, setName] = useState(user?.name || '');
   const [gender, setGender] = useState('');
   const [country, setCountry] = useState('');
@@ -57,13 +57,13 @@ export default function ProfileCreation() {
     if (!file) return;
 
     const preview = URL.createObjectURL(file);
-    setProfileImage(preview);
-    setProfileImageFile(file);
+    setChangedImage(preview);
+    setChangedImageFile(file);
   };
 
   const handleProfileUpload = () => {
     mutate(
-      { name, gender, country, profileImageFile },
+      { name, gender, country, profileImageFile: changedImageFile },
       {
         onSuccess: () => {
           setSearchParams({ step: 'personality' });
@@ -84,9 +84,9 @@ export default function ProfileCreation() {
 
   useEffect(() => {
     return () => {
-      if (profileImage) URL.revokeObjectURL(profileImage);
+      if (changedImage) URL.revokeObjectURL(changedImage);
     };
-  }, [profileImage]);
+  }, [changedImage]);
 
   return (
     <div className={`${styles['page-container']}`}>
@@ -108,9 +108,9 @@ export default function ProfileCreation() {
                 onChange={handleImageChange}
               />
               <label htmlFor="image" className={styles['upload-label']}>
-                {profileImage ? (
+                {user?.profileImage || changedImage ? (
                   <img
-                    src={profileImage}
+                    src={changedImage || user.profileImage}
                     alt="Profile"
                     className={styles.preview}
                   />
