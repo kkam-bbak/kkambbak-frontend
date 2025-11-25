@@ -24,6 +24,7 @@ import BaseLayout from '@/components/layout/BaseLayout/BaseLayout';
 import PaymentCheckoutPage from '@/pages/PaymentPage/CheckoutPage/PaymentCheckoutPage';
 import PaymentReceiptPage from '@/pages/PaymentPage/ReceiptPage/PaymentReceiptPage';
 import CheckoutResultPage from '@/pages/PaymentPage/CheckoutPage/CheckoutResultPage/CheckoutResultPage';
+import NotFound from '@/pages/NotFound/NotFound';
 
 function Protected() {
   const user = useUser((s) => s.user);
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <BaseLayout />,
+    errorElement: <NotFound />,
     children: [
       { index: true, element: <Splash /> },
       {
@@ -58,7 +60,7 @@ export const router = createBrowserRouter([
         element: <ProfileCreation />,
       },
       {
-        path: 'mainpage',
+        path: 'main',
         element: <MainLayout />,
         //element: <Protected />,
         children: [

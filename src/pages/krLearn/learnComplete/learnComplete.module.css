@@ -1,31 +1,8 @@
-/* learnComplete.css */
 
-.learnCompleteContainer {
-  width: 100%;
-}
-
-.complete-bubble {
-  top: 60px;
-  left: 115px;
-  width: 130px;
-  height: 49px;
-}
 
 /* -------------------- 3. 학습 결과 카드 영역 -------------------- */
 
-/* learnStart.css의 .learning-card 재활용 */
-.completeCard {
-  position: absolute;
-  bottom: 0;
-  box-sizing: border-box;
-  width: 100%;
-  height: 430px;
-  padding: 0 15px 15px;
-  overflow: hidden;
-  color: black;
-  background-color: #ff5000;
-  border-radius: 20px 20px 0 0;
-}
+
 
 /* Session Complete! 제목 스타일 */
 .sessionCompleteTitle {
@@ -37,17 +14,16 @@
 
 /* 결과 박스 (검은색 배경) */
 .resultsBox {
-  padding: 1px 15px 15px; /* 내부 패딩 */
-  margin-top: 52px; /* 제목과의 간격 */
-  margin-bottom: 16px; /* 아래 여백 */
+  padding: 12px 13px 11px 13px; /* 내부 패딩 */
+  margin-top: 36px;
+  height: 131px;
   color: white; /* 결과 값은 흰색 */
-  background-color: black;
+  background-color: #101010;
   border-radius: 10px;
 }
 
 /* 학습 이름 제목 스타일 */
 .comresultsTopicTitle {
-  margin-bottom: 15px;
   font-size: 18px;
   font-weight: 500;
   color: white;
@@ -58,7 +34,6 @@
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-bottom: 10px; /* 행 간격 */
 }
 
 .resultRow:last-child {
@@ -67,8 +42,8 @@
 
 /* 아이콘 스타일 */
 .resultIcon {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   margin-right: 5px;
   color: white; /* 아이콘 색상: 흰색 */
 }
@@ -84,6 +59,7 @@
 
 /* Review / Try Again 버튼 컨테이너 */
 .actionButtonsRow {
+  margin-top: 16px;
   display: flex;
   justify-content: space-between;
 }
@@ -104,10 +80,10 @@
 
 /* Next learning 버튼 */
 .nextLearningButton {
-  position: absolute;
-  bottom: 14px; /* 요청하신대로 하단에서 14px 간격 */
-  left: 50%; /* 가운데 정렬을 위해 왼쪽 50% 지정 */
-  width: 328px;
+
+  margin-top: 135px;
+
+  width: 100%;
   height: 40px; /* 이미지에 맞춰서 높이 증가 */
   font-size: 14px; /* 텍스트 크기 증가 */
   font-weight: 600;
@@ -116,5 +92,15 @@
   background-color: white; /* 배경: 흰색 */
   border: none;
   border-radius: 10px;
-  transform: translateX(-50%); /* 정확히 가운데로 이동 */
+
+}
+
+.divider {
+  width: 100%;       /* 부모 너비에 맞춤 (328px 고정값 대신 권장) */
+  height: 0;         /* 높이 0 */
+  border: 0;         /* 기본 테두리 제거 */
+  border-top: 1.5px solid black; /* 위쪽 테두리로 선 그리기 */
+  margin: 8px 0;    /* 위아래 간격 (상황에 맞게 조절) */
+  
+  /* position: absolute;  <-- 이 속성은 반드시 지워야 합니다! */
 }

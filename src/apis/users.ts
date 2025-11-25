@@ -62,6 +62,21 @@ export async function uploadImage(file: File) {
   return imageURL;
 }
 
+export async function getImageBinary(imageUrl: string) {
+  if (!imageUrl) {
+    throw Error('프로필 이미지가 존재하지 않습니다');
+  }
+
+  const list = imageUrl.split('/');
+  const imageId = list[list.length - 1];
+
+  const imageBinary = await http.get(`/upload/images/${imageId}`, {
+    responseType: 'blob',
+  });
+
+  return imageBinary.data;
+}
+
 type PersonalityInfo = {
   topText: string;
   bottomText: string;
@@ -74,7 +89,7 @@ export async function registerPersonality(info: PersonalityInfo) {
   };
   const response = await http.post('/users/register-korean', data);
 
-  return response;
+  return response.data;
 }
 
 type ResponseGenerateName = {

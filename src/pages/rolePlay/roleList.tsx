@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react'; // useCallback 추가
 import { useNavigate } from 'react-router-dom';
-//import { Clock } from 'lucide-react'; 
+//import { Clock } from 'lucide-react';
 import { http } from '@/apis/http';
 import styles from './roleList.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 import Clock from '@/assets/Clock.png';
+import Button from '@/components/Button/Button';
 
 // --- LocalStorage 타입 정의 ---
 const LS_KEY_COMPLETIONS = 'roleplay_completions';
@@ -20,7 +21,7 @@ type CompletedScenarios = { [scenarioId: number]: CompletionData };
 // --- API 응답 타입 정의 (보내주신 JSON에 맞춤) ---
 interface RoleplayScenario {
   id: number;
-  title: string;            // "At a Cafe", "At school" 등
+  title: string; // "At a Cafe", "At school" 등
   description: string;
   estimated_minutes: number;
 }
@@ -36,7 +37,7 @@ interface RolePlayItem {
   title: string;
   time: string;
   isSubscribed: boolean;
-  isCompleted: boolean; 
+  isCompleted: boolean;
 }
 
 // --- 시간 포맷팅 함수 ---
@@ -51,7 +52,9 @@ const formatMinutesToDisplay = (minutes: number | null | undefined): string => {
 // --- API 함수 ---
 const getRoleplayScenarios = async (): Promise<RoleplayScenario[]> => {
   try {
-    const response = await http.get<ApiResponseBody<RoleplayScenario[]>>('/roleplay/all');
+    const response = await http.get<ApiResponseBody<RoleplayScenario[]>>(
+      '/roleplay/all',
+    );
     return response.data.body;
   } catch (error) {
     console.error('Failed to fetch roleplay scenarios:', error);
@@ -71,7 +74,7 @@ const RoleList: React.FC = () => {
 
   // ⭐ [추가] 뒤로 가기 핸들러: 메인 페이지로 이동
   const handleBackClick = useCallback(() => {
-      navigate('/mainpage');
+    navigate('/main');
   }, [navigate]);
 
   // 1. LocalStorage 데이터 로드
@@ -94,12 +97,13 @@ const RoleList: React.FC = () => {
         const data = await getRoleplayScenarios();
 
         const formatted: RolePlayItem[] = data.map((scenario) => {
-            const completionInfo = completedMap[scenario.id];
-            const isCompleted = completionInfo?.isCompleted || false;
-            
-            const minutesToDisplay = isCompleted && completionInfo.actualTime !== undefined
-                ? completionInfo.actualTime
-                : scenario.estimated_minutes;
+          const completionInfo = completedMap[scenario.id];
+          const isCompleted = completionInfo?.isCompleted || false;
+
+          const minutesToDisplay =
+            isCompleted && completionInfo.actualTime !== undefined
+              ? completionInfo.actualTime
+              : scenario.estimated_minutes;
 
           return {
             id: scenario.id,
@@ -110,8 +114,10 @@ const RoleList: React.FC = () => {
           };
         });
 
+        formatted.sort((a, b) => a.id - b.id);
+
         setScenarios(formatted);
-        
+
         if (formatted.length > 0) {
           setSelectedRole(formatted[0].id);
         }
@@ -129,16 +135,18 @@ const RoleList: React.FC = () => {
 
   // 3. 학습 시작 핸들러
   const handleStart = (roleId: number) => {
-    const selectedScenario = scenarios.find(s => s.id === roleId);
-    
+    const selectedScenario = scenarios.find((s) => s.id === roleId);
+
     if (!selectedScenario) return;
 
-    console.log(`Starting role play: ${selectedScenario.title} (ID: ${roleId})`);
-    
-    navigate(`/mainpage/rolePlay/${roleId}`, {
-        state: {
-            scenarioTitle: selectedScenario.title 
-        }
+    console.log(
+      `Starting role play: ${selectedScenario.title} (ID: ${roleId})`,
+    );
+
+    navigate(`/main/rolePlay/${roleId}`, {
+      state: {
+        scenarioTitle: selectedScenario.title,
+      },
     });
   };
 
@@ -147,78 +155,89 @@ const RoleList: React.FC = () => {
   };
 
   const handleSubscribe = () => {
-     navigate('/payment/checkout');
+    navigate('/payment/checkout');
   };
 
-  if (isLoading) return (
-    <div className={styles.roleListContainer}>
+  if (isLoading)
+    return (
+      <div className={styles.roleListContainer}>
         {/* ⭐ customBackAction 추가 */}
         <Header hasBackButton customBackAction={handleBackClick} />
         <Mascot image="thinking" text="로딩 중..." />
         <ContentSection color="blue">
-            <div className={styles.roleListContentHeader}>
-                <h2 className={styles.roleListTitle}>Role Play</h2>
-            </div>
-            <div className={styles.roleListItemsContainer}>
-                <p style={{textAlign: 'center', color: 'white'}}>시나리오 목록을 불러오는 중입니다...</p>
-            </div>
+          <div className={styles.roleListContentHeader}>
+            <h2 className={styles.roleListTitle}>Role Play</h2>
+          </div>
+          <div className={styles.roleListItemsContainer}>
+            <p style={{ textAlign: 'center', color: 'white' }}>
+              시나리오 목록을 불러오는 중입니다...
+            </p>
+          </div>
         </ContentSection>
-    </div>
-  );
+      </div>
+    );
 
-  if (error) return (
+  if (error)
+    return (
       <div className={styles.roleListContainer}>
         {/* ⭐ customBackAction 추가 */}
         <Header hasBackButton customBackAction={handleBackClick} />
         <Mascot image="gloomy" text="문제가 발생했어요" />
         <ContentSection color="blue">
-            <div className={styles.roleListContentHeader}>
-                <h2 className={styles.roleListTitle}>Role Play</h2>
-            </div>
-            <div className={styles.roleListItemsContainer}>
-                <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>
-                <button onClick={() => window.location.reload()} style={{ display: 'block', margin: '20px auto', padding: '10px 20px' }}>
-                    다시 시도
-                </button>
-            </div>
+          <div className={styles.roleListContentHeader}>
+            <h2 className={styles.roleListTitle}>Role Play</h2>
+          </div>
+          <div className={styles.roleListItemsContainer}>
+            <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                display: 'block',
+                margin: '20px auto',
+                padding: '10px 20px',
+              }}
+            >
+              다시 시도
+            </button>
+          </div>
         </ContentSection>
-    </div>
-  );
+      </div>
+    );
 
   return (
     <div className={styles.roleListContainer}>
-      {/* ⭐ customBackAction 추가 */}
       <Header hasBackButton customBackAction={handleBackClick} />
       <Mascot image="basic" text={speechBubbleText} />
 
       <ContentSection color="blue">
         <div className={styles.roleListContentHeader}>
           <h2 className={styles.roleListTitle}>Role Play</h2>
-          <button className={styles.subscribeButton} onClick={handleSubscribe}>
+          <Button size="sm" onClick={handleSubscribe}>
             Subscribe
-          </button>
+          </Button>
         </div>
 
         <div className={styles.roleListItemsContainer}>
           {scenarios.map((role) => {
             const isSelected = role.id === selectedRole;
-            // const isStartVisible = isSelected && role.isSubscribed;
-            // const buttonText = role.isCompleted ? 'Learn Again' : 'Start';
 
             return (
               <div
                 key={role.id}
-                className={`${styles.roleItemRow} ${isSelected ? styles.selected : ''}`}
+                // isSelected일 때도 hover 스타일과 동일한 .selected 클래스 적용
+                className={`${styles.roleItemRow} ${
+                  isSelected ? styles.selected : ''
+                }`}
                 onClick={() => handleRoleSelect(role.id)}
               >
                 <div className={styles.roleItemHeader}>
                   <span className={styles.roleItemTitle}>{role.title}</span>
 
-                  {/* ⭐ [수정] 버튼 렌더링 로직 변경 */}
+                  {/* 🔥 [수정] 버튼 렌더링 로직 */}
                   {role.isCompleted ? (
-                    /* Case 1: 학습 완료됨 -> 선택 여부 상관없이 항상 'Learn Again' 표시 */
+                    // Case 1: 완료됨 -> Learn Again (항상 보임)
                     <button
-                      className={styles.learnAgainButton} // 새로 만든 스타일 적용
+                      className={styles.learnAgainButton}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleStart(role.id);
@@ -227,10 +246,12 @@ const RoleList: React.FC = () => {
                       Learn Again
                     </button>
                   ) : (
-                    /* Case 2: 학습 미완료 -> 선택되었을 때(isSelected)만 'Start' 표시 */
-                    isSelected && (
+                    // Case 2: 미완료 -> Start (CSS로 평소엔 숨김, Hover시 등장)
+                    // isSelected 조건 제거: 선택 안되어도 호버하면 나옴
+                    <div className={styles.startButtonContainer}>
                       <button
-                        className={styles.roleStartButton} // 기존 흰색 버튼 스타일
+                        
+                        className={styles.customStartButton} // 흰색 배경/검은 글씨 스타일 적용
                         onClick={(e) => {
                           e.stopPropagation();
                           handleStart(role.id);
@@ -238,17 +259,14 @@ const RoleList: React.FC = () => {
                       >
                         Start
                       </button>
-                    )
+                    </div>
                   )}
                 </div>
 
-                <hr className={styles.divider}/>
+                <hr className={styles.divider} />
 
                 <div className={styles.roleItemInfo}>
-                  <span className={styles.roleTime}>
-                    {role.time}
-                  </span>
-                
+                  <span className={styles.roleTime}>{role.time}</span>
                   <img src={Clock} alt="time" className={styles.roleTimeIcon} />
                 </div>
               </div>

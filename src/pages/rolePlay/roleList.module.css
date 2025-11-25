@@ -26,7 +26,7 @@
   margin: 0;
   font-size: 18px;
   font-weight: 500;
-  color: black; /* 파란색 배경 위 흰색 텍스트 */
+  color: var(--color-grayscale-7); /* 파란색 배경 위 흰색 텍스트 */
 }
 
 .subscribeButton {
@@ -35,9 +35,9 @@
   padding: 5px 10px;
   font-size: 10px;
   font-weight: 600;
-  color: black;
+  color: var(--color-grayscale-7);
   cursor: pointer;
-  background-color: white;
+  background-color: var(--color-grayscale-1);
   border: none;
   border-radius: 5px;
 }
@@ -46,7 +46,6 @@
 .roleListItemsContainer {
   /* content-window의 height 430px 기준, 헤더(약 60px)를 제외한 나머지 공간 사용 */
   height: calc(100% - 20px);
-  
 
   /* content-window가 overflow: hidden을 가지므로, 스크롤바가 안 보이게 설정 */
   overflow-y: scroll;
@@ -70,31 +69,28 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  
-  /* 🔥 [수정 1] 요소 위치 고정 */
-  /* center 대신 space-between을 사용하여 헤더는 위, 정보는 아래로 밀어버립니다 */
-  justify-content: space-between; 
-  
+  justify-content: space-between;
   width: 100%;
-  height: 82px; /* 높이를 조금 넉넉하게 잡는 것을 추천 (기존 82px -> 92px 등) */
-  padding: 12px 15px; /* 내부 여백으로 위치 미세 조정 */
-  
+  height: 82px;
+  padding: 12px 15px;
   margin-bottom: 8px;
-  color: #484848; 
-  background-color: #101010;
-  border-radius: 10px;
-  transition: color 0.1s;
-  
-  /* 선택되지 않았을 때(기본) 배경색이 투명이어야 목록처럼 보입니다. */
-  /* 만약 기본 상태가 어두운 카드라면 위 background-color 유지, 아니라면 아래처럼 transparent */
+
+  /* [기본 상태] 배경 #101010 고정, 글씨 회색 */
   background-color: #101010; 
-  border-bottom: 1px solid transparent; /* 레이아웃 흔들림 방지용 투명 테두리 */
+  color: #484848;
+
+  border-bottom: 1px solid transparent;
+  border-radius: 10px;
+  
+  /* 부드러운 전환 효과 */
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-/* 선택된 항목 스타일 */
-.roleItemRow.selected {
-  background-color: #101010; /* 선택 시 검은 배경 */
-  color: white;
+/* 🔥 [추가/수정] Hover 시 배경은 유지하되, '글자색'만 흰색으로 변경 */
+.roleItemRow:hover {
+  background-color: #101010;       /* 배경색 유지 */
+  color: var(--color-grayscale-1); /* 글자색 흰색으로 변경 (Title이 inherit이므로 같이 변함) */
 }
 
 /* 1. 제목 헤더 */
@@ -103,29 +99,23 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  /* margin-bottom 제거 -> space-between이 간격 자동 조절 */
-  margin-bottom: 0; 
+  margin-bottom: 0;
 }
 
 .roleItemTitle {
   font-size: 18px;
   font-weight: 500;
-  color: inherit;
+  color: inherit; /* 🔥 부모(.roleItemRow)의 색상을 따라가므로 Hover 시 자동으로 흰색 됨 */
 }
-
-/* 2. 구분선 (HR) 스타일 수정 */
+/* 2. 구분선 (HR) */
 .divider {
-  /* 🔥 [수정 2] HR 태그 색상 적용 방법 */
-  border: none; /* 기본 입체 테두리 제거 */
-  height: 1px;  /* 선 두께 */
-  background-color: black; /* 선 색상 */
-  
-  width: 100%;  /* 부모 너비에 맞춤 */
-  margin: 0;    /* flex space-between이 간격을 잡아주므로 마진 제거 */
-
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  background-color: var(--color-grayscale-7);
+  border: none;
+  opacity: 0.5;
 }
-
-
 
 /* 3. 시간 정보 */
 .roleItemInfo {
@@ -134,66 +124,73 @@
   align-items: center;
   justify-content: flex-end;
   width: 100%;
-  /* margin-bottom 제거 */
-  margin-bottom: 0;
   padding-right: 8px;
+  margin-bottom: 0;
 }
 
-/* 버튼 스타일 (기존 유지) */
-.roleStartButton {
-  width: 65px !important;
-  height: 20px;
-  padding: 0;
-  margin-left: 10px;
-  color: black;
-  cursor: pointer;
-  background-color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 10px;
-}
-
-.learnAgainButton {
-  width: 72px !important;
-  height: 20px;
-  padding: 0; 
-  white-space: nowrap; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translateY(-8px);
-  margin-left: auto;
-  background-color: #484848;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 10px;
-  cursor: pointer;
-}
-
-.roleTime{
-  font-weight: 500;
-  font-size: 10px;
+.roleTime {
   margin-right: 5px;
+  font-size: 10px;
+  font-weight: 500;
+  color: inherit; /* 부모(row)의 색상을 따라감 */
 }
 
 .roleTimeIcon {
   width: 10px;
   height: 10px;
-
+  /* [기본 상태] 회색 아이콘 */
   filter: invert(15%) sepia(0%) saturate(0%) hue-rotate(154deg) brightness(30%) contrast(87%);
-  
-
-  transition: filter 0.1s;
+  transition: filter 0.2s;
 }
 
-/* 🔥 [수정] 선택되었을 때: 무조건 완전한 흰색으로 변경 */
-.roleItemRow.selected .roleTimeIcon {
-  /* brightness(0): 이미지를 완전 검은색으로 만듦
-     invert(1): 검은색을 반전시켜 완전 흰색으로 만듦
-     이 조합은 원본 이미지 색상과 상관없이 무조건 흰색을 만듭니다.
-  */
-  filter: brightness(0) invert(1);
+/* 🔥 [수정] Hover 시 아이콘을 흰색으로 변경 */
+.roleItemRow:hover .roleTimeIcon {
+  filter: brightness(0) invert(1); /* 완전한 흰색 */
+}
+
+/* -------------------- 버튼 스타일 -------------------- */
+
+/* 1. Start 버튼 컨테이너 (평소에는 숨김) */
+.startButtonContainer {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+}
+
+/* 🔥 [수정] Hover 시 Start 버튼 보이기 */
+.roleItemRow:hover .startButtonContainer {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Start 버튼 커스텀 (흰색 배경 + 검은 글씨) */
+.customStartButton {
+  background-color: var(--color-grayscale-1) !important;
+  color: #101010 !important;
+  border: none;
+  font-weight: 700;
+  width: 65px !important; /* 너비 고정 */
+  height: 20px;
+  border-radius: 6px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+/* 2. Learn Again 버튼 (항상 보임) */
+.learnAgainButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px !important;
+  height: 20px;
+  padding: 0;
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-grayscale-1);
+  white-space: nowrap;
+  cursor: pointer;
+  background-color: #484848;
+  border: none;
+  border-radius: 6px;
 }
