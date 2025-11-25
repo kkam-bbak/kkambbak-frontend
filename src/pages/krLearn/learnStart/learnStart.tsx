@@ -84,8 +84,6 @@ type LearningStatus = 'initial' | 'listen' | 'countdown' | 'speak';
 type ResultStatus = 'none' | 'processing' | 'correct' | 'incorrect';
 type ResultDisplayStatus = 'none' | 'initial_feedback' | 'meaning_revealed';
 
-const LS_LEARNING_TIMES_KEY = 'learning_completion_times';
-
 const formatDuration = (ms: number) => {
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
@@ -139,14 +137,13 @@ const LearnStart: React.FC = () => {
   const currentCategory = state?.categoryName || 'TOPIK';
 
   const hasFetched = useRef(false);
+  
   const startTimeRef = useRef<number>(0);
   const resultsRef = useRef<WordResult[]>([]);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   
-  // 오디오 타입 Ref
   const audioMimeTypeRef = useRef<string>('audio/wav');
-
   const isProcessingRef = useRef(false);
 
   const wordsToRetry = state?.wordsToRetry;
@@ -172,8 +169,10 @@ const LearnStart: React.FC = () => {
   const countdownRef = useRef<number | null>(null);
 
   const [showExitModal, setShowExitModal] = useState(false);
-
   const [isTtsPlaying, setIsTtsPlaying] = useState(false);
+
+  // 🔥 [추가] 다음 문제 데이터를 임시 저장할 State (캐시)
+  const [nextContentCache, setNextContentCache] = useState<LearningContent | null>(null);
 
   const isWordVisible = status !== 'initial';
   const isSpeakerActive = status !== 'initial';
@@ -235,44 +234,55 @@ const LearnStart: React.FC = () => {
     }
   };
 
-  const fetchLearningData = useCallback(async () => {
+  useEffect(() => {
+    if (hasFetched.current) return;
+
     const numericSessionId = Number(sessionIdParam);
     if (!sessionIdParam || isNaN(numericSessionId)) {
       alert('잘못된 접근입니다.');
       navigate('/main/learn');
       return;
     }
-    setIsLoading(true);
-    try {
-      const modeParam = isRetryWrong ? 'WRONG_ONLY' : 'ALL';
-      const bodyPayload: { mode: string; baseResultId?: string | null } = {
-        mode: modeParam,
-      };
 
-      if (modeParam === 'WRONG_ONLY') {
-        if (baseResultId === null) {
-          setIsLoading(false);
-          return;
+    const fetchData = async () => {
+      hasFetched.current = true;
+      setIsLoading(true);
+
+      try {
+        const modeParam = isRetryWrong ? 'WRONG_ONLY' : 'ALL';
+        const bodyPayload: { mode: string; baseResultId?: string | null } = {
+          mode: modeParam,
+        };
+
+        if (modeParam === 'WRONG_ONLY') {
+          if (baseResultId === null) {
+            setIsLoading(false);
+            return;
+          }
+          bodyPayload.baseResultId = String(baseResultId);
         }
-        bodyPayload.baseResultId = String(baseResultId);
-      }
 
-      const response = await http.post<LearningStartResponse>(
-        `/learning/sessions/${numericSessionId}/start`,
-        bodyPayload,
-        {},
-      );
-      handleSessionData(response.data.body);
-    } catch (error: any) {
-      alert(
-        '세션 시작 실패: ' +
-          (error.response?.data?.status?.message || '알 수 없는 오류'),
-      );
-      navigate('/main/learnList');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [sessionIdParam, navigate, wordsToRetry, isRetryWrong, baseResultId]);
+        const response = await http.post<LearningStartResponse>(
+          `/learning/sessions/${numericSessionId}/start`,
+          bodyPayload,
+          {},
+        );
+        handleSessionData(response.data.body);
+      } catch (error: any) {
+        console.error('세션 시작 에러:', error);
+        alert(
+          '세션 시작 실패: ' +
+            (error.response?.data?.status?.message || '알 수 없는 오류'),
+        );
+        navigate('/main/learnList');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const startGrading = useCallback(
     async (
@@ -290,7 +300,6 @@ const LearnStart: React.FC = () => {
 
       if (action === 'GRADE' && !audioFileObj) {
         if (isProcessingRef.current) return;
-        // 🔥 [수정] 파일 없음 에러 로그는 간단하게 유지
         console.error('❌ [Grading Failed] 녹음된 오디오 파일이 없습니다.'); 
         setResultStatus('incorrect');
         return; 
@@ -327,7 +336,7 @@ const LearnStart: React.FC = () => {
         );
         const data = response.data.body;
 
-        console.log('채점 성공 (Score):', data.score);
+        console.log('✅ 채점 성공 (Score):', data.score);
 
         setResultStatus(data.correct ? 'correct' : 'incorrect');
         if (data.correct) setDisplayStatus('initial_feedback');
@@ -342,24 +351,27 @@ const LearnStart: React.FC = () => {
           });
         }
 
+        // 🔥 [수정] 틀렸을 때(GRADE), 혹시 서버가 준 다음 문제 정보가 있다면 미리 저장해둠
         if (!data.correct && action === 'GRADE') {
+          if (data.next) {
+            // 백엔드가 next를 주면 캐싱!
+            const nextData = nextItemToContent(data.next, content.topicTitle);
+            setNextContentCache(nextData); 
+          }
+          
           setIsProcessing(false);
           isProcessingRef.current = false;
           return;
         }
 
+        // 완료 처리
         if (data.finished) {
           const endTime = Date.now();
           const duration = endTime - startTimeRef.current;
 
           setTimeout(() => {
             const safeSessionId = Number(sessionIdParam);
-            console.log('🚀 [LearnStart] Navigating with Session ID:', {
-              rawParam: sessionIdParam,
-              safeSessionId: safeSessionId,
-              resultId: resultId
-            });
-
+            
             if (isNaN(safeSessionId)) {
                 alert('Session ID 오류 발생! 목록으로 이동합니다.');
                 navigate('/main/learnList');
@@ -392,10 +404,12 @@ const LearnStart: React.FC = () => {
           return;
         }
 
+        // 정답이거나, 강제 이동 시
         if (data.next) {
           const nextContent = nextItemToContent(data.next, content.topicTitle);
 
           if (data.correct) {
+            // 정답: 2초 후 이동
             setTimeout(() => {
               setContent(nextContent);
               setCurrentWordIndex((prev) => prev + 1);
@@ -403,8 +417,10 @@ const LearnStart: React.FC = () => {
               setResultStatus('none');
               setIsProcessing(false);
               isProcessingRef.current = false;
+              setNextContentCache(null); // 캐시 초기화
             }, 2000);
           } else {
+            // 오답 후 Next: 즉시 이동
             if (action === 'NEXT_AFTER_WRONG') {
               setContent(nextContent);
               setCurrentWordIndex((prev) => prev + 1);
@@ -412,11 +428,11 @@ const LearnStart: React.FC = () => {
               setResultStatus('none');
               setIsProcessing(false);
               isProcessingRef.current = false;
+              setNextContentCache(null); // 캐시 초기화
             }
           }
         }
       } catch (error: any) {
-        // 🔥 [수정] 에러 로그를 하나로 통합하여 깔끔하게 출력
         console.error('❌ [Grading Failed] 서버 채점 요청 실패:', error);
         
         setResultStatus('incorrect');
@@ -434,12 +450,6 @@ const LearnStart: React.FC = () => {
       totalWords,
     ],
   );
-
-  useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
-    fetchLearningData();
-  }, [fetchLearningData]);
 
   // --- 타이머 & 상태 제어 ---
   useEffect(() => {
@@ -535,8 +545,22 @@ const LearnStart: React.FC = () => {
   ]);
 
   const handleAction = async (action: 'tryAgain' | 'next') => {
-    if (action === 'next') await startGrading('NEXT_AFTER_WRONG', null); 
-    else if (action === 'tryAgain') {
+    if (action === 'next') {
+      // 🔥 [핵심 로직] 캐시가 있으면 그거 쓰고, 없으면 API 호출
+      if (nextContentCache) {
+        setContent(nextContentCache);
+        setCurrentWordIndex((prev) => prev + 1);
+        setStatus('initial');
+        setResultStatus('none');
+        setDisplayStatus('none');
+        setNextContentCache(null); // 사용했으니 비움
+        setIsProcessing(false);
+        isProcessingRef.current = false;
+      } else {
+        // 캐시가 없으면 (현재 백엔드 로직상 이쪽을 타게 됨)
+        await startGrading('NEXT_AFTER_WRONG', null); 
+      }
+    } else if (action === 'tryAgain') {
       setStatus('initial');
       setResultStatus('none');
       setDisplayStatus('none');
@@ -556,9 +580,9 @@ const LearnStart: React.FC = () => {
         'audio/webm',
         'audio/wav',
         'audio/ogg',
-        'audio/mp4', // Mac Safari
-        'audio/aac', // Safari Fallback
-        'audio/x-m4a', // Safari Fallback
+        'audio/mp4',
+        'audio/aac',
+        'audio/x-m4a',
       ];
       for (const type of supportedTypes) {
         if (MediaRecorder.isTypeSupported(type)) {
@@ -601,7 +625,7 @@ const LearnStart: React.FC = () => {
             currentMimeType.includes('aac') || 
             currentMimeType.includes('m4a')
           ) {
-            fileExtension = 'm4a'; // Mac/Safari
+            fileExtension = 'm4a';
           } else if (currentMimeType.includes('ogg')) {
             fileExtension = 'ogg';
           }

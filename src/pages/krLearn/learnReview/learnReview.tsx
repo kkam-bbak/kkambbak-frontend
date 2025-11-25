@@ -1,5 +1,5 @@
 // src/pages/krLearn/learnReview/learnReview.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
 import styles from './learnReview.module.css';
@@ -112,6 +112,9 @@ const LearnReview: React.FC = () => {
   const isUpdateComplete = state?.isUpdateComplete || false;
   const categoryName = state?.categoryName || 'TOPIK';
 
+  // 🔥 [수정 1] 중복 요청 방지용 Ref 추가
+  const hasFetched = useRef(false);
+
   const [reviewData, setReviewData] = useState<{
     sessionId: number | undefined;
     resultId: number | undefined;
@@ -136,12 +139,22 @@ const LearnReview: React.FC = () => {
     completionDate: 'N/A',
   });
 
-  const fetchReviewResult = useCallback(
-    async (sId: number) => {
+  // 🔥 [수정 2] useEffect 내에서 중복 체크 후 API 호출
+  useEffect(() => {
+    if (!initialSessionId) {
+      navigate('/main/learnList');
+      return;
+    }
+
+    // 이미 데이터를 가져왔다면 실행 중단
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
+    const fetchReviewResult = async () => {
       setReviewData((prev) => ({ ...prev, isLoading: true }));
       try {
         const response = await http.get<ReviewResponse>(
-          `/learning/${sId}/results/review`,
+          `/learning/${initialSessionId}/results/review`,
         );
         const { summary, items } = response.data.body;
 
@@ -153,7 +166,7 @@ const LearnReview: React.FC = () => {
         }));
 
         setReviewData({
-          sessionId: sId,
+          sessionId: initialSessionId,
           resultId: summary.resultId,
           topicName: summary.sessionTitle,
           learningTime: formatDuration(summary.durationSeconds),
@@ -164,24 +177,18 @@ const LearnReview: React.FC = () => {
           isLoading: false,
           completionDate: formatDate(summary.completedAt),
         });
-        console.log(`[LearnReview] Fetched Review Result for Session ${sId}`);
+        console.log(`[LearnReview] Fetched Review Result for Session ${initialSessionId}`);
       } catch (error) {
         console.error('Failed to fetch review result:', error);
         setReviewData((prev) => ({ ...prev, isLoading: false }));
         alert('결과를 불러오지 못했습니다. 목록으로 이동합니다.');
         navigate('/main/learnList');
       }
-    },
-    [navigate],
-  );
+    };
 
-  useEffect(() => {
-    if (initialSessionId) {
-      fetchReviewResult(initialSessionId);
-    } else {
-      navigate('/main/learnList');
-    }
-  }, [initialSessionId, fetchReviewResult, navigate]);
+    fetchReviewResult();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 마운트 시 1회만 실행
 
   const handleBackButtonClick = () => {
     navigate('/main/learn/complete', {
