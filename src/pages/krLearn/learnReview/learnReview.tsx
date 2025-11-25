@@ -1,15 +1,17 @@
+// LearnReview.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle, Clock, Calendar } from 'lucide-react';
 import styles from './learnReview.module.css';
 import { http } from '../../../apis/http';
 import Header from '@/components/layout/Header/Header';
-import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
+// Mascot 관련 주석 처리 (리뷰 페이지에는 마스코트 로직이 불필요)
+// import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import type { WordResult } from '../learnStart/learnStart';
 import Button from '@/components/Button/Button';
 import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
 
-// --- API 인터페이스 ---
+// --- API 인터페이스 (기존 유지) ---
 interface ApiResponseBody<T> {
   status: { statusCode: string; message: string; description: string | null };
   body: T;
@@ -39,18 +41,17 @@ interface ReviewApiResultBody {
 }
 type ReviewResponse = ApiResponseBody<ReviewApiResultBody>;
 
+// LocationState 간소화 (API로 모든 데이터 대체)
 interface ReviewState {
   sessionId?: number;
-  resultId?: number;
-  results?: WordResult[]; // 최초 학습 완료 시에만 존재
-  topicName?: string;
-  learningTime?: string;
-  learningDuration?: number;
+  resultId?: number; // LearnComplete에서 받은 최신 resultId (API 호출 시 사용)
+  topicName?: string; // (선택) 로딩 전 표시용
   isUpdateComplete?: boolean; // 재학습 후 돌아왔는지 여부
   isRetryWrong?: boolean; // 재학습 모드였는지 여부
+  categoryName?: string; // Try Again 시 필요
 }
 
-// --- 로컬 스토리지 로직 ---
+// ... (로컬 스토리지 로직 및 유틸리티 함수 - formatDuration, formatDate, saveLocalLearningTime - 기존 유지) ...
 const LS_LEARNING_TIMES_KEY = 'learning_completion_times';
 interface CompletionTime {
   time: string;
@@ -94,8 +95,7 @@ const saveLocalLearningTime = (sessionId: number, durationSeconds: number) => {
     console.error('Failed to save local learning time', e);
   }
 };
-
-// ... (ResultRow, WordResultRow 컴포넌트) ...
+// ... (ResultRow, WordResultRow 컴포넌트 - 기존 유지) ...
 const ResultRow = ({
   icon: Icon,
   value,
@@ -130,18 +130,22 @@ const WordResultRow: React.FC<{
   </div>
 );
 
+
 const LearnReview: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as ReviewState;
 
   const initialSessionId = state?.sessionId;
+  const initialResultId = state?.resultId; // API 호출 시 사용 가능 (최신 결과 보장)
   const isUpdateComplete = state?.isUpdateComplete || false;
   const isRetryWrong = state?.isRetryWrong || false;
+  const categoryName = state?.categoryName || 'TOPIK';
 
+  // API 호출로 채워질 초기 상태
   const [reviewData, setReviewData] = useState<{
     sessionId: number | undefined;
-    resultId: number | undefined; // 🔥 최신 resultId 관리
+    resultId: number | undefined;
     topicName: string;
     learningTime: string;
     rawDurationSeconds: number;
@@ -152,29 +156,24 @@ const LearnReview: React.FC = () => {
     completionDate: string;
   }>({
     sessionId: initialSessionId,
-    resultId: state?.resultId,
-    topicName: state?.topicName || 'Result',
-    learningTime: state?.learningTime || '0m 0s',
-    rawDurationSeconds: state?.learningDuration
-      ? state.learningDuration / 1000
-      : 0,
-    wordResults: state?.results || [],
-    totalCount: state?.results?.length || 0,
-    correctCount: state?.results
-      ? state.results.filter((w) => w.isCorrect).length
-      : 0,
-    // sessionId가 있고, (결과 배열이 없거나 || 재학습 후 돌아온 경우) -> 로딩 시작
-    isLoading: !!initialSessionId && (!state?.results || isUpdateComplete),
-    completionDate: formatDate(new Date().toISOString()),
+    resultId: initialResultId,
+    topicName: state?.topicName || 'Result', // 로딩 전 표시용
+    learningTime: '0m 0s',
+    rawDurationSeconds: 0,
+    wordResults: [],
+    totalCount: 0,
+    correctCount: 0,
+    isLoading: !!initialSessionId, // 세션 ID가 있다면 무조건 로딩 시작
+    completionDate: 'N/A',
   });
 
-  // API로 최신 결과 가져오기
+  // 🔥 API로 최신 결과 가져오기 (useCallback을 사용하여 의존성 최적화)
   const fetchReviewResult = useCallback(
     async (sId: number) => {
       setReviewData((prev) => ({ ...prev, isLoading: true }));
       try {
         const response = await http.get<ReviewResponse>(
-          `/learning/${sId}/results/review`,
+          `/learning/${sId}/results/review`, // ✅ Review API 호출
         );
         const { summary, items } = response.data.body;
 
@@ -183,11 +182,12 @@ const LearnReview: React.FC = () => {
           korean: item.korean,
           translation: item.english,
           isCorrect: item.correct,
+          // WordResult 타입에 맞는 추가 필드 필요 시 여기서 매핑
         }));
 
         setReviewData({
           sessionId: sId,
-          resultId: summary.resultId, // 🔥 서버가 준 최신 resultId로 갱신
+          resultId: summary.resultId, // ✅ 서버가 준 최신 resultId로 갱신
           topicName: summary.sessionTitle,
           learningTime: formatDuration(summary.durationSeconds),
           rawDurationSeconds: summary.durationSeconds,
@@ -197,6 +197,7 @@ const LearnReview: React.FC = () => {
           isLoading: false,
           completionDate: formatDate(summary.completedAt),
         });
+        console.log(`[LearnReview] Fetched Review Result for Session ${sId}`);
       } catch (error) {
         console.error('Failed to fetch review result:', error);
         setReviewData((prev) => ({ ...prev, isLoading: false }));
@@ -208,37 +209,22 @@ const LearnReview: React.FC = () => {
   );
 
   useEffect(() => {
-    // 로딩이 필요하다고 판단되면 API 호출
-    if (initialSessionId && reviewData.isLoading) {
+    // 세션 ID가 있다면 무조건 API 호출
+    if (initialSessionId) {
       fetchReviewResult(initialSessionId);
+    } else {
+      navigate('/main/learnList'); // 세션 ID 없으면 목록으로 이동
     }
-  }, [initialSessionId, reviewData.isLoading, fetchReviewResult]);
+  }, [initialSessionId, fetchReviewResult, navigate]); // initialSessionId와 fetchReviewResult에 의존
 
   // 뒤로 가기 (완료 페이지로)
   const handleBackButtonClick = () => {
-    // 재도전 모드가 아니었을 때만 완료 기록 저장 (기존 로직 유지)
-    if (
-      !isRetryWrong &&
-      reviewData.sessionId &&
-      reviewData.rawDurationSeconds > 0
-    ) {
-      saveLocalLearningTime(
-        reviewData.sessionId,
-        reviewData.rawDurationSeconds,
-      );
-    }
-
-    // ⭐ [수정] 목록(/learnList) 대신 완료 페이지(/learn/complete)로 이동
+    // ⭐ 완료 페이지 이동 로직 (결과 데이터를 API로 가져오게 했으므로, 최소한의 정보만 전달)
     navigate('/main/learn/complete', {
       state: {
-        // 완료 페이지에 필요한 정보를 다시 넘겨줍니다.
-        resultId: reviewData.resultId,
         sessionId: reviewData.sessionId,
-        // wordResults를 results라는 이름으로 전달 (LearnComplete에서 사용하는 이름 확인 필요)
-        results: reviewData.wordResults,
-        topicName: reviewData.topicName,
-        learningDuration: reviewData.rawDurationSeconds * 1000, // ms 단위로 변환 필요할 수 있음
-        categoryName: 'TOPIK', // 카테고리 정보가 있다면 state에서 가져와서 넣기
+        categoryName: categoryName, // Next learning을 위해 카테고리 정보 유지
+        // 완료 페이지는 이제 Summary API를 호출하여 데이터를 가져옵니다.
       },
     });
   };
@@ -248,15 +234,14 @@ const LearnReview: React.FC = () => {
     // 현재 화면에 보이는 최신 데이터 사용
     const { sessionId, wordResults, resultId } = reviewData;
 
-    if (!sessionId) {
-      navigate('/main/learnList');
+    if (!sessionId || !resultId) {
+      alert('Review data is not fully loaded.');
       return;
     }
 
     // 틀린 단어 필터링
     const incorrectWords = wordResults.filter((w) => !w.isCorrect);
 
-    // 혹시라도 틀린 게 없는데 눌렸다면 차단
     if (incorrectWords.length === 0) {
       alert('All correct! Perfect 🎉');
       return;
@@ -266,17 +251,19 @@ const LearnReview: React.FC = () => {
     navigate(`/main/learn/${sessionId}`, {
       state: {
         isRetryWrong: true,
-        baseResultId: resultId, // 🔥 여기가 중요! 갱신된 ID를 넘겨야 연속 재도전 가능
+        baseResultId: resultId, // ✅ 갱신된 ID를 넘겨야 연속 재도전 가능
         wordsToRetry: incorrectWords,
         sessionId: sessionId,
-        categoryName: 'TOPIK', // 필요 시 카테고리 유지
+        categoryName: categoryName,
       },
     });
   };
 
   const handleTryAgain = () => {
     if (reviewData.sessionId) {
-      navigate(`/main/learn/${reviewData.sessionId}`);
+      navigate(`/main/learn/${reviewData.sessionId}`, {
+        state: { categoryName: categoryName },
+      });
     } else {
       navigate('/main/learnList');
     }
@@ -321,6 +308,7 @@ const LearnReview: React.FC = () => {
         </div>
       </div>
 
+      {/* ... (WordResultList 부분은 변경 없음) ... */}
       <div className={styles.wordResultList}>
         {reviewData.wordResults.length === 0 ? (
           <div style={{ color: 'white', textAlign: 'center' }}>
@@ -357,7 +345,7 @@ const LearnReview: React.FC = () => {
               ? {
                   cursor: 'not-allowed',
                   backgroundColor: 'white',
-                  color: 'E3E3E3',
+                  color: '#E3E3E3',
                 }
               : {}
           }

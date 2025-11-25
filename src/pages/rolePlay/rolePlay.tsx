@@ -186,7 +186,7 @@ const BUBBLE_TEXT = {
   [STEPS.PRACTICE_SPEAK]: 'Speak Now!',
   [STEPS.CHOICE_SETUP]: 'Which is correct?',
   CORRECT: 'Good job!',
-  INCORRECT: "It's a waste.",
+  INCORRECT: "That was close.",
   OOS: "That's out of our Learning Scope\ntry to focus on your Study",
 };
 
