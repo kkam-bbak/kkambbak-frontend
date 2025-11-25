@@ -327,7 +327,7 @@ const LearnStart: React.FC = () => {
         );
         const data = response.data.body;
 
-        console.log('✅ 채점 성공 (Score):', data.score);
+        console.log('채점 성공 (Score):', data.score);
 
         setResultStatus(data.correct ? 'correct' : 'incorrect');
         if (data.correct) setDisplayStatus('initial_feedback');
