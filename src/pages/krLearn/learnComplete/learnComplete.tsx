@@ -1,7 +1,6 @@
-// LearnComplete.tsx
+// src/pages/krLearn/learnComplete/learnComplete.tsx
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import type { WordResult } from '../learnStart/learnStart';
 import styles from './learnComplete.module.css';
 import Header from '@/components/layout/Header/Header';
 import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
@@ -11,17 +10,17 @@ import Check from '@/assets/sentenceCrt.png';
 import Calendar from '@/assets/Calendar.png';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 import Button from '@/components/Button/Button';
-import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon'; // 스피너 추가
+import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
 
 // --- API 응답 타입 ---
 interface SummaryBody {
-  resultId: number; // 새로 추가된 resultId
+  resultId: number;
   sessionId: number;
   sessionTitle: string;
   totalCount: number;
   correctCount: number;
   durationSeconds: number;
-  completedAt: string; // ISO 8601 형식
+  completedAt: string;
 }
 interface SummaryResponse {
   status: { statusCode: string; message: string; description: string | null };
@@ -46,7 +45,6 @@ interface NextLearningResponse {
   };
 }
 
-// 유틸리티
 const formatDuration = (durationMs: number): string => {
   const totalSeconds = Math.round(durationMs / 1000);
   const minutes = Math.floor(totalSeconds / 60);
@@ -60,7 +58,7 @@ const formatDate = (dateString: string): string => {
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
-      month: 'long', // ✅ month 속성 중복 제거
+      month: 'long',
       day: 'numeric',
     });
   } catch {
@@ -68,7 +66,6 @@ const formatDate = (dateString: string): string => {
   }
 };
 
-// 로컬 스토리지 타입 및 저장 로직 (기존 유지)
 const LS_LEARNING_TIMES_KEY = 'learning_completion_times';
 interface CompletionTime {
   time: string;
@@ -78,23 +75,16 @@ type LearningTimes = { [sessionId: number]: CompletionTime };
 
 const saveLocalLearningTime = (sessionId: number, durationSeconds: number) => {
   if (sessionId === null || durationSeconds === 0) return;
-
-  const timeString = formatDuration(durationSeconds * 1000); // 초를 ms로 변환하여 사용
+  const timeString = formatDuration(durationSeconds * 1000);
   const newCompletion: CompletionTime = {
     time: timeString,
     completedAt: Date.now(),
   };
-
   try {
     const storedData = localStorage.getItem(LS_LEARNING_TIMES_KEY);
     const times: LearningTimes = storedData ? JSON.parse(storedData) : {};
-
     times[sessionId] = newCompletion;
-
     localStorage.setItem(LS_LEARNING_TIMES_KEY, JSON.stringify(times));
-    console.log(
-      `[LearnComplete] Saved completion time for Session ${sessionId}: ${timeString}`,
-    );
   } catch (e) {
     console.error('Failed to save local learning time', e);
   }
@@ -107,21 +97,14 @@ const ResultRow = ({ icon, value }: { icon: string; value: string }) => (
   </div>
 );
 
-// LocationState에서 WordResult[] 제거 (API로 대체)
 interface LocationState {
   sessionId?: number;
   categoryName?: string;
-  // resultId?: number; // 서버에서 가져오므로 필요 없음 (필요 시 SummaryData에 포함)
-  // results?: WordResult[]; // API로 대체
-  // topicName?: string; // API로 대체
-  // learningDuration?: number; // API로 대체
-  // totalCount?: number; // API로 대체
 }
 
 interface SummaryData extends SummaryBody {
-  categoryName: string; // API에는 없지만, Next Learning에 필요하여 State에서 가져옴
+  categoryName: string;
 }
-
 
 const LearnComplete: React.FC = () => {
   const navigate = useNavigate();
@@ -129,13 +112,16 @@ const LearnComplete: React.FC = () => {
   const state = location.state as LocationState;
 
   const currentSessionId = state?.sessionId ? Number(state.sessionId) : null;
-  const categoryName = state?.categoryName || 'TOPIK'; // Next Learning을 위해 유지
+  const categoryName = state?.categoryName || 'TOPIK';
 
-  // 🔥 상태를 로컬 state로 관리 (API 응답 기반)
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🔥 API 호출하여 학습 결과 요약 정보 가져오기
+  // 🔥 [디버깅] Start 페이지에서 제대로 넘어왔는지 확인
+  useEffect(() => {
+    console.log('🏁 [LearnComplete] Received Session ID:', currentSessionId);
+  }, [currentSessionId]);
+
   const fetchSummary = useCallback(async (sId: number) => {
     if (!sId) {
       setIsLoading(false);
@@ -144,19 +130,17 @@ const LearnComplete: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await http.get<SummaryResponse>(
-        `/learning/${sId}/results/summary`, // ✅ Summary API 호출
+        `/learning/${sId}/results/summary`,
       );
       
       const data = response.data.body;
       const result: SummaryData = {
         ...data,
-        categoryName: categoryName, // state에서 가져온 카테고리 정보 병합
+        categoryName: categoryName,
       };
 
       setSummaryData(result);
-      
-      // 로컬 스토리지에 저장 (DurationSeconds 기준)
-      saveLocalLearningTime(result.sessionId, result.durationSeconds); 
+      saveLocalLearningTime(result.sessionId, result.durationSeconds);
       
       console.log(`[LearnComplete] Fetched Summary for Session ${sId}`);
     } catch (error) {
@@ -168,34 +152,26 @@ const LearnComplete: React.FC = () => {
     }
   }, [categoryName, navigate]);
 
-
   useEffect(() => {
-    // 세션 ID가 있을 경우에만 API 호출
     if (currentSessionId) {
       fetchSummary(currentSessionId);
     } else {
-      // 세션 ID가 없다면 목록으로 이동
       navigate('/main/learnList');
     }
   }, [currentSessionId, fetchSummary, navigate]);
 
-  // 계산된 값들 (summaryData 기반)
-  // !를 사용하여 summaryData가 null이 아닐 때만 접근하도록 보장하거나, 기본값 설정
   const { correctCount, totalCount, durationSeconds, sessionTitle, completedAt, resultId } = summaryData || {};
 
   const learningTime = useMemo(
-    // durationSeconds가 있다면 ms로 변환하여 사용
     () => summaryData && durationSeconds !== undefined ? formatDuration(durationSeconds * 1000) : '0m 0s',
     [durationSeconds, summaryData],
   );
   const completionDate = useMemo(() => completedAt ? formatDate(completedAt) : 'N/A', [completedAt]);
 
-
-  // 마스코트 텍스트 및 이미지 결정
   const { speechBubbleText, mascotImage: characterImageSrc } = useMemo(() => {
     let text = '';
     let mascot: MascotImage;
-    if (totalCount && correctCount) {
+    if (totalCount && correctCount !== undefined) {
       if (correctCount === totalCount) {
         text = 'Perfect!!!';
         mascot = 'shining';
@@ -216,12 +192,10 @@ const LearnComplete: React.FC = () => {
     return { speechBubbleText: text, mascotImage: mascot };
   }, [correctCount, totalCount]);
 
-  // 🔥 [추가] 헤더 뒤로가기 버튼 클릭 시 learnList로 이동하는 핸들러
   const handleBackToLearnList = () => {
     navigate('/main/learnList');
   };
 
-  // 핸들러
   const handleReview = () => {
     if (!currentSessionId || !resultId) {
         alert('Review data is not ready.');
@@ -230,9 +204,8 @@ const LearnComplete: React.FC = () => {
     navigate('/main/learn/review', {
       state: {
         sessionId: currentSessionId,
-        resultId: resultId, // ✅ Summary API에서 받은 resultId 전달
-        topicName: sessionTitle, // API에서 받은 title 전달
-        // learningTime, learningDuration 등은 Review 페이지에서 API로 가져오게 됩니다.
+        resultId: resultId,
+        topicName: sessionTitle,
       },
     });
   };
@@ -247,13 +220,8 @@ const LearnComplete: React.FC = () => {
     }
   };
 
-  // ... (handleNextLearning 함수는 변경 없음) ...
   const handleNextLearning = async () => {
     try {
-      console.log(
-        `[Next Learning] Fetching list for category: ${categoryName}`,
-      );
-
       const response = await http.get<NextLearningResponse>(
         '/learning/sessions',
         {
@@ -270,28 +238,22 @@ const LearnComplete: React.FC = () => {
         let nextSession = sessions.find(
           (s) => !s.completed && s.id !== currentSessionId,
         );
-
         if (!nextSession) {
           nextSession = sessions.find((s) => s.id > (currentSessionId || 0));
         }
-
         if (!nextSession) {
           nextSession = sessions.find((s) => s.id !== currentSessionId);
         }
 
         if (nextSession) {
-          console.log(`[Next Learning] Starting: ${nextSession.title}`);
-
           navigate(`/main/learn/${nextSession.id}`, {
             state: { categoryName: categoryName },
           });
         } else {
-          console.log('[Next Learning] No suitable next session found.');
           alert('더 이상 진행할 학습이 없습니다. 목록으로 이동합니다.');
           navigate('/main/learnList');
         }
       } else {
-        console.log('[Next Learning] No sessions returned.');
         alert('학습 가능한 세션이 없습니다.');
         navigate('/main/learnList');
       }
@@ -301,7 +263,6 @@ const LearnComplete: React.FC = () => {
     }
   };
 
-  // correctCount, totalCount 등은 summaryData가 있을 때만 사용 가능합니다.
   if (isLoading || !summaryData) {
     return (
       <div className={styles.spinner}>
@@ -310,12 +271,10 @@ const LearnComplete: React.FC = () => {
     );
   }
 
-  // summaryData가 확정되었으므로, 구조 분해 할당을 다시 사용
   const { correctCount: finalCorrectCount, totalCount: finalTotalCount, sessionTitle: finalSessionTitle } = summaryData;
 
   return (
     <div className={styles.learnCompleteContainer}>
-      {/* 🔥 [중요] customBackAction이 적용된 헤더 */}
       <Header hasBackButton customBackAction={handleBackToLearnList} />
 
       <Mascot image={characterImageSrc} text={speechBubbleText} />
@@ -325,7 +284,6 @@ const LearnComplete: React.FC = () => {
         <div className={styles.resultsBox}>
           <h2 className={styles.comresultsTopicTitle}>{finalSessionTitle} Result</h2>
           <hr className={styles.divider} />
-          {/* ⭐ 이미지 변수(Check, Clock, Calendar)를 icon prop으로 전달 */}
           <ResultRow
             icon={Check}
             value={`${finalCorrectCount}/${finalTotalCount} Vocabularies correct`}
