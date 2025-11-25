@@ -13,6 +13,7 @@ import Select from '@/components/Select/Select';
 import { AxiosError } from 'axios';
 import { AppErrorResponse } from '@/apis/http';
 import { useNavigate } from 'react-router-dom';
+import Modal from '@/components/Modal/Modal';
 
 const PLAN = {
   PREMIUM: 'Premium',
@@ -22,6 +23,8 @@ function PaymentCheckoutPage() {
   const [isJoin, setIsJoin] = useState(false);
   const [selected, setSelected] = useState('');
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalText, setModalText] = useState('');
 
   const { data: plans } = useQuery({
     queryKey: ['plans'],
@@ -44,9 +47,27 @@ function PaymentCheckoutPage() {
         const code = e.response.data.status.statusCode;
         if (code === 'PA007') {
           navigate('/payment/receipt');
+        } else if (code === 'PA008') {
+          handleModalOpen(
+            `진행중인 결제가 있습니다.\n15분 뒤 다시 시도해주세요.`,
+          );
+        } else if (code === 'PA013') {
+          handleModalOpen(`결제는 소셜 로그인 계정으로 진행해주세요.`);
+        } else {
+          handleModalOpen(`결제 오류가 발생했습니다.${[code]}`);
         }
       },
     });
+  };
+
+  const handleModalOpen = (text: string) => {
+    setIsModalOpen(true);
+    setModalText(text);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setModalText('');
   };
 
   return (
@@ -114,6 +135,15 @@ function PaymentCheckoutPage() {
             </div>
           </ContentSection>
         </div>
+      )}
+
+      {isModalOpen && (
+        <Modal onCloseModal={handleModalClose}>
+          <p className={styles['modal-text']}>{modalText}</p>
+          <Button isFull onClick={handleModalClose}>
+            Yes
+          </Button>
+        </Modal>
       )}
     </div>
   );
