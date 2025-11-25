@@ -44,7 +44,7 @@ function PaymentCheckoutPage() {
         window.location.href = data.approvalUrl;
       },
       onError: (e: AxiosError<AppErrorResponse>) => {
-        const code = e.response.data.status.statusCode;
+        const code = e.response?.data?.status?.statusCode;
         if (code === 'PA007') {
           navigate('/payment/receipt');
         } else if (code === 'PA008') {
@@ -54,7 +54,9 @@ function PaymentCheckoutPage() {
         } else if (code === 'PA013') {
           handleModalOpen(`결제는 소셜 로그인 계정으로 진행해주세요.`);
         } else {
-          handleModalOpen(`결제 오류가 발생했습니다.${[code]}`);
+          handleModalOpen(
+            `결제 오류가 발생했습니다.${code ? `[${code}]` : ''}`,
+          );
         }
       },
     });
