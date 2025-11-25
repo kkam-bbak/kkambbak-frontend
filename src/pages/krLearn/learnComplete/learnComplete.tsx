@@ -1,5 +1,5 @@
 // src/pages/krLearn/learnComplete/learnComplete.tsx
-import React, { useMemo, useEffect, useState, useCallback } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './learnComplete.module.css';
 import Header from '@/components/layout/Header/Header';
@@ -117,48 +117,53 @@ const LearnComplete: React.FC = () => {
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🔥 [디버깅] Start 페이지에서 제대로 넘어왔는지 확인
+  // 🔥 [수정 1] 중복 요청 방지용 ref 추가
+  const hasFetched = useRef(false);
+
   useEffect(() => {
     console.log('🏁 [LearnComplete] Received Session ID:', currentSessionId);
   }, [currentSessionId]);
 
-  const fetchSummary = useCallback(async (sId: number) => {
-    if (!sId) {
-      setIsLoading(false);
+  // 🔥 [수정 2] fetchSummary 제거하고 useEffect 내부에 로직 통합 (중복 방지 적용)
+  useEffect(() => {
+    if (!currentSessionId) {
+      navigate('/main/learnList');
       return;
     }
-    setIsLoading(true);
-    try {
-      const response = await http.get<SummaryResponse>(
-        `/learning/${sId}/results/summary`,
-      );
-      
-      const data = response.data.body;
-      const result: SummaryData = {
-        ...data,
-        categoryName: categoryName,
-      };
 
-      setSummaryData(result);
-      saveLocalLearningTime(result.sessionId, result.durationSeconds);
-      
-      console.log(`[LearnComplete] Fetched Summary for Session ${sId}`);
-    } catch (error) {
-      console.error('Failed to fetch summary:', error);
-      alert('학습 결과를 불러오지 못했습니다. 목록으로 이동합니다.');
-      navigate('/main/learnList');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [categoryName, navigate]);
+    // 이미 데이터를 가져왔으면 실행 중단
+    if (hasFetched.current) return;
+    hasFetched.current = true;
 
-  useEffect(() => {
-    if (currentSessionId) {
-      fetchSummary(currentSessionId);
-    } else {
-      navigate('/main/learnList');
-    }
-  }, [currentSessionId, fetchSummary, navigate]);
+    const fetchPayload = async () => {
+      setIsLoading(true);
+      try {
+        const response = await http.get<SummaryResponse>(
+          `/learning/${currentSessionId}/results/summary`,
+        );
+        
+        const data = response.data.body;
+        const result: SummaryData = {
+          ...data,
+          categoryName: categoryName,
+        };
+
+        setSummaryData(result);
+        saveLocalLearningTime(result.sessionId, result.durationSeconds);
+        
+        console.log(`[LearnComplete] Fetched Summary for Session ${currentSessionId}`);
+      } catch (error) {
+        console.error('Failed to fetch summary:', error);
+        alert('학습 결과를 불러오지 못했습니다. 목록으로 이동합니다.');
+        navigate('/main/learnList');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPayload();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 마운트 시 1회만 실행
 
   const { correctCount, totalCount, durationSeconds, sessionTitle, completedAt, resultId } = summaryData || {};
 
@@ -196,16 +201,18 @@ const LearnComplete: React.FC = () => {
     navigate('/main/learnList');
   };
 
+  // 🔥 [수정 3] handleReview는 순수하게 이동 로직만 수행
   const handleReview = () => {
     if (!currentSessionId || !resultId) {
-        alert('Review data is not ready.');
-        return;
+      alert('Review data is not ready.');
+      return;
     }
     navigate('/main/learn/review', {
       state: {
         sessionId: currentSessionId,
         resultId: resultId,
         topicName: sessionTitle,
+        categoryName: categoryName,
       },
     });
   };
