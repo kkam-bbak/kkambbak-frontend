@@ -206,7 +206,6 @@ const RoleList: React.FC = () => {
 
   return (
     <div className={styles.roleListContainer}>
-      {/* ⭐ customBackAction 추가 */}
       <Header hasBackButton customBackAction={handleBackClick} />
       <Mascot image="basic" text={speechBubbleText} />
 
@@ -221,12 +220,11 @@ const RoleList: React.FC = () => {
         <div className={styles.roleListItemsContainer}>
           {scenarios.map((role) => {
             const isSelected = role.id === selectedRole;
-            // const isStartVisible = isSelected && role.isSubscribed;
-            // const buttonText = role.isCompleted ? 'Learn Again' : 'Start';
 
             return (
               <div
                 key={role.id}
+                // isSelected일 때도 hover 스타일과 동일한 .selected 클래스 적용
                 className={`${styles.roleItemRow} ${
                   isSelected ? styles.selected : ''
                 }`}
@@ -235,11 +233,11 @@ const RoleList: React.FC = () => {
                 <div className={styles.roleItemHeader}>
                   <span className={styles.roleItemTitle}>{role.title}</span>
 
-                  {/* ⭐ [수정] 버튼 렌더링 로직 변경 */}
+                  {/* 🔥 [수정] 버튼 렌더링 로직 */}
                   {role.isCompleted ? (
-                    /* Case 1: 학습 완료됨 -> 선택 여부 상관없이 항상 'Learn Again' 표시 */
+                    // Case 1: 완료됨 -> Learn Again (항상 보임)
                     <button
-                      className={styles.learnAgainButton} // 새로 만든 스타일 적용
+                      className={styles.learnAgainButton}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleStart(role.id);
@@ -248,18 +246,20 @@ const RoleList: React.FC = () => {
                       Learn Again
                     </button>
                   ) : (
-                    /* Case 2: 학습 미완료 -> 선택되었을 때(isSelected)만 'Start' 표시 */
-                    isSelected && (
-                      <Button
-                        size="sm"
+                    // Case 2: 미완료 -> Start (CSS로 평소엔 숨김, Hover시 등장)
+                    // isSelected 조건 제거: 선택 안되어도 호버하면 나옴
+                    <div className={styles.startButtonContainer}>
+                      <button
+                        
+                        className={styles.customStartButton} // 흰색 배경/검은 글씨 스타일 적용
                         onClick={(e) => {
                           e.stopPropagation();
                           handleStart(role.id);
                         }}
                       >
                         Start
-                      </Button>
-                    )
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -267,7 +267,6 @@ const RoleList: React.FC = () => {
 
                 <div className={styles.roleItemInfo}>
                   <span className={styles.roleTime}>{role.time}</span>
-
                   <img src={Clock} alt="time" className={styles.roleTimeIcon} />
                 </div>
               </div>

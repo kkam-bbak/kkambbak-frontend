@@ -41,7 +41,7 @@
 
 /* 결과 요약 박스 (검은색 배경) */
 .reviewResultsBox {
-  background-color: black;
+  background-color: #101010;
   color: white;
   border-radius: 10px;
   padding: 0px 15px 20px 15px;
@@ -100,7 +100,7 @@
 
 /* 단어 컨테이너 (단어 한 쌍) */
 .rvWordResultContainer {
-  background-color: black;
+  background-color: #101010;
   border-radius: 10px;
   margin-bottom: 8px;
   padding-bottom: 2px;
@@ -114,11 +114,11 @@
   display: flex;
   align-items: center;
   height: 32px;
-  background-color: #000;
+  background-color: #101010;
   color: white;
   padding: 0 10px;
   gap: 10px;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid black;
 }
 
 .WordResultRow:last-child {

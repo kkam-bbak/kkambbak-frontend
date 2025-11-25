@@ -13,6 +13,7 @@ import TailAI from '@/assets/TailAI.png';
 import TailUser from '@/assets/TailUser.png';
 import Modal from '@/components/Modal/Modal';
 import Button from '@/components/Button/Button';
+import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
 
 // --- 인터페이스 정의 ---
 interface ApiResponseBody<T> {
@@ -1002,7 +1003,7 @@ const RolePlay: React.FC = () => {
   if (isLoading)
     return (
       <div className={styles['loading-page']}>
-        <Mascot image="thinking" text="Loading roleplay..." />
+        <SpinnerIcon></SpinnerIcon>
       </div>
     );
   if (error || !currentDialogue)
@@ -1331,11 +1332,7 @@ const RolePlay: React.FC = () => {
       const practiceButtonActive =
         step === STEPS.PRACTICE_SPEAK ||
         step === STEPS.PRACTICE_LISTEN_DONE;
-      const practiceMainMicClass = practiceButtonActive
-        ? isRecording
-          ? styles.on
-          : styles.off
-        : `${styles.off} ${styles.disabled}`;
+      
       const currentGradeClass =
         step === STEPS.PRACTICE_GRADING
           ? gradingResult === 'CORRECT'
@@ -1344,6 +1341,17 @@ const RolePlay: React.FC = () => {
           : '';
       const isTtsActionable =
         step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK;
+
+      // 🔥 [수정된 부분]
+      const isMicActionable =
+        step === STEPS.PRACTICE_SPEAK || 
+        step === STEPS.PRACTICE_LISTEN_DONE;
+
+      const mainMicButtonClass = isMicActionable
+        ? isRecording
+          ? styles.on
+          : styles.off
+        : `${styles.off} ${styles.disabled}`;
 
       const isPracticeUser = practiceLineData.speaker === 'USER';
       const practiceAlign = isPracticeUser ? styles.textRight : '';
@@ -1426,28 +1434,21 @@ const RolePlay: React.FC = () => {
           </div>
 
           <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
-            <div className={styles.micButtonWrapper}>
-              <button
-                className={`${styles.mainMicButton} ${practiceMainMicClass}`}
-                onMouseDown={handleMicPress}
-                onMouseUp={handleMicRelease}
-                onTouchStart={handleMicPress}
-                onTouchEnd={handleMicRelease}
-                disabled={!practiceButtonActive || isCurrentlySpeaking}
-              >
-                <span className={styles.mainMicIcon}>
-                  <img
-                    src={isRecording ? MicOn : MicOff}
-                    alt={isRecording ? 'On' : 'Off'}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                    }}
-                  />
-                </span>
-              </button>
-            </div>
+            <Button
+              className={styles['record-button']}
+              onMouseDown={handleMicPress}
+              onMouseUp={handleMicRelease}
+              onTouchStart={handleMicPress}
+              onTouchEnd={handleMicRelease}
+              disabled={!isMicActionable || isCurrentlySpeaking}
+              isFull
+            >
+              <img
+                className={styles['mic-image']}
+                src={isRecording ? MicOn : MicOff}
+                alt={isRecording ? 'On' : 'Off'}
+              />
+            </Button>
           </div>
         </div>
       );
