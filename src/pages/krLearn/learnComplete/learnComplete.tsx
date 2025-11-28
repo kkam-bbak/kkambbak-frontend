@@ -272,8 +272,8 @@ const LearnComplete: React.FC = () => {
 
   if (isLoading || !summaryData) {
     return (
-      <div className={styles.spinner}>
-        <SpinnerIcon />
+         <div className={styles.spinnerWrapper}>
+        <SpinnerIcon></SpinnerIcon>
       </div>
     );
   }

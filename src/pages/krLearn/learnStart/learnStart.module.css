@@ -234,19 +234,26 @@
   background-color: black;
 }
 
-
 .micButton.disabled {
-    /* 1. 불투명도를 낮춰 흐릿하게 만듭니다. */
-    opacity: 0.5; 
-    
-    /* 2. 사용자 클릭을 막아 비활성화 상태임을 확실히 합니다. */
-    pointer-events: none;
-    
-    /* 3. (선택 사항) 커서를 '금지' 아이콘으로 바꿔 시각적 피드백을 강화합니다. */
-    cursor: not-allowed; 
+  /* 1. 배경은 흰색, 테두리는 회색(#E3E3E3)으로 고정 */
+  background-color: white !important;
+  border: 2px solid #E3E3E3 !important;
+  
+  /* 2. 클릭 방지 및 커서 변경 */
+  pointer-events: none;
+  cursor: not-allowed;
 
-    /* 4. (선택 사항) 이미지를 흑백으로 처리하여 색상을 둔하게 만듭니다. */
-    filter: grayscale(80%); 
+  /* 3. 투명도는 1로 유지하여 배경이 흐려지지 않고 선명한 흰색이 되게 함 */
+  opacity: 1;
+  filter: none; /* 기존 grayscale 필터 제거 */
+}
+
+/* 비활성화 상태일 때 내부 이미지(아이콘) 스타일 */
+.micButton.disabled img {
+  /* 검은색(#000000) 아이콘을 #E3E3E3(연한 회색)로 변경하는 필터 */
+  /* 계산식: 255 * 0.89 ≈ 227 (Hex: E3) */
+  filter: invert(89%); 
+  opacity: 1;
 }
 
 .mascotWrapper {
@@ -275,95 +282,108 @@
 
 
 
-/*뒤로갈때 사용자 의사 묻기*/
 
+/* 1. 전체 화면을 덮는 어두운 배경 */
 .exitModalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 9999; /* 가장 위에 표시 */
+  display: flex;
+  align-items: flex-end; /* 내용을 하단으로 정렬 */
+  justify-content: center;
+  background-color: rgb(0 0 0 / 60%); /* 반투명 검은 배경 */
+}
+
+@media (min-width: 600px) {
+  .exitModalOverlay {
+    position: absolute;
     bottom: 0;
-    /* 🔥 [수정] 배경 전체를 어둡게 만듭니다 */
-    background-color: rgba(0, 0, 0, 0.5); 
-    
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    
-    /* 🔥 [수정] 콘텐츠를 하단으로 밀어냅니다. */
-    justify-content: flex-end; 
-    
-    padding: 0; 
-    z-index: 1000;
+  }
 }
 
-/* 🔥 [수정] 모달 카드 컨테이너: 하단 여백 및 너비 설정 */
+/* 2. 모달 콘텐츠 래퍼 (가로 폭 제한 등) */
 .exitModalContent {
-    width: 400px;
-    height: 280px;
-    display: flex;
-    justify-content: center;
-    
-    /* 하단에 여백을 주기 위해 */
-    padding-bottom: 65px; 
-    
-    /* 마스코트와 분리되도록 margin-top: auto; 삭제 */
+  width: 100%;
+  animation: slideUp 0.3s ease-out; /* 밑에서 올라오는 애니메이션 효과 */
 }
 
-
-/* 🔥 [추가/수정] 경고 메시지 카드 (하단 고정될 요소) */
+/* 3. 모달 카드 (파란색 박스) */
 .exitModalCard {
-    background-color: #FF5000; /* 주황색 카드 배경 */
-    color: white;
-    padding: 20px 15px;
-    border-radius: 12px;
-    width: 90%; /* 모바일 화면에 맞춰 너비 조정 */
-    /* margin-top: auto; 삭제 */
-}
-
-.exitModalQuestion{
-  color: black;
-  font-weight: 500;
-  font-size: 18px;
-  width: 260px;
+  height: 230px;
+  padding: 30px 20px;
+  color: var(--color-grayscale-7);
   text-align: center;
-  /* 🔥 [수정] width를 100%로 설정하여 카드의 중앙에 배치 */
-    width: 260px; 
-    
-    /* 🔥 [수정] 텍스트 중앙 정렬 */
-    text-align: center; 
-    
-    /* 🔥 [수정] 상하 여백을 줄여 질문이 중앙에 위치하도록 함 */
-    margin-top: 10%;
-    margin-left: 10%;
-}
-.exitModalButtons {
-    /* 🔥 [수정] 버튼을 수평으로 나란히 배치하고 간격을 조정 */
-    display: flex;
-    margin-top: 20%;
-    justify-content: space-between; /* 버튼 사이에 공간 확보 */
-    width: 100%; /* 카드 너비 전체 사용 */
-    gap: 15px; /* 버튼 사이 간격 조정 */
+  background-color: #ff5000;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 20%);
 }
 
-/* 4. 개별 버튼 스타일 수정: 비율(width) 및 배경 */
-.exitButtonNo, .exitButtonYes {
-    /* 기존 스타일 유지 */
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    height: 40px;
-    /* 🔥 [수정] 버튼 너비를 균일하게 나누어 비율에 맞춤 */
-    flex: 1; 
-    
-    /* 배경색 지정 (요청대로 흰색) */
-    background-color: white; 
-    color: black; /* 텍스트 색상 (선택 사항) */
+/* 4. 질문 텍스트 */
+.exitModalQuestion {
+  margin-top: 20px;
+  margin-bottom: 70px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: pre-wrap; /* 줄바꿈 적용 */
 }
+
+/* 5. 버튼 영역 */
+.exitModalButtons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* 6. 버튼 공통 스타일 */
+.exitButtonNo,
+.exitButtonYes {
+  display: flex;
+  flex: 1; /* 버튼 크기 1:1 비율 */
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 16px 0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+/* No 버튼 (흰색) */
+.exitButtonNo {
+  color: var(--color-grayscale-7);
+  background-color: var(--color-grayscale-1);
+}
+
+/* Yes 버튼 (흰색) */
+.exitButtonYes {
+  color: var(--color-grayscale-7);
+  background-color: var(--color-grayscale-1);
+}
+
+/* 버튼 눌림 효과 */
+.exitButtonNo:active,
+.exitButtonYes:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+}
+
+/* 애니메이션 정의 */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 /* 이미지 컨테이너: 상대 위치를 잡아주어 O/X 표시가 위에 뜨도록 함 */
 .wordImagePlaceholder {
@@ -399,10 +419,40 @@
   justify-content: center; 
   align-items: center;
   width: 100%;
-  height: 300px; /* 예: 화면 중간쯤 오도록 높이 강제 지정 */
+  height: 90vh; /* 화면 전체 높이 사용 */
+  /* 만약 특정 영역 안에서만 돌고 싶다면 부모 div의 height가 100%인지 확인 필요 */
 }
+
+/* .spinnerWrapper 클래스 내부의 svg 태그 선택 */
+.spinnerWrapper svg {
+  animation: spin 1.0s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 
 .speakerIcon.active .speakerIconImage {
   /* 어떤 색상의 이미지든 완전한 흰색으로 만듭니다. */
   filter: brightness(0) invert(1); 
+}
+
+
+/* 1. OFF 상태(흰색 배경)일 때 호버 -> 배경 검은색으로 */
+.micButton.off:not(:disabled):hover {
+  background-color: black;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+/* 2. OFF 상태일 때 호버 -> 이미지(아이콘)를 흰색으로 반전 */
+.micButton.off:not(:disabled):hover .micStatusImage {
+  /* 검은색 아이콘을 흰색으로 변경 */
+  filter: invert(100%) brightness(200%);
+}
+
+.micButton.on:not(:disabled):hover {
+  background-color: black; /* 완전 검정보다 살짝 연한 검정 */
 }
