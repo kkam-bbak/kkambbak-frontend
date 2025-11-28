@@ -30,7 +30,7 @@
 
 /* 대화 기록 스크롤 영역 */
 .turnHistoryArea {
-  height: calc(100% - 72px);
+  height: calc(100% - 94px);
   overflow-y: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -123,7 +123,6 @@
   font-weight: 500;
   line-height: 24px;
   color: #757575;
-  transition: color 0.3s;
 }
 
 /* 🎙️ 작은 마이크 아이콘 */
@@ -284,8 +283,7 @@
   color: var(--color-grayscale-7);
   text-align: center;
   background-color: #007cff;
-  border-radius: 24px 24px 0 0;
-  box-shadow: 0 4px 20px rgb(0 0 0 / 20%);
+  border-radius: 24px 24px 0 0;;
 }
 
 /* 4. 질문 텍스트 */
@@ -410,4 +408,42 @@
   height: 30px;
   animation: spin 1s linear infinite;
   color: #666;
+}
+
+
+
+/* --- 텍스트 색상 유틸리티 추가 --- */
+.colorDefault {
+  color: #484848 !important;
+}
+
+.colorWhite {
+  color: #ffffff !important;
+}
+
+.colorGreen {
+  color: #39FF14 !important;
+}
+
+.colorRed {
+  color: #FF0000 !important;
+}
+
+/* ⭐ English 디폴트 색상 추가 */
+.colorBlue {
+  color: #007cff !important;
+}
+
+/* --- 아이콘 필터 유틸리티 (기존 유지) --- */
+.filterWhite {
+  filter: brightness(0) invert(1) !important;
+}
+.filterGreen {
+  filter: invert(65%) sepia(83%) saturate(1471%) hue-rotate(86deg) brightness(109%) contrast(104%) !important;
+}
+.filterRed {
+  filter: invert(13%) sepia(96%) saturate(6794%) hue-rotate(357deg) brightness(97%) contrast(116%) !important;
+}
+.filterDefault {
+  filter: none !important;
 }
