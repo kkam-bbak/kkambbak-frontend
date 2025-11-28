@@ -9,7 +9,6 @@
 
 /* 카드 타이틀 바 */
 .cardTitleBar {
-  /* JSX: className={styles.cardTitleBar} */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,23 +18,18 @@
 
 .cardTitleText {
   margin: 0;
-
-  /* JSX: className={styles.cardTitleText} */
   font-size: 18px;
   font-weight: 500;
   color: var(--color-grayscale-7);
 }
 
 .cardStepText {
-  /* JSX: className={styles.cardStepText} */
   font-size: 18px;
   font-weight: 500;
 }
 
 /* 대화 기록 스크롤 영역 */
 .turnHistoryArea {
-  /* JSX: className={styles.turnHistoryArea} */
-
   height: calc(100% - 145px);
   overflow-y: auto;
   -ms-overflow-style: none;
@@ -51,12 +45,6 @@
   height: auto;
   background-color: #101010;
   border-radius: 10px;
-
-  /* margin-bottom 제거 -> turnWrapper에서 처리 */
-}
-
-.historyBox {
-  /* composes: textdisplaybox; */
 }
 
 /* ⭐ [핵심] 턴 전체를 감싸는 래퍼 */
@@ -67,7 +55,14 @@
   margin-bottom: 16px; /* 대화 사이 간격 */
 }
 
-/* ⭐ [핵심] USER일 때 내부 아이콘/텍스트 위치 반전 */
+/* ⭐ [핵심] User 턴일 때 (오른쪽 정렬) */
+.turnWrapper.userTurn {
+  /* 아이템 배치를 반대로 뒤집음 (말풍선이 왼쪽, 태그가 오른쪽 -> 뒤집혀서 말풍선 오른쪽, 태그 왼쪽) */
+  /* 단, 태그 위치는 flex item 순서에 따르므로, 아래 RoleContainer 정렬 속성과 함께 봐야 함 */
+  align-items: flex-end; /* 전체 오른쪽 정렬 */
+}
+
+/* ⭐ [핵심] 내부 콘텐츠 좌우 반전용 */
 .rowReverse {
   flex-direction: row-reverse;
 }
@@ -88,7 +83,7 @@
 /* 텍스트 라인 */
 .textLine {
   display: flex;
-  gap: 10px; /* ⭐ 텍스트와 아이콘 사이 간격 확보 */
+  gap: 10px;
   align-items: center;
   justify-content: space-between;
   padding: 8px 9px;
@@ -96,21 +91,18 @@
 
 /* 한국어 텍스트 */
 .koreanText {
-  /* ⭐ 추가: 남은 공간 채우기 & 줄어들기 허용 */
   flex: 1;
-  min-width: 0; /* Flexbox 내에서 텍스트 줄바꿈이 정상 작동하도록 필수 설정 */
+  min-width: 0;
   font-size: 13px;
   font-weight: 500;
   line-height: 24px;
   color: var(--color-grayscale-1);
-  word-break: keep-all; /* 단어 단위 줄바꿈 */
+  word-break: keep-all;
 }
 
 /* 🎧 듣기 버튼 */
 .ttsButton {
   display: flex;
-
-  /* ⭐ 추가: 공간이 좁아져도 절대 찌그러지지 않음 */
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
@@ -124,7 +116,6 @@
 
 /* 📝 로마자 텍스트 */
 .romanizedText {
-  /* ⭐ 추가: 남은 공간 채우기 & 줄어들기 허용 */
   flex: 1;
   min-width: 0;
   font-size: 13px;
@@ -137,8 +128,6 @@
 /* 🎙️ 작은 마이크 아이콘 */
 .smallMicIcon {
   display: flex;
-
-  /* ⭐ 추가: 공간이 좁아져도 절대 찌그러지지 않음 */
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
@@ -147,7 +136,6 @@
 }
 
 .smallMicIcon.active {
-  /* JSX: className={`${styles.smallMicIcon} ${styles.active}`} */
   color: var(--color-grayscale-1);
 }
 
@@ -157,14 +145,12 @@
   font-size: 13px;
   font-weight: 500;
   line-height: 24px;
-
-  /* JSX: className={styles.englishText} */
   color: #007cff;
 }
 
 .englishText.textRight {
   padding: 8px 9px;
-  margin-left: 0; /* 기존 AI용 왼쪽 여백 초기화 */
+  margin-left: 0;
 }
 
 /* Role Container 공통 */
@@ -176,16 +162,12 @@
   min-width: 44px;
   height: 20px;
   padding: 0 8px;
-  margin-top: 20px; /* 말풍선과의 간격 */
+  margin-top: 20px;
   font-size: 12px;
   font-weight: 600;
   color: var(--color-grayscale-7);
   background-color: var(--color-grayscale-1);
   border-radius: 5px;
-}
-
-.costomer {
-  /* composes: rolecontainer; */
 }
 
 /* ⭐ AI: 왼쪽 정렬 */
@@ -199,49 +181,11 @@
   margin-right: 15px;
 }
 
-/* -------------------- 4. 턴 2 (선택지) 스타일 -------------------- */
-.choiceOptionsArea {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  /* JSX: className={styles.choiceOptionsArea} */
-  width: 100%;
-  height: 120px;
-  margin-top: 15px;
+.turnWrapper.userTurn .roleContainer {
+   /* User 턴일때도 align-self는 userRole 클래스가 처리하므로 중복 방지 */
 }
 
-.activeChoiceContent {
-  top: 52px;
-  left: 15px;
-
-  /* JSX: className={styles.activeChoiceContent} */
-  width: 300px;
-  height: 120px;
-  background-color: #101010;
-  border-radius: 10px;
-}
-
-.choiceItem {
-  /* JSX: className={styles.choiceItem} */
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  width: 100%;
-}
-
-.choiceButtonAction {
-  /* JSX: className={styles.choiceButtonAction} */
-  width: 60px;
-  height: 40px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-grayscale-7);
-  background-color: var(--color-grayscale-1);
-  border-radius: 10px;
-}
-
-/* -------------------- 4. 메인 마이크 버튼 -------------------- */
+/* -------------------- 메인 마이크 버튼 -------------------- */
 .record-button {
   display: flex;
   align-items: center;
@@ -266,21 +210,12 @@
 }
 
 @keyframes pressed {
-  0% {
-    filter: invert(0);
-  }
-
-  50% {
-    filter: invert(0.6);
-  }
-
-  100% {
-    filter: invert(0);
-  }
+  0% { filter: invert(0); }
+  50% { filter: invert(0.6); }
+  100% { filter: invert(0); }
 }
 
 .micArea {
-  /* JSX: className={styles.micArea} */
   position: absolute;
   right: 0;
   bottom: 0;
@@ -294,73 +229,13 @@
   background-color: transparent;
 }
 
-.mainMicButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  /* JSX: className={styles.mainMicButton} */
-  width: 328px;
-  height: 40px;
-  cursor: pointer;
-  border: none;
-  border-radius: 10px;
-  transition: background-color 0.3s, transform 0.1s;
-}
-
-.mainMicIcon {
-  /* JSX: className={styles.mainMicIcon} */
-  width: 54px;
-  height: 40px;
-  font-size: 20px;
-  transition: color 0.1s;
-}
-
-/* 마이크 버튼 상태: CSS Modules에서 조합 클래스 사용 */
-.mainMicButton.off {
-  /* JSX: className={`${styles.mainMicButton} ${styles.off}`} */
-  background-color: var(--color-grayscale-1);
-}
-
-.mainMicButton.off .mainMicIcon {
-  color: var(--color-grayscale-7);
-}
-
-.mainMicButton.on {
-  /* JSX: className={`${styles.mainMicButton} ${styles.on}`} */
-  color: var(--color-grayscale-1);
-  background-color: var(--color-grayscale-7);
-}
-
-.mainMicButton.on .mainMicIcon {
-  color: var(--color-grayscale-1);
-}
-
-.mainMicButton.disabled {
-  /* JSX: className={`${styles.mainMicButton} ${styles.disabled}`} */
-  cursor: not-allowed;
-  background-color: #e3e3e3;
-  opacity: 0.3;
-}
-
-/* 마이크 상태 텍스트 (ON/OFF) */
-.micStatusText {
-  margin-top: 4px;
-
-  /* JSX: className={styles.micStatusText} */
-  font-size: 10px;
-  font-weight: 700;
-}
-
 /* choice 버튼 스타일 */
 .choice-options-area {
-  /* JSX: className={styles.choiceOptionsArea} */
   position: absolute;
   top: 190px;
 }
 
 .micArea.choiceButton {
-  /* JSX: className={`${styles.micArea} ${styles.choiceButton}`} */
   display: flex;
   gap: 16px;
   align-items: center;
@@ -372,74 +247,6 @@
   display: flex;
   gap: 16px;
   width: 100%;
-}
-
-.choiceButton .choiceButtonAction {
-  /* JSX: className={styles.choiceButtonAction} */
-  width: 60px;
-  height: 40px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1a1a1a;
-  cursor: pointer;
-  background-color: var(--color-grayscale-1);
-  border: 2px solid #eee;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-}
-
-.choiceButton .choiceButtonAction.selected {
-  color: var(--color-grayscale-1);
-
-  /* JSX: className={`${styles.choiceButtonAction} ${styles.selected}`} */
-  background-color: #1a1a1a;
-  border: 2px solid #1a1a1a;
-  box-shadow: 0 4px 10px rgb(0 0 0 / 40%);
-}
-
-.micArea .selectSubmitButton {
-  /* JSX: className={styles.selectSubmitButton} */
-  flex-grow: 1;
-  max-width: 176px;
-  height: 40px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-grayscale-7);
-  cursor: pointer;
-  background-color: var(--color-grayscale-1);
-  border: none;
-  border-radius: 10px;
-}
-
-/* ⭐ 기본 상태 (선택 전) */
-.micArea .selectSubmitButton,
-.micArea .selectSubmitButton.off.disabled {
-  color: #1a1a1a;
-  pointer-events: none;
-  cursor: not-allowed;
-
-  /* JSX: className={styles.off} ${styles.disabled} */
-  background-color: var(--color-grayscale-1);
-  opacity: 0.5;
-}
-
-/* ⭐ 활성화 상태 (선택 후) */
-.micArea .selectSubmitButton.on {
-  color: #1a1a1a;
-  pointer-events: auto;
-  cursor: pointer;
-
-  /* JSX: className={styles.on} */
-  background-color: var(--color-grayscale-1);
-  opacity: 1;
-}
-
-/* ⭐⭐⭐ 핵심 수정: 버튼이 실제로 눌리는 순간 (:active) ⭐⭐⭐ */
-
-/* JSX에서 styles.on이 적용된 버튼에 :active 의사 클래스 사용 */
-.micArea .selectSubmitButton.on:active {
-  color: var(--color-grayscale-1);
-  background-color: #1a1a1a;
 }
 
 /* --- 학습 중단 확인 모달 (하단 고정) --- */
@@ -544,28 +351,61 @@
     transform: translateY(0);
   }
 }
-
 .tailIcon {
   position: absolute;
-  bottom: -10px; /* 말풍선 바로 아래에 붙도록 조정 (이미지 높이에 따라 조절) */
-  z-index: 1; /* 말풍선보다 위에 표시 */
-  width: 12px; /* 꼬리 이미지 너비 */
-  height: 12px;
+  bottom: -10px;
+  z-index: 1;
+  width: 12px;
   height: auto;
 }
 
-/* ⭐ [추가] AI (왼쪽) 꼬리 위치 */
+/* ⭐ AI (왼쪽) 꼬리 위치 */
 .tailAI {
-  left: 20px; /* 왼쪽에서 20px 떨어짐 */
+  left: 20px;
 }
 
-/* ⭐ [추가] USER (오른쪽) 꼬리 위치 */
+/* ⭐ USER (오른쪽) 꼬리 위치 */
 .tailUser {
-  right: 20px; /* 오른쪽에서 20px 떨어짐 */
+  right: 20px;
 }
 
 .modal-message {
   display: block;
   margin: 33px 0 50px;
   text-align: center;
+}
+
+/* --- Loading Spinner Styles --- */
+.spinnerWrapper {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  width: 100%;
+  height: 90vh; /* 화면 전체 로딩용 */
+}
+
+.spinnerWrapper svg {
+  animation: spin 1.0s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 말풍선 내부 스피너 박스 */
+.spinnerWrapperBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 60px; /* 로딩 박스 최소 높이 */
+}
+
+.spinnerWrapperBox svg {
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  color: #666;
 }

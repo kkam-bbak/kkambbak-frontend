@@ -15,6 +15,7 @@ import WrgSnd from '@/assets/WrgSnd.mp3';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 import Button from '@/components/Button/Button';
 import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
+import Modal from '@/components/Modal/Modal';
 
 // --- 인터페이스 정의 ---
 interface ApiResponseBody<T> {
@@ -776,7 +777,7 @@ const LearnStart: React.FC = () => {
   if (isLoading) {
     return (
       <div className={styles.spinnerWrapper}>
-        <SpinnerIcon />
+        <SpinnerIcon></SpinnerIcon>
       </div>
     );
   }
@@ -881,6 +882,7 @@ const LearnStart: React.FC = () => {
         )}
       </ContentSection>
       {showExitModal && (
+        <Modal onCloseModal={handleContinueLearning}>
         <div className={styles.exitModalOverlay}>
           <div className={styles.exitModalContent}>
             <div className={styles.exitModalCard}>
@@ -904,6 +906,7 @@ const LearnStart: React.FC = () => {
             </div>
           </div>
         </div>
+        </Modal>
       )}
     </div>
   );
