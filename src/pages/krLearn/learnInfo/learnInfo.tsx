@@ -6,6 +6,7 @@ import Mascot, { MascotImage } from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 import MicOn from '@/assets/MicOn.png';
 import MicOff from '@/assets/MicOff.png';
+
 import { http } from '../../../apis/http';
 
 interface Topic {
@@ -33,7 +34,7 @@ const INFO_STEPS_TEXT = [
   "If you don't understand after listening,", // 6
   'You can also press the voice to hear it again.', // 7
   'Okay, now focus on my instructions.', // 8
-  'start!',
+  'start!', //9
 ];
 
 const LearnInfo: React.FC<LearnInfoProps> = ({
@@ -107,23 +108,38 @@ const LearnInfo: React.FC<LearnInfoProps> = ({
     }
   };
 
-  const getMicButtonState = () => {
+const getMicButtonState = () => {
+    // 1. 활성화 단계 (3: 누르기 전, 4: 말하기)
     if (currentStep === 4) return styles.on;
-    if (currentStep === 3 || currentStep === 5) return styles.off;
+    if (currentStep === 3) return styles.off;
+
+    // 2. ⭐ [수정] 0, 1, 9번 단계: 비활성화 상태지만 "선명하게" 보여야 함
+    if (currentStep === 0 || currentStep === 1 || currentStep === 9) {
+      return styles.cleanDisabled;
+    }
+
+    // 3. 나머지 단계 (2, 5~8): 흐릿하게 보여야 함 (오버레이 아래)
     return styles.disabledInfo;
-  }; // ⭐ [추가] 마이크 상태에 따라 이미지를 렌더링하는 함수
+  };
 
   const renderMicIcon = () => {
     const stateClass = getMicButtonState();
-    let micImageSrc = MicOff; // 기본값: off (흰색 배경) // styles.on 클래스가 검은색 배경이라고 가정합니다.
-    if (stateClass === styles.on) {
-      micImageSrc = MicOn;
-    } // styles.off 또는 disabled 상태는 흰색 배경 (MicOff)을 사용합니다.
+    
+    // 기본 이미지는 MicBase
+    let micImageSrc = MicOff; 
+
+    // 3번, 4번 단계일 때만 MicOn/MicOff 사용
+    if (currentStep === 3 || currentStep === 4) {
+      micImageSrc = stateClass === styles.on ? MicOn : MicOff;
+    }
+    
+    // (참고: cleanDisabled나 disabledInfo일 때는 위에서 설정한 MicBase가 그대로 유지됨)
+
     return (
       <img
         src={micImageSrc}
         alt="Mic Status"
-        className={styles.micStatusImage} // CSS로 크기 및 위치 제어
+        className={styles.micStatusImage}
       />
     );
   };

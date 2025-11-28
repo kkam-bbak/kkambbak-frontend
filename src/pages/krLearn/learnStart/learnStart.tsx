@@ -867,7 +867,8 @@ const LearnStart: React.FC = () => {
             </Button>
           </div>
         ) : (
-          <button
+          <div>
+          <Button isFull
             className={`${styles.micButton} ${micOn ? styles.on : styles.off} ${
               isMicButtonDisabled ? styles.disabled : ''
             }`}
@@ -878,11 +879,12 @@ const LearnStart: React.FC = () => {
             disabled={isMicButtonDisabled}
           >
             {renderMicIcon()}
-          </button>
+          </Button>
+          </div>
         )}
       </ContentSection>
       {showExitModal && (
-        <Modal onCloseModal={handleContinueLearning}>
+        <Modal onCloseModal={handleExitLearning}>
         <div className={styles.exitModalOverlay}>
           <div className={styles.exitModalContent}>
             <div className={styles.exitModalCard}>

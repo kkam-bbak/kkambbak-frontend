@@ -30,10 +30,11 @@
 
 /* 대화 기록 스크롤 영역 */
 .turnHistoryArea {
-  height: calc(100% - 145px);
+  height: calc(100% - 72px);
   overflow-y: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
+
 }
 
 .textDisplayBox {
@@ -225,8 +226,9 @@
   justify-content: center;
   width: 100%;
   height: 72px;
-  padding: 0 16px;
+  padding: 16px;
   background-color: transparent;
+  z-index: 100;
 }
 
 /* choice 버튼 스타일 */
