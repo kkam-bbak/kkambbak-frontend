@@ -8,6 +8,7 @@ import Mascot from '@/components/Mascot/Mascot';
 import ContentSection from '@/components/layout/ContentSection/ContentSection';
 import Clock from '@/assets/Clock.png';
 import Button from '@/components/Button/Button';
+import SpinnerIcon from '@/components/icons/SpinnerIcon/SpinnerIcon';
 
 // --- LocalStorage 타입 정의 ---
 const LS_KEY_COMPLETIONS = 'roleplay_completions';
@@ -163,16 +164,14 @@ const RoleList: React.FC = () => {
       <div className={styles.roleListContainer}>
         {/* ⭐ customBackAction 추가 */}
         <Header hasBackButton customBackAction={handleBackClick} />
-        <Mascot image="thinking" text="로딩 중..." />
+        <Mascot image="basic" text={speechBubbleText} />
         <ContentSection color="blue">
           <div className={styles.roleListContentHeader}>
             <h2 className={styles.roleListTitle}>Role Play</h2>
           </div>
-          <div className={styles.roleListItemsContainer}>
-            <p style={{ textAlign: 'center', color: 'white' }}>
-              시나리오 목록을 불러오는 중입니다...
-            </p>
-          </div>
+           <div className={styles.spinnerWrapper}>
+        <SpinnerIcon></SpinnerIcon>
+        </div>
         </ContentSection>
       </div>
     );

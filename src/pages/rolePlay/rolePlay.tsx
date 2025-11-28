@@ -214,26 +214,25 @@ interface TurnContentBoxProps {
   startTtsAndListen: (text: string) => void;
 }
 
+// 히스토리용 컴포넌트
 const TurnContentBox = React.memo(
   ({ data, isTtsPlaying, startTtsAndListen }: TurnContentBoxProps) => {
     const isRecordingTurn = data.speaker === 'AI';
     const isUser = data.speaker === 'USER';
-    const romanizedClass = styles.correctRom;
+    
+    const romanizedClass = styles.colorDefault; 
     const role = data.speaker;
 
-    const textAlignmentClass = isUser ? styles.textRight : '';
     const rowDirectionClass = isUser ? styles.rowReverse : '';
+    const textAlignmentClass = isUser ? styles.textRight : '';
     const rolePositionClass = isUser ? styles.userRole : styles.aiRole;
+    const tailClass = isUser ? styles.tailUser : styles.tailAI;
 
     return (
-      <div className={styles.turnWrapper}>
+      <div className={`${styles.turnWrapper} ${isUser ? styles.userTurn : ''}`}>
         <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
-          <div
-            className={`${styles.textLine} ${styles.koreanLine} ${rowDirectionClass}`}
-          >
-            <span
-              className={`${styles.koreanText} ${styles.historyKorean} ${textAlignmentClass}`}
-            >
+          <div className={`${styles.textLine} ${styles.koreanLine} ${rowDirectionClass}`}>
+            <span className={`${styles.koreanText} ${styles.historyKorean} ${textAlignmentClass} ${styles.colorDefault}`}>
               {data.korean}
             </span>
 
@@ -258,18 +257,15 @@ const TurnContentBox = React.memo(
 
           <div className={styles.divider} />
 
-          <div
-            className={`${styles.textLine} ${styles.romanizedLine} ${rowDirectionClass}`}
-          >
-            <span
-              className={`${styles.romanizedText} ${styles.historyRomanized} ${romanizedClass} ${textAlignmentClass}`}
-            >
+          <div className={`${styles.textLine} ${styles.romanizedLine} ${rowDirectionClass}`}>
+            <span className={`${styles.romanizedText} ${styles.historyRomanized} ${romanizedClass} ${textAlignmentClass} ${styles.colorDefault}`}>
               {data.romanized}
             </span>
             <span className={`${styles.smallMicIcon} ${styles.active}`}>
               <img
                 src={MicBase}
                 alt="Mic"
+                className={styles.filterDefault}
                 style={{
                   width: '20px',
                   height: '20px',
@@ -280,25 +276,19 @@ const TurnContentBox = React.memo(
           </div>
 
           <div className={styles.divider} />
-          <div className={`${styles.textLine} ${styles.romanizedLine}`}>
-            <span
-              className={`${styles.englishText} ${styles.historyEnglish} ${textAlignmentClass}`}
-            >
+          <div className={`${styles.textLine} ${styles.romanizedLine} ${rowDirectionClass}`}>
+            <span className={`${styles.englishText} ${styles.historyEnglish} ${textAlignmentClass} ${styles.colorBlue}`}>
               {data.english}
             </span>
           </div>
           <img
             src={isUser ? TailUser : TailAI}
-            className={`${styles.tailIcon} ${
-              isUser ? styles.tailUser : styles.tailAI
-            }`}
+            className={`${styles.tailIcon} ${tailClass}`}
             alt="tail"
           />
         </div>
 
-        <div
-          className={`${styles.roleContainer} ${styles.costomer} ${rolePositionClass}`}
-        >
+        <div className={`${styles.roleContainer} ${styles.costomer} ${rolePositionClass}`}>
           <span className={styles.roleTag}>{role}</span>
         </div>
       </div>
@@ -312,6 +302,7 @@ const RolePlay: React.FC = () => {
   const { roleId } = useParams<{ roleId: string }>();
   const scenarioId = roleId;
 
+  // ... (State 및 Ref 등 기존 코드 유지) ...
   interface LocationState {
     wordsToRetry?: any[];
     isRetryWrong?: boolean;
@@ -325,23 +316,18 @@ const RolePlay: React.FC = () => {
   const initialTitle = state?.scenarioTitle || 'Role Play_At a Cafe';
   const [scenarioTitle, setScenarioTitle] = useState(initialTitle);
 
-  const hasFetched = useRef(false);
-  const startTimeRef = useRef<number>(0);
-  const resultsRef = useRef<any[]>([]);
+  const sessionStartTimeRef = useRef<number>(Date.now());
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const ttsPlayedRef = useRef<{ [key: string]: boolean }>({});
   const audioMimeTypeRef = useRef<string>('audio/wav');
-  const sessionStartTimeRef = useRef<number>(Date.now());
+  const timerRef = useRef<number | null>(null);
+  const flowTimerRef = useRef<number | null>(null);
 
   const [sessionId, setSessionId] = useState<number | null>(null);
-  const [currentDialogue, setCurrentDialogue] = useState<DialogueData | null>(
-    null,
-  );
+  const [currentDialogue, setCurrentDialogue] = useState<DialogueData | null>(null);
   const [turnHistory, setTurnHistory] = useState<DialogueData[]>([]);
-  const [practiceLineData, setPracticeLineData] = useState<DialogueData | null>(
-    null,
-  );
+  const [practiceLineData, setPracticeLineData] = useState<DialogueData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -349,20 +335,14 @@ const RolePlay: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isTtsPlaying, setIsTtsPlaying] = useState(false);
   const [gradingResult, setGradingResult] = useState<string | null>(null);
-  const [recordingCountdown, setRecordingCountdown] = useState(10);
   const [selectedChoiceId, setSelectedChoiceId] = useState<number | null>(null);
   const [ttsOptionId, setTtsOptionId] = useState<number | null>(null);
   const [isLoadingNextTurn, setIsLoadingNextTurn] = useState(false);
-  const [selectedChoiceData, setSelectedChoiceData] =
-    useState<DialogueData | null>(null);
+  const [selectedChoiceData, setSelectedChoiceData] = useState<DialogueData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalText, setModalText] = useState('');
 
   const [showLoadingMessage, setShowLoadingMessage] = useState(false);
-
-  const timerRef = useRef<number | null>(null);
-  const flowTimerRef = useRef<number | null>(null);
-
   const [showExitModal, setShowExitModal] = useState(false);
 
   const modalOpen = (message: string) => {
@@ -387,6 +367,7 @@ const RolePlay: React.FC = () => {
     setShowExitModal(false);
   }, []);
 
+  // ... (speakKoreanText, useEffect 등 기존 코드 유지) ...
   const speakKoreanText = useCallback(
     (text: string, onFinish: ((success: boolean) => void) | null = null) => {
       if (!('speechSynthesis' in window)) {
@@ -423,9 +404,7 @@ const RolePlay: React.FC = () => {
       try {
         setIsLoading(true);
         sessionStartTimeRef.current = Date.now();
-        const initialDialogue = await startRoleplaySession(
-          parseInt(scenarioId),
-        );
+        const initialDialogue = await startRoleplaySession(parseInt(scenarioId));
         setSessionId(initialDialogue.sessionId);
         setCurrentDialogue(initialDialogue);
         setError(null);
@@ -437,15 +416,11 @@ const RolePlay: React.FC = () => {
         const status = err?.response?.data?.status;
         const errorMsg = status?.message || err?.message || 'Unknown error';
 
-        if (
-          errorMsg.includes('Credit limit') ||
-          errorMsg === 'Credit limit standard'
-        ) {
+        if (errorMsg.includes('Credit limit') || errorMsg === 'Credit limit standard') {
           modalOpen('크레딧이 부족합니다. 충전 페이지로 이동합니다.');
           navigate('/payment/checkout');
           return;
         }
-
         setError(`Failed to start roleplay: ${errorMsg}`);
       } finally {
         setIsLoading(false);
@@ -461,7 +436,7 @@ const RolePlay: React.FC = () => {
       }
     }, 100);
     return () => clearTimeout(timeout);
-  }, [turnHistory, step, selectedChoiceId, showLoadingMessage]);
+  }, [turnHistory, step, selectedChoiceId, showLoadingMessage, isLoadingNextTurn]);
 
   useEffect(() => {
     let loadingTimer: ReturnType<typeof setTimeout>;
@@ -508,10 +483,8 @@ const RolePlay: React.FC = () => {
         delete ttsPlayedRef.current[`listen-${nextDialogue.dialogueId}`];
         delete ttsPlayedRef.current[`practice-${nextDialogue.dialogueId}`];
 
-        const nextStep =
-          nextDialogue.speaker === 'AI' ? STEPS.LISTEN : STEPS.CHOICE_SETUP;
+        const nextStep = nextDialogue.speaker === 'AI' ? STEPS.LISTEN : STEPS.CHOICE_SETUP;
         setStep(nextStep);
-        setIsLoadingNextTurn(false);
       } catch (err: any) {
         if (err?.response?.data?.status?.statusCode === 'R016') {
           try {
@@ -544,18 +517,19 @@ const RolePlay: React.FC = () => {
           } catch (completeErr) {
             setError('세션 완료 처리 중 오류가 발생했습니다.');
             setStep(STEPS.DONE);
-            setIsLoadingNextTurn(false);
           }
         } else {
           setError('다음 대사를 불러올 수 없습니다.');
           setStep(STEPS.DONE);
-          setIsLoadingNextTurn(false);
         }
+      } finally {
+        setIsLoadingNextTurn(false);
       }
     },
     [sessionId, navigate, turnHistory, scenarioId, scenarioTitle],
   );
 
+  // ... (handleRecordingGrading, handlePracticeGrading, handleTtsPlaybackFinished, handleChoiceOptionClick 등 기존 코드 유지) ...
   const handleRecordingGrading = useCallback(
     (feedback: string) => {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -627,14 +601,8 @@ const RolePlay: React.FC = () => {
       setIsTtsPlaying(false);
       if (flowTimerRef.current) clearTimeout(flowTimerRef.current);
 
-      if (
-        success &&
-        (step === STEPS.LISTEN || step === STEPS.PRACTICE_LISTEN)
-      ) {
-        const nextStep =
-          step === STEPS.LISTEN
-            ? STEPS.LISTEN_DONE
-            : STEPS.PRACTICE_LISTEN_DONE;
+      if (success && (step === STEPS.LISTEN || step === STEPS.PRACTICE_LISTEN)) {
+        const nextStep = step === STEPS.LISTEN ? STEPS.LISTEN_DONE : STEPS.PRACTICE_LISTEN_DONE;
         setTimeout(() => {
           setStep(nextStep);
         }, 500);
@@ -696,13 +664,7 @@ const RolePlay: React.FC = () => {
         startTtsAndListen(textToSpeak);
       }
     }
-  }, [
-    step,
-    currentDialogue,
-    practiceLineData,
-    isTtsPlaying,
-    startTtsAndListen,
-  ]);
+  }, [step, currentDialogue, practiceLineData, isTtsPlaying, startTtsAndListen]);
 
   useEffect(() => {
     if (step === STEPS.LISTEN && currentDialogue) {
@@ -806,15 +768,14 @@ const RolePlay: React.FC = () => {
           audio: true,
         });
         let mimeType = '';
-        // ⭐ 수정 1: Mac(Safari) 호환 포맷(mp4, aac) 우선순위 및 지원 리스트 추가
         const supportedTypes = [
-          'audio/webm;codecs=opus', // Chrome/Firefox (최적)
+          'audio/webm;codecs=opus',
           'audio/webm',
           'audio/wav',
           'audio/ogg',
-          'audio/mp4', // Safari (Mac/iOS)
-          'audio/aac', // Safari Fallback
-          'audio/x-m4a', // Safari Fallback
+          'audio/mp4',
+          'audio/aac',
+          'audio/x-m4a',
         ];
         for (const type of supportedTypes) {
           if (MediaRecorder.isTypeSupported(type)) {
@@ -873,9 +834,8 @@ const RolePlay: React.FC = () => {
         }
 
         const mimeType = audioMimeTypeRef.current;
-        let fileExtension = 'wav'; // 기본값
+        let fileExtension = 'wav';
 
-        // ⭐ 수정 2: 브라우저가 제공한 MimeType에 맞춰 정확한 확장자 매핑
         if (mimeType.includes('webm')) {
           fileExtension = 'webm';
         } else if (
@@ -883,16 +843,12 @@ const RolePlay: React.FC = () => {
           mimeType.includes('aac') ||
           mimeType.includes('m4a')
         ) {
-          fileExtension = 'm4a'; // Mac/Safari용 확장자 (서버 지원 리스트 포함됨)
+          fileExtension = 'm4a';
         } else if (mimeType.includes('ogg')) {
           fileExtension = 'ogg';
         } else if (mimeType.includes('wav')) {
           fileExtension = 'wav';
         }
-
-        console.log(
-          `📤 Sending Audio: MIME=${mimeType}, Extension=.${fileExtension}`,
-        );
 
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         const audioFile = new File(
@@ -1002,10 +958,11 @@ const RolePlay: React.FC = () => {
 
   if (isLoading)
     return (
-      <div className={styles['loading-page']}>
-        <SpinnerIcon></SpinnerIcon>
+      <div className={styles.spinnerWrapper}>
+        <SpinnerIcon />
       </div>
     );
+
   if (error || !currentDialogue)
     return (
       <div className={styles.pageContainer}>
@@ -1039,36 +996,28 @@ const RolePlay: React.FC = () => {
     const isCurrentlySpeaking = window.speechSynthesis.speaking;
 
     if (isLoadingNextTurn) {
-      if (showLoadingMessage) {
-        return (
-          <div className={styles.activeTurnRecordingFlow}>
-            <div className={styles.turnWrapper}>
-              <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
-                <div
-                  style={{
-                    padding: '20px 15px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <span className={styles.koreanText}>Loading...</span>
-                </div>
-                <img
-                  src={TailAI}
-                  className={`${styles.tailIcon} ${styles.tailAI}`}
-                  alt="tail"
-                />
+      const isUserLoading = currentDialogue?.speaker === 'AI'; 
+
+      return (
+        <div className={styles.activeTurnRecordingFlow}>
+          <div className={`${styles.turnWrapper} ${isUserLoading ? styles.userTurn : ''}`}>
+            <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
+              <div className={styles.spinnerWrapperBox}>
+                <SpinnerIcon />
               </div>
-              <div
-                className={`${styles.roleContainer} ${styles.costomer} ${styles.aiRole}`}
-              >
-                <span className={styles.roleTag}>AI</span>
-              </div>
+              {!isModalOpen && !showExitModal && (
+                <>
+                  {!isUserLoading && <img src={TailAI} className={`${styles.tailIcon} ${styles.tailAI}`} alt="tail" />}
+                  {isUserLoading && <img src={TailUser} className={`${styles.tailIcon} ${styles.tailUser}`} alt="tail" />}
+                </>
+              )}
+            </div>
+            <div className={`${styles.roleContainer} ${isUserLoading ? styles.userRole : styles.aiRole}`}>
+              <span className={styles.roleTag}>{isUserLoading ? 'User' : 'AI'}</span>
             </div>
           </div>
-        );
-      }
-      return null;
+        </div>
+      );
     }
 
     if (
@@ -1094,23 +1043,31 @@ const RolePlay: React.FC = () => {
         step === STEPS.SPEAK_SETUP ||
         step === STEPS.RECORDING ||
         step === STEPS.LISTEN_DONE;
-      const mainMicButtonClass = isMicActionable
-        ? isRecording
-          ? styles.on
-          : styles.off
-        : `${styles.off} ${styles.disabled}`;
+      
+      let koreanColorClass = styles.colorDefault; 
+      let romanizedColorClass = styles.colorDefault;
+      let micFilterClass = styles.filterDefault;
+      let speakerFilterClass = styles.filterDefault;
 
-      const getRomClass = () => {
-        if (step === STEPS.GRADING) {
-          return gradingResult === 'CORRECT'
-            ? styles.correctActive
-            : gradingResult === 'INCORRECT' || gradingResult === 'OOS'
-            ? styles.incorrectActive
-            : '';
+      if (step === STEPS.LISTEN || isTtsPlaying) {
+        koreanColorClass = styles.colorWhite;
+        speakerFilterClass = styles.filterWhite;
+      }
+
+      if (step === STEPS.SPEAK_SETUP) {
+        romanizedColorClass = styles.colorWhite;
+      } else if (step === STEPS.RECORDING) {
+        romanizedColorClass = styles.colorWhite;
+        micFilterClass = styles.filterWhite;
+      } else if (step === STEPS.GRADING) {
+        if (gradingResult === 'CORRECT') {
+          romanizedColorClass = styles.colorGreen;
+          micFilterClass = styles.filterGreen;
+        } else if (gradingResult === 'INCORRECT' || gradingResult === 'OOS') {
+          romanizedColorClass = styles.colorRed;
+          micFilterClass = styles.filterRed;
         }
-        return '';
-      };
-      const currentGradeClass = getRomClass();
+      }
 
       return (
         <div className={styles.activeTurnRecordingFlow}>
@@ -1118,7 +1075,7 @@ const RolePlay: React.FC = () => {
             <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
               <div className={`${styles.textLine} ${styles.koreanLine}`}>
                 <span
-                  className={`${styles.koreanText} ${currentGradeClass}`}
+                  className={`${styles.koreanText} ${koreanColorClass}`}
                 >
                   {currentDialogue.korean}
                 </span>
@@ -1132,6 +1089,7 @@ const RolePlay: React.FC = () => {
                   <img
                     src={SoundImg}
                     alt="TTS"
+                    className={speakerFilterClass}
                     style={{ width: '20px', height: '20px' }}
                   />
                 </button>
@@ -1139,7 +1097,7 @@ const RolePlay: React.FC = () => {
               <div className={styles.divider} />
               <div className={`${styles.textLine} ${styles.romanizedLine}`}>
                 <span
-                  className={`${styles.romanizedText} ${currentGradeClass}`}
+                  className={`${styles.romanizedText} ${romanizedColorClass}`}
                 >
                   {currentDialogue.romanized}
                 </span>
@@ -1151,22 +1109,25 @@ const RolePlay: React.FC = () => {
                   <img
                     src={MicBase}
                     alt="Mic Indicator"
+                    className={micFilterClass}
                     style={{ width: '20px', height: '20px' }}
                   />
                 </span>
               </div>
               <div className={styles.divider} />
               <div className={`${styles.textLine}`}>
-                <span className={`${styles.englishText} ${currentGradeClass}`}>
+                <span className={`${styles.englishText} ${styles.colorBlue}`}>
                   {currentDialogue.english}
                 </span>
               </div>
 
-              <img
-                src={TailAI}
-                className={`${styles.tailIcon} ${styles.tailAI}`}
-                alt="tail"
-              />
+              {!isModalOpen && !showExitModal && (
+                <img
+                  src={TailAI}
+                  className={`${styles.tailIcon} ${styles.tailAI}`}
+                  alt="tail"
+                />
+              )}
             </div>
             <div
               className={`${styles.roleContainer} ${styles.costomer} ${styles.aiRole}`}
@@ -1177,23 +1138,26 @@ const RolePlay: React.FC = () => {
             </div>
           </div>
 
-          <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
-            <Button
-              className={styles['record-button']}
-              onMouseDown={handleMicPress}
-              onMouseUp={handleMicRelease}
-              onTouchStart={handleMicPress}
-              onTouchEnd={handleMicRelease}
-              disabled={!isMicActionable || isCurrentlySpeaking}
-              isFull
-            >
-              <img
-                className={styles['mic-image']}
-                src={isRecording ? MicOn : MicOff}
-                alt={isRecording ? 'On' : 'Off'}
-              />
-            </Button>
-          </div>
+          {!isModalOpen && !showExitModal && (
+            <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
+              <Button
+                className={styles['record-button']}
+                onMouseDown={handleMicPress}
+                onMouseUp={handleMicRelease}
+                onTouchStart={handleMicPress}
+                onTouchEnd={handleMicRelease}
+                disabled={!isMicActionable || isCurrentlySpeaking}
+                isFull
+              >
+                <img
+                  className={styles['mic-image']}
+                  src={isRecording ? MicOn : MicOff}
+                  alt={isRecording ? 'On' : 'Off'}
+                  style={isRecording ? { filter: 'brightness(0) invert(1)' } : {}}
+                />
+              </Button>
+            </div>
+          )}
         </div>
       );
     }
@@ -1204,20 +1168,42 @@ const RolePlay: React.FC = () => {
         return <div>No choices</div>;
       const isDisabled = step === STEPS.CHOICE_FEEDBACK || isCurrentlySpeaking;
       const isSubmitActive = selectedChoiceId !== null;
-      const submitButtonClass = isSubmitActive
-        ? styles.on
-        : `${styles.off} ${styles.disabled}`;
 
       let displayOption = customerData.find((c) => c.id === selectedChoiceId);
       if (!displayOption && step === STEPS.CHOICE_SETUP)
         displayOption = customerData[0];
+
+      let koreanColorClass = styles.colorDefault; 
+      let romanizedColorClass = styles.colorDefault;
+      let englishTextColorClass = styles.colorBlue; 
+      let speakerFilterClass = styles.filterDefault;
+
+      const isThisOptionPlaying = isCurrentlySpeaking && ttsOptionId === displayOption.id;
+      
+      // ⭐ [수정] 카드 섹션: TTS 재생 시 Korean & 스피커만 흰색 (Romanized 변동 X)
+      if (isThisOptionPlaying) {
+        koreanColorClass = styles.colorWhite;
+        speakerFilterClass = styles.filterWhite;
+      }
+
+      if (step === STEPS.CHOICE_FEEDBACK) {
+        if (gradingResult === 'CORRECT') {
+          koreanColorClass = styles.colorGreen;
+          romanizedColorClass = styles.colorGreen;
+          englishTextColorClass = styles.colorGreen;
+        } else if (gradingResult === 'INCORRECT') {
+          koreanColorClass = styles.colorRed;
+          romanizedColorClass = styles.colorRed;
+          englishTextColorClass = styles.colorRed;
+        }
+      }
 
       return (
         <>
           {displayOption &&
             (step === STEPS.CHOICE_SETUP ||
               step === STEPS.CHOICE_FEEDBACK) && (
-              <div className={styles.turnWrapper}>
+              <div className={`${styles.turnWrapper} ${styles.userTurn}`}>
                 <div
                   className={`${styles.textDisplayBox} ${styles.historyBox}`}
                 >
@@ -1225,7 +1211,7 @@ const RolePlay: React.FC = () => {
                     className={`${styles.textLine} ${styles.koreanLine} ${styles.rowReverse}`}
                   >
                     <span
-                      className={`${styles.koreanText} ${styles.textRight}`}
+                      className={`${styles.koreanText} ${styles.textRight} ${koreanColorClass}`}
                     >
                       {displayOption.korean}
                     </span>
@@ -1247,6 +1233,7 @@ const RolePlay: React.FC = () => {
                       <img
                         src={SoundImg}
                         alt="TTS"
+                        className={speakerFilterClass}
                         style={{ width: '20px', height: '20px' }}
                       />
                     </button>
@@ -1258,7 +1245,7 @@ const RolePlay: React.FC = () => {
                     className={`${styles.textLine} ${styles.romanizedLine} ${styles.rowReverse}`}
                   >
                     <span
-                      className={`${styles.romanizedText} ${styles.textRight}`}
+                      className={`${styles.romanizedText} ${styles.textRight} ${romanizedColorClass}`}
                     >
                       {displayOption.romanized}
                     </span>
@@ -1280,16 +1267,18 @@ const RolePlay: React.FC = () => {
                   <div className={styles.divider} />
 
                   <span
-                    className={`${styles.englishText} ${styles.textRight}`}
+                    className={`${styles.englishText} ${styles.textRight} ${englishTextColorClass}`}
                   >
                     {displayOption.english}
                   </span>
 
-                  <img
-                    src={TailUser}
-                    className={`${styles.tailIcon} ${styles.tailUser}`}
-                    alt="tail"
-                  />
+                  {!isModalOpen && !showExitModal && (
+                    <img
+                      src={TailUser}
+                      className={`${styles.tailIcon} ${styles.tailUser}`}
+                      alt="tail"
+                    />
+                  )}
                 </div>
                 <div
                   className={`${styles.roleContainer} ${styles.costomer} ${styles.userRole}`}
@@ -1300,30 +1289,32 @@ const RolePlay: React.FC = () => {
                 </div>
               </div>
             )}
-          <div className={`${styles.micArea} ${styles.choiceButton}`}>
-            <div className={styles.choices}>
-              {customerData.map((option) => (
-                <Button
-                  key={option.id}
-                  onClick={() =>
-                    handleChoiceOptionClick(option.id, option.korean)
-                  }
-                  isFull
-                  disabled={isDisabled}
-                  selected={option.id === selectedChoiceId}
-                >
-                  {option.id}
-                </Button>
-              ))}
+          {!isModalOpen && !showExitModal && (
+            <div className={`${styles.micArea} ${styles.choiceButton}`}>
+              <div className={styles.choices}>
+                {customerData.map((option) => (
+                  <Button
+                    key={option.id}
+                    onClick={() =>
+                      handleChoiceOptionClick(option.id, option.korean)
+                    }
+                    isFull
+                    disabled={isDisabled}
+                    selected={option.id === selectedChoiceId}
+                  >
+                    {option.id}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                onClick={handleChoiceSelect}
+                disabled={!isSubmitActive}
+                isFull
+              >
+                Select
+              </Button>
             </div>
-            <Button
-              onClick={handleChoiceSelect}
-              disabled={!isSubmitActive}
-              isFull
-            >
-              Select
-            </Button>
-          </div>
+          )}
         </>
       );
     }
@@ -1333,25 +1324,12 @@ const RolePlay: React.FC = () => {
         step === STEPS.PRACTICE_SPEAK ||
         step === STEPS.PRACTICE_LISTEN_DONE;
       
-      const currentGradeClass =
-        step === STEPS.PRACTICE_GRADING
-          ? gradingResult === 'CORRECT'
-            ? styles.correctActive
-            : styles.incorrectActive
-          : '';
       const isTtsActionable =
         step === STEPS.PRACTICE_LISTEN || step === STEPS.PRACTICE_SPEAK;
 
-      // 🔥 [수정된 부분]
       const isMicActionable =
         step === STEPS.PRACTICE_SPEAK || 
         step === STEPS.PRACTICE_LISTEN_DONE;
-
-      const mainMicButtonClass = isMicActionable
-        ? isRecording
-          ? styles.on
-          : styles.off
-        : `${styles.off} ${styles.disabled}`;
 
       const isPracticeUser = practiceLineData.speaker === 'USER';
       const practiceAlign = isPracticeUser ? styles.textRight : '';
@@ -1359,16 +1337,51 @@ const RolePlay: React.FC = () => {
       const practiceRole = isPracticeUser
         ? styles.userRole
         : styles.aiRole;
+      const practiceTurnClass = isPracticeUser ? styles.userTurn : '';
+      const practiceTail = isPracticeUser ? styles.tailUser : styles.tailAI;
+
+      // ⭐ [수정] Practice Flow 색상 로직
+      let koreanColorClass = styles.colorDefault;
+      let romanizedColorClass = styles.colorDefault;
+      let micFilterClass = styles.filterDefault;
+      let speakerFilterClass = styles.filterDefault;
+
+      // 1. TTS 재생 시: 한국어 & 스피커 흰색 (기존 colorDefault 덮어쓰기)
+      if (step === STEPS.PRACTICE_LISTEN || isTtsPlaying) {
+         koreanColorClass = styles.colorWhite;
+         speakerFilterClass = styles.filterWhite;
+      }
+
+      // 2. 말하기 준비 단계 (Romanized 흰색)
+      if (step === STEPS.PRACTICE_SPEAK) {
+         romanizedColorClass = styles.colorWhite;
+      }
+      
+      // 3. 녹음 중: 작은 마이크 & 메인 마이크 흰색 (로마자는 원래 색상)
+      if (isRecording || step === STEPS.RECORDING) { 
+         micFilterClass = styles.filterWhite;
+      }
+      
+      // 4. 채점 결과
+      if (step === STEPS.PRACTICE_GRADING) {
+        if (gradingResult === 'CORRECT') {
+          romanizedColorClass = styles.colorGreen;
+          micFilterClass = styles.filterGreen;
+        } else if (gradingResult === 'INCORRECT') {
+          romanizedColorClass = styles.colorRed;
+          micFilterClass = styles.filterRed;
+        }
+      }
 
       return (
         <div className={styles.activeTurnRecordingFlow}>
-          <div className={styles.turnWrapper}>
+          <div className={`${styles.turnWrapper} ${practiceTurnClass}`}>
             <div className={`${styles.textDisplayBox} ${styles.historyBox}`}>
               <div
                 className={`${styles.textLine} ${styles.koreanLine} ${practiceRow}`}
               >
                 <span
-                  className={`${styles.koreanText} ${currentGradeClass} ${practiceAlign}`}
+                  className={`${styles.koreanText} ${practiceAlign} ${koreanColorClass}`}
                 >
                   {practiceLineData.korean}
                 </span>
@@ -1382,6 +1395,8 @@ const RolePlay: React.FC = () => {
                   <img
                     src={SoundImg}
                     alt="TTS"
+                    // ⭐ [수정] 스피커 이미지 필터 적용
+                    className={speakerFilterClass}
                     style={{ width: '20px', height: '20px' }}
                   />
                 </button>
@@ -1391,7 +1406,7 @@ const RolePlay: React.FC = () => {
                 className={`${styles.textLine} ${styles.romanizedLine} ${practiceRow}`}
               >
                 <span
-                  className={`${styles.romanizedText} ${currentGradeClass} ${practiceAlign}`}
+                  className={`${styles.romanizedText} ${romanizedColorClass} ${practiceAlign}`}
                 >
                   {practiceLineData.romanized}
                 </span>
@@ -1405,24 +1420,26 @@ const RolePlay: React.FC = () => {
                   <img
                     src={MicBase}
                     alt="Mic"
+                    // ⭐ [수정] 마이크 이미지 필터 적용
+                    className={micFilterClass}
                     style={{ width: '20px', height: '20px' }}
                   />
                 </span>
               </div>
               <div className={styles.divider} />
               <span
-                className={`${styles.englishText} ${currentGradeClass} ${practiceAlign}`}
+                className={`${styles.englishText} ${styles.colorBlue} ${practiceAlign}`}
               >
                 {practiceLineData.english}
               </span>
 
-              <img
-                src={isPracticeUser ? TailUser : TailAI}
-                className={`${styles.tailIcon} ${
-                  isPracticeUser ? styles.tailUser : styles.tailAI
-                }`}
-                alt="tail"
-              />
+              {!isModalOpen && !showExitModal && (
+                <img
+                  src={isPracticeUser ? TailUser : TailAI}
+                  className={`${styles.tailIcon} ${practiceTail}`}
+                  alt="tail"
+                />
+              )}
             </div>
             <div
               className={`${styles.roleContainer} ${styles.customer} ${practiceRole}`}
@@ -1433,23 +1450,27 @@ const RolePlay: React.FC = () => {
             </div>
           </div>
 
-          <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
-            <Button
-              className={styles['record-button']}
-              onMouseDown={handleMicPress}
-              onMouseUp={handleMicRelease}
-              onTouchStart={handleMicPress}
-              onTouchEnd={handleMicRelease}
-              disabled={!isMicActionable || isCurrentlySpeaking}
-              isFull
-            >
-              <img
-                className={styles['mic-image']}
-                src={isRecording ? MicOn : MicOff}
-                alt={isRecording ? 'On' : 'Off'}
-              />
-            </Button>
-          </div>
+          {!isModalOpen && !showExitModal && (
+            <div className={`${styles.micArea} ${styles.fullWidthMic}`}>
+              <Button
+                className={styles['record-button']}
+                onMouseDown={handleMicPress}
+                onMouseUp={handleMicRelease}
+                onTouchStart={handleMicPress}
+                onTouchEnd={handleMicRelease}
+                disabled={!isMicActionable || isCurrentlySpeaking}
+                isFull
+              >
+                <img
+                  className={styles['mic-image']}
+                  src={isRecording ? MicOn : MicOff}
+                  alt={isRecording ? 'On' : 'Off'}
+                  // ⭐ [수정] 녹음 중일 때 하단 마이크 이미지 흰색 필터 적용
+                  style={isRecording ? { filter: 'brightness(0) invert(1)' } : {}}
+                />
+              </Button>
+            </div>
+          )}
         </div>
       );
     }
@@ -1486,9 +1507,9 @@ const RolePlay: React.FC = () => {
         </div>
       </ContentSection>
 
+      {/* Exit Modal */}
       {showExitModal && (
-        <div className={styles.exitModalOverlay}>
-          <div className={styles.exitModalContent}>
+        <Modal onCloseModal={handleExitCancel}>
             <div className={styles.exitModalCard}>
               <div className={styles.exitModalQuestion}>
                 Are you sure you want to quit
@@ -1496,23 +1517,28 @@ const RolePlay: React.FC = () => {
                 Role Play and go back?
               </div>
               <div className={styles.exitModalButtons}>
-                <Button onClick={handleExitCancel} isFull>
+                <Button 
+                  onClick={handleExitCancel} 
+                  className={styles.exitButtonNo}
+                >
                   No
                 </Button>
-                <Button onClick={handleExitConfirm} isFull>
+                <Button 
+                  onClick={handleExitConfirm} 
+                  className={styles.exitButtonYes}
+                >
                   Yes
                 </Button>
               </div>
             </div>
-          </div>
-        </div>
+        </Modal>
       )}
 
       {isModalOpen && (
         <Modal onCloseModal={modalClose}>
           <p className={styles['modal-message']}>{modalText}</p>
           <Button isFull onClick={modalClose}>
-            Yes
+            OK
           </Button>
         </Modal>
       )}

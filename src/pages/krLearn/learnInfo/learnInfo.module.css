@@ -244,13 +244,9 @@
 .off {
   background-color: white;
   color: black;
+  border: 2px solid #ff5000;
 }
 
-.disabledInfo {
-  background-color: rgba(255, 255, 255, 0.5);
-  color: rgba(0, 0, 0, 0.4);
-  cursor: not-allowed;
-}
 
 
 /* 마스코트 래퍼 */
@@ -272,3 +268,36 @@
 }
 
 
+/* -------------------- 0, 1, 9번 단계 (선명한 배경) -------------------- */
+.cleanDisabled {
+  background-color: white !important;
+  border: 2px solid #E3E3E3 !important;
+  cursor: not-allowed;
+  
+  /* 오버레이 위로 올라오게 설정 (선명함) */
+  opacity: 1; 
+  z-index: 20; 
+}
+
+/* ⭐ [핵심] 0, 1, 9번일 때 아이콘 색상을 #E3E3E3로 변경 */
+.cleanDisabled .micStatusImage {
+  filter: invert(89%); 
+  opacity: 1;
+}
+
+/* -------------------- 2, 5~8번 단계 (흐린 배경) -------------------- */
+.disabledInfo {
+  background-color: white !important;
+  border: 2px solid #E3E3E3 !important;
+  cursor: not-allowed;
+  
+  /* 오버레이 아래로 들어가게 설정 (흐려짐) */
+  z-index: 5 !important; 
+  opacity: 0.5;
+}
+
+/* ⭐ [핵심] 2, 5~8번일 때도 아이콘 색상을 #E3E3E3로 변경 */
+.disabledInfo .micStatusImage {
+  filter: invert(89%); 
+  opacity: 1;
+}

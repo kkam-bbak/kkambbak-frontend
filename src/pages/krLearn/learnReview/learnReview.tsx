@@ -237,8 +237,8 @@ const LearnReview: React.FC = () => {
 
   if (reviewData.isLoading) {
     return (
-      <div className={styles.spinner}>
-        <SpinnerIcon />
+      <div className={styles.spinnerWrapper}>
+        <SpinnerIcon></SpinnerIcon>
       </div>
     );
   }
